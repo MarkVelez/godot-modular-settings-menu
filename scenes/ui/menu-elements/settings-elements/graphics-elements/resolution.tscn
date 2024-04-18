@@ -1,0 +1,78 @@
+[gd_scene load_steps=2 format=3 uid="uid://cn8r63dmvd55c"]
+
+[sub_resource type="GDScript" id="GDScript_utf5l"]
+resource_name = "resolution"
+script/source = "extends HBoxContainer
+
+@onready var options: OptionButton = %Options
+
+var selectedId: int
+
+var RESOLUTIONS: Dictionary = {
+	\"3840x2160\": Vector2i(3840, 2160),
+	\"2560x1440\": Vector2i(2560, 1440),
+	\"1920x1080\": Vector2i(1920, 1080),
+	\"1280x720\": Vector2i(1280, 720)
+}
+
+
+func _ready():
+	initialize_resolutions()
+
+
+func _process(_delta):
+	if owner.CURRENT_SETTINGS[\"graphics\"][\"displayMode\"] != \"Windowed\":
+		if !options.disabled:
+			options.disabled = true
+	else:
+		if options.disabled:
+			options.disabled = false
+
+
+func initialize_resolutions() -> void:
+	var currentResolution: String = SettingsDataManager.SETTINGS_DATA[\"graphics\"][\"resolution\"]
+	var id: int = 0
+	
+	for resolution in RESOLUTIONS:
+		options.add_item(resolution, id)
+		if resolution == currentResolution:
+			options.select(id)
+			selectedId = id
+		
+		id += 1
+
+
+func resolution_selected(index: int) -> void:
+	owner.CURRENT_SETTINGS[\"graphics\"][\"resolutions\"] = options.get_item_text(index)
+	selectedId = index
+
+
+func apply_settings() -> void:
+	var selected: String = options.get_item_text(selectedId)
+	
+	DisplayServer.window_set_size(RESOLUTIONS[selected])
+	get_window().move_to_center()
+"
+
+[node name="Resolution" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_utf5l")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Resolution"
+vertical_alignment = 1
+
+[node name="Options" type="OptionButton" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+
+[connection signal="item_selected" from="Options" to="." method="resolution_selected"]

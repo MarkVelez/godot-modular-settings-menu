@@ -1,0 +1,157 @@
+[gd_scene load_steps=2 format=3 uid="uid://cqqhgk8ufkmqa"]
+
+[sub_resource type="GDScript" id="GDScript_0eq0v"]
+script/source = "extends Control
+
+@onready var inputButtonScene = preload(\"input_button.tscn\")
+@onready var actionList = %actionList
+
+var isRemapping: bool = false
+var actionToRemap = null
+var remappingButton = null
+
+var inputActions: Dictionary = {
+	\"up\": \"Forward\",
+	\"down\": \"Backward\",
+	\"left\": \"Left\",
+	\"right\": \"Right\",
+	\"jump\": \"Jump\",
+	\"exit\": \"Pause\"
+}
+
+
+func _ready():
+	createActionList()
+
+
+func createActionList():
+	InputMap.load_from_project_settings()
+	for item in actionList.get_children():
+		item.queue_free()
+	
+	for action in inputActions:
+		var button = inputButtonScene.instantiate()
+		var actionLabel = button.find_child(\"labelAction\")
+		var inputLabel = button.find_child(\"labelInput\")
+		
+		actionLabel.text = inputActions[action]
+		
+		
+		var events = InputMap.action_get_events(action)
+		if events.size() > 0:
+			inputLabel.text = events[0].as_text().trim_suffix(\" (Physical)\")
+		else:
+			inputLabel.text = \"\"
+		
+		actionList.add_child(button)
+		button.pressed.connect(inputButtonPressed.bind(button, action))
+
+
+func inputButtonPressed(button, action):
+	if !isRemapping:
+		isRemapping = true
+		actionToRemap = action
+		remappingButton = button
+		button.find_child(\"labelInput\").text = \"Press key to bind...\"
+
+
+func _input(event):
+	if isRemapping:
+		if (event is InputEventKey || (event is InputEventMouseButton && event.pressed)):
+			if event is InputEventMouseButton && event.double_click:
+				event.double_click = false
+			
+			InputMap.action_erase_events(actionToRemap)
+			InputMap.action_add_event(actionToRemap, event)
+			updateActionList(remappingButton, event)
+			
+			isRemapping = false
+			actionToRemap = null
+			remappingButton = null
+			
+			accept_event()
+
+
+func updateActionList(button, event):
+	button.find_child(\"labelInput\").text = event.as_text().trim_suffix(\" (Physical)\")
+
+
+func resetButtonPressed():
+	createActionList()
+
+
+func backButtonPressed():
+	visible = false
+	$\"../inGameMenu\".visible = true
+"
+
+[node name="inputSettings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_0eq0v")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -194.0
+offset_top = -29.0
+offset_right = 194.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 280)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="actionList" type="VBoxContainer" parent="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="resetButton" type="Button" parent="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+text = "Reset to default"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="backButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_direction = 1
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Back"
+
+[node name="applyButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_direction = 1
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Apply"
+
+[connection signal="pressed" from="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/resetButton" to="." method="resetButtonPressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/backButton" to="." method="backButtonPressed"]
