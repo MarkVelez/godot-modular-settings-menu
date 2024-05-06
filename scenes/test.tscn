@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://bh7hetspcaxp0"]
+
+[ext_resource type="PackedScene" uid="uid://becfhb65goqg6" path="res://scenes/ui/in_game_menu.tscn" id="1_6olxy"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qs1ik"]
+sky_energy_multiplier = 15.0
+
+[sub_resource type="Sky" id="Sky_mdnst"]
+sky_material = SubResource("ProceduralSkyMaterial_qs1ik")
+
+[sub_resource type="Environment" id="Environment_snm0g"]
+sky = SubResource("Sky_mdnst")
+sky_rotation = Vector3(0, 0, -0.225147)
+ambient_light_source = 3
+
+[node name="Node3D" type="Node3D"]
+
+[node name="GUI" type="CanvasLayer" parent="."]
+
+[node name="InGameMenu" parent="GUI" instance=ExtResource("1_6olxy")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="CSGBox3D" type="CSGSphere3D" parent="."]
+transform = Transform3D(0.854921, 0, 0.518758, 0, 1, 0, -0.518758, 0, 0.854921, 0, -0.682839, -2.45244)
+radial_segments = 48
+rings = 24
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.40856, -6.17434)
+size = Vector3(10, 0.5, 10)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_snm0g")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.715053, 0.331086, -0.615696, 0.351323, 0.59124, 0.725953, 0.604377, -0.735403, 0.30645, -4.13041, 4.14287, -0.369184)

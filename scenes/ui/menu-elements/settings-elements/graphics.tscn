@@ -1,0 +1,65 @@
+[gd_scene load_steps=5 format=3 uid="uid://buqq0kms2dbb4"]
+
+[ext_resource type="PackedScene" uid="uid://byff0jwaicxvr" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/display_mode.tscn" id="1_mr6e7"]
+[ext_resource type="PackedScene" uid="uid://cn8r63dmvd55c" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/resolution.tscn" id="2_5bpi0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v0fou"]
+
+[sub_resource type="GDScript" id="GDScript_kywvr"]
+resource_name = "graphics"
+script/source = "extends TabBar
+
+signal apply_settings
+
+var REFERENCE_TABLE: Dictionary
+var GRAPHICS_SETTINGS_CACHE: Dictionary
+
+
+func _ready():
+	SettingsDataManager.connect(\"load_settings\", load_settings)
+
+
+func load_settings():
+	GRAPHICS_SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA[\"graphics\"].duplicate(true)
+
+
+func settings_changed() -> void:
+	owner.settings_changed()
+
+
+func on_apply_settings() -> void:
+	owner.SETTINGS_CACHE[\"graphics\"] = GRAPHICS_SETTINGS_CACHE.duplicate(true)
+	SettingsDataManager.SETTINGS_DATA[\"graphics\"] = GRAPHICS_SETTINGS_CACHE.duplicate(true)
+	emit_signal(\"apply_settings\")
+"
+
+[node name="Graphics" type="TabBar"]
+theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_v0fou")
+script = SubResource("GDScript_kywvr")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DisplayMode" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_mr6e7")]
+layout_mode = 2
+
+[node name="Resolution" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_5bpi0")]
+layout_mode = 2

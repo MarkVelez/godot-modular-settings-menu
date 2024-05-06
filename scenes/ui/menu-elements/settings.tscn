@@ -1,67 +1,48 @@
-[gd_scene load_steps=12 format=3 uid="uid://px6a2dg8cawb"]
+[gd_scene load_steps=7 format=3 uid="uid://px6a2dg8cawb"]
 
-[ext_resource type="PackedScene" uid="uid://byff0jwaicxvr" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/display_mode.tscn" id="1_lrw8j"]
-[ext_resource type="PackedScene" uid="uid://cn8r63dmvd55c" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/resolution.tscn" id="2_dv1xd"]
-[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input_settings.tscn" id="2_ohqfr"]
+[ext_resource type="PackedScene" uid="uid://baaurgnw10lsy" path="res://scenes/ui/menu-elements/settings-elements/gameplay.tscn" id="1_k4yar"]
+[ext_resource type="PackedScene" uid="uid://buqq0kms2dbb4" path="res://scenes/ui/menu-elements/settings-elements/graphics.tscn" id="2_gtlr3"]
+[ext_resource type="PackedScene" uid="uid://dtiki8x56j1tu" path="res://scenes/ui/menu-elements/settings-elements/controls.tscn" id="3_yucxh"]
+[ext_resource type="PackedScene" uid="uid://bdgbsm4a85jy5" path="res://scenes/ui/menu-elements/settings-elements/audio.tscn" id="4_s7xsc"]
 
 [sub_resource type="GDScript" id="GDScript_ha1g1"]
 resource_name = "settings"
 script/source = "extends Control
 
 @onready var settingsPanel = %SettingsPanel
+@onready var settingsTabs = %SettingsTabs
 @onready var discardChangesPopup = %DiscardChangesPopup
-@onready var inputSettings = %InputSettings
-@onready var gameplay = %Gameplay
-@onready var graphics = %Graphics
-@onready var controls = %Controls
-@onready var audio = %Audio
 @onready var applyButton = %ApplyButton
 
-var CURRENT_SETTINGS: Dictionary = SettingsDataManager.SETTINGS_DATA.duplicate(true)
+var SETTINGS_CACHE: Dictionary
 
 
-func _process(_delta):
-	if CURRENT_SETTINGS == SettingsDataManager.SETTINGS_DATA && !applyButton.disabled:
-		applyButton.disabled = true
-	else:
-		if applyButton.disabled:
-			applyButton.disabled = false
+func _ready():
+	SettingsDataManager.connect(\"load_settings\", load_settings)
 
 
-func back_button_pressed():
+func load_settings() -> void:
+	SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA.duplicate(true)
+
+
+func back_button_pressed() -> void:
 	visible = false
 	owner.menu.visible = true
 
 
-func apply_button_pressed():
-	get_tree().call_group(\"SettingsElements\", \"apply_settings\")
-	SettingsDataManager.SETTINGS_DATA = CURRENT_SETTINGS.duplicate(true)
+func apply_button_pressed() -> void:
+	applyButton.disabled = true
+	settingsTabs.get_child(settingsTabs.current_tab).apply_settings()
+
+
+func settings_changed() -> void:
+	if SETTINGS_CACHE == SettingsDataManager.SETTINGS_DATA:
+		applyButton.set_disabled(true)
+	else:
+		applyButton.set_disabled(false)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kwbsm"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_otlod"]
-
-[sub_resource type="GDScript" id="GDScript_3niwp"]
-resource_name = "gameplay_tab"
-script/source = "extends TabBar
-
-@onready var settingsPanel = %SettingsPanel
-"
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v0fou"]
-
-[sub_resource type="GDScript" id="GDScript_b7s5r"]
-resource_name = "graphics_tab"
-script/source = "extends TabBar
-
-@onready var settingsPanel = %SettingsPanel
-
-"
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1rjnm"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e0spm"]
 
 [node name="Settings" type="Control"]
 layout_mode = 3
@@ -88,125 +69,24 @@ offset_bottom = 256.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TabContainer" type="TabContainer" parent="SettingsPanel"]
+[node name="SettingsTabs" type="TabContainer" parent="SettingsPanel"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(450, 512)
 layout_mode = 2
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
 
-[node name="Gameplay" type="TabBar" parent="SettingsPanel/TabContainer"]
-unique_name_in_owner = true
+[node name="Gameplay" parent="SettingsPanel/SettingsTabs" instance=ExtResource("1_k4yar")]
 layout_mode = 2
-theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_otlod")
-script = SubResource("GDScript_3niwp")
 
-[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/TabContainer/Gameplay"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ScrollContainer" type="ScrollContainer" parent="SettingsPanel/TabContainer/Gameplay/MarginContainer"]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel/TabContainer/Gameplay/MarginContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Graphics" type="TabBar" parent="SettingsPanel/TabContainer"]
-unique_name_in_owner = true
+[node name="Graphics" parent="SettingsPanel/SettingsTabs" instance=ExtResource("2_gtlr3")]
 visible = false
 layout_mode = 2
-theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_v0fou")
-script = SubResource("GDScript_b7s5r")
 
-[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/TabContainer/Graphics"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ScrollContainer" type="ScrollContainer" parent="SettingsPanel/TabContainer/Graphics/MarginContainer"]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel/TabContainer/Graphics/MarginContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="DisplayMode" parent="SettingsPanel/TabContainer/Graphics/MarginContainer/ScrollContainer/VBoxContainer" groups=["SettingsElements"] instance=ExtResource("1_lrw8j")]
+[node name="Controls" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_yucxh")]
 layout_mode = 2
 
-[node name="Resolution" parent="SettingsPanel/TabContainer/Graphics/MarginContainer/ScrollContainer/VBoxContainer" groups=["SettingsElements"] instance=ExtResource("2_dv1xd")]
+[node name="Audio" parent="SettingsPanel/SettingsTabs" instance=ExtResource("4_s7xsc")]
 layout_mode = 2
-
-[node name="Controls" type="TabBar" parent="SettingsPanel/TabContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_1rjnm")
-
-[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/TabContainer/Controls"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ScrollContainer" type="ScrollContainer" parent="SettingsPanel/TabContainer/Controls/MarginContainer"]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel/TabContainer/Controls/MarginContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Audio" type="TabBar" parent="SettingsPanel/TabContainer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_e0spm")
-
-[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/TabContainer/Audio"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ScrollContainer" type="ScrollContainer" parent="SettingsPanel/TabContainer/Audio/MarginContainer"]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel/TabContainer/Audio/MarginContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel"]
 layout_mode = 2
@@ -215,17 +95,13 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+disabled = true
 text = "Apply"
 
 [node name="BackButton" type="Button" parent="SettingsPanel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Back"
-
-[node name="InputSettings" parent="." instance=ExtResource("2_ohqfr")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
 
 [node name="DiscardChangesPopup" type="PanelContainer" parent="."]
 unique_name_in_owner = true

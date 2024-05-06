@@ -1,0 +1,84 @@
+[gd_scene load_steps=2 format=3 uid="uid://f5anrphbj5o2"]
+
+[sub_resource type="GDScript" id="GDScript_3hywj"]
+resource_name = "sensitivity"
+script/source = "extends HBoxContainer
+
+@onready var slider: HSlider = %SenitivitySlider
+@onready var value: SpinBox = %SensitivityValue
+
+@export var minSensitivity: float = 0.01
+@export var maxSensitivity: float = 10
+@export var defaultSensitivity: float = 5
+
+var userSensitivity: float
+
+
+func _ready():
+	slider.connect(\"value_changed\", sensitivity_slider_value_changed)
+	value.connect(\"value_changed\", sensitivity_value_value_changed)
+	
+	value.get_line_edit().caret_blink = true
+	
+	if owner.owner.SETTINGS_CACHE[\"controls\"][\"sensitivity\"] == defaultSensitivity:
+		userSensitivity = defaultSensitivity
+	else:
+		userSensitivity = owner.owner.SETTINGS_CACHE[\"controls\"][\"sensitivity\"]
+	
+	value.min_value = minSensitivity
+	value.max_value = maxSensitivity
+	value.value = userSensitivity
+	
+	slider.min_value = minSensitivity
+	slider.max_value = maxSensitivity
+	slider.value = userSensitivity
+
+
+func sensitivity_slider_value_changed(newValue: float):
+	value.value = newValue
+
+
+func sensitivity_value_value_changed(newValue: float):
+	slider.value = newValue
+	owner.owner.SETTINGS_CACHE[\"controls\"][\"sensitivity\"] = newValue
+"
+
+[node name="Sensitivity" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_3hywj")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Sensitivity"
+vertical_alignment = 1
+
+[node name="Value" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SenitivitySlider" type="HSlider" parent="Value"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.01
+max_value = 10.0
+step = 0.01
+value = 5.0
+
+[node name="SensitivityValue" type="SpinBox" parent="Value"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+min_value = 0.01
+max_value = 10.0
+step = 0.01
+value = 5.0
+alignment = 1

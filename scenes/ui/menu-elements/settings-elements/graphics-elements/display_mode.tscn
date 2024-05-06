@@ -6,7 +6,10 @@ script/source = "extends HBoxContainer
 
 @onready var options: OptionButton = %Options
 
+@export var defaultValue: String
+
 var selectedId: int
+var currentDisplayMode: String = defaultValue
 
 var DISPLAY_MODES: Dictionary = {
 	\"Fullscreen\": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
@@ -16,11 +19,13 @@ var DISPLAY_MODES: Dictionary = {
 
 
 func _ready():
+	options.connect(\"item_selected\", mode_selected)
+	SettingsDataManager.connect(\"set_default_value\", set_default_value)
+	owner.REFERENCE_TABLE[\"displayMode\"] = self
 	initialize_modes()
 
 
 func initialize_modes() -> void:
-	var currentDisplayMode: String = SettingsDataManager.SETTINGS_DATA[\"graphics\"][\"displayMode\"]
 	var id: int = 0
 	
 	for mode in DISPLAY_MODES:
@@ -33,11 +38,12 @@ func initialize_modes() -> void:
 
 
 func mode_selected(index: int) -> void:
-	owner.CURRENT_SETTINGS[\"graphics\"][\"displayMode\"] = options.get_item_text(index)
+	owner.GRAPHICS_SETTINGS_CACHE[\"displayMode\"] = options.get_item_text(index)
 	selectedId = index
+	owner.settings_changed()
 
 
-func apply_settings() -> void:
+func on_apply_settings() -> void:
 	var selected: String = options.get_item_text(selectedId)
 	
 	if selected == \"Borderless Windowed\":
@@ -46,6 +52,10 @@ func apply_settings() -> void:
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 	
 	DisplayServer.window_set_mode(DISPLAY_MODES[selected])
+
+
+func set_default_value() -> void:
+	SettingsDataManager.DEFAULT_SETTINGS[\"graphics\"][\"displayMode\"] = defaultValue
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
@@ -71,5 +81,3 @@ layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 theme_override_styles/focus = SubResource("StyleBoxEmpty_drjjf")
-
-[connection signal="item_selected" from="Options" to="." method="mode_selected"]
