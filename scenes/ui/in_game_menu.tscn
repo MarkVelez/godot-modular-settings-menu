@@ -20,6 +20,7 @@ func resume_button_pressed():
 func settings_button_pressed():
 	menu.visible = false
 	settings.visible = true
+	settings.emit_signal(\"get_settings\")
 
 
 func quit_button_pressed():

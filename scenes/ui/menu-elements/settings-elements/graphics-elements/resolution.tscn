@@ -6,12 +6,12 @@ script/source = "extends HBoxContainer
 
 @onready var options: OptionButton = %Options
 
-@export var defaultValue: String
+@export_enum(\"3840x2160\", \"2560x1440\", \"1920x1080\", \"1280x720\", \"960x540\") var defaultValue: String
 
 var selectedId: int
-var currentResolution: String = defaultValue
+var currentValue: String
 
-var RESOLUTION_LIST: Dictionary = {
+const RESOLUTION_LIST: Dictionary = {
 	\"3840x2160\": Vector2i(3840, 2160),
 	\"2560x1440\": Vector2i(2560, 1440),
 	\"1920x1080\": Vector2i(1920, 1080),
@@ -22,30 +22,22 @@ var RESOLUTION_LIST: Dictionary = {
 
 func _ready():
 	options.connect(\"item_selected\", resolution_selected)
-	SettingsDataManager.connect(\"set_default_value\", set_default_value)
-	owner.REFERENCE_TABLE[\"resolution\"] = self
-	initialize_resolutions()
-
-
-func _process(_delta):
-	if is_visible_in_tree():
-		if owner.GRAPHICS_SETTINGS_CACHE[\"displayMode\"] != \"Windowed\":
-			if !options.disabled:
-				options.set_disabled(true)
-		else:
-			if options.disabled:
-				options.set_disabled(false)
+	owner.connect(\"apply_settings\", apply_settings)
+	owner.connect(\"get_default_settings\", get_default_settings)
+	SettingsDataManager.connect(\"load_settings\", load_settings)
+	
+	owner.REFERENCE_TABLE[name] = self
+	load_settings()
 
 
 # Add all the resolution options
 func initialize_resolutions() -> void:
 	var id: int = 0
 	
-	
 	for resolution in RESOLUTION_LIST:
 		options.add_item(resolution, id)
 		# Select the current resolution
-		if resolution == currentResolution:
+		if resolution == currentValue:
 			options.select(id)
 			selectedId = id
 		
@@ -54,7 +46,7 @@ func initialize_resolutions() -> void:
 
 func resolution_selected(index: int) -> void:
 	# Update the resolution in the settings cache
-	owner.GRAPHICS_SETTINGS_CACHE[\"resolutions\"] = options.get_item_text(index)
+	owner.GRAPHICS_SETTINGS_CACHE[name] = options.get_item_text(index)
 	selectedId = index
 	owner.settings_changed()
 
@@ -68,12 +60,22 @@ func apply_settings() -> void:
 	DisplayServer.window_set_size(resolution)
 	get_window().move_to_center()
 	
-	if owner.GRAPHICS_SETTINGS_CACHE[\"displayMode\"] != \"Windowed\":
+	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
 		DisplayServer.window_set_size(resolution)
 
 
-func set_default_value() -> void:
-	SettingsDataManager.DEFAULT_SETTINGS[\"graphics\"][\"resolution\"] = defaultValue
+func load_settings() -> void:
+	if SettingsDataManager.noSaveFile:
+		currentValue = defaultValue
+	else:
+		currentValue = SettingsDataManager.SETTINGS_DATA[owner.name][name]
+	
+	initialize_resolutions()
+	apply_settings()
+
+
+func get_default_settings() -> void:
+	owner.GRAPHICS_SETTINGS_CACHE[name] = currentValue
 "
 
 [node name="Resolution" type="HBoxContainer"]

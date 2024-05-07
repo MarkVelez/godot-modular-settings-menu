@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-SettingsDataManager="*res://singletons/settings_data_manager.gd"
+SettingsDataManager="*res://singletons/ui/settings_data_manager.gd"
 
 [display]
 

@@ -10,26 +10,33 @@ resource_name = "graphics"
 script/source = "extends TabBar
 
 signal apply_settings
+signal get_default_settings
 
 var REFERENCE_TABLE: Dictionary
 var GRAPHICS_SETTINGS_CACHE: Dictionary
 
 
 func _ready():
-	SettingsDataManager.connect(\"load_settings\", load_settings)
+	owner.connect(\"get_settings\", get_settings)
+	SettingsDataManager.SETTINGS_DATA = {
+		name: {}
+	}
 
 
-func load_settings():
-	GRAPHICS_SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA[\"graphics\"].duplicate(true)
+func get_settings() -> void:
+	if SettingsDataManager.noSaveFile:
+		emit_signal(\"get_default_settings\")
+	else:
+		GRAPHICS_SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA[name].duplicate(true)
 
 
 func settings_changed() -> void:
-	owner.settings_changed()
+	owner.settings_changed(GRAPHICS_SETTINGS_CACHE, name)
 
 
 func on_apply_settings() -> void:
-	owner.SETTINGS_CACHE[\"graphics\"] = GRAPHICS_SETTINGS_CACHE.duplicate(true)
-	SettingsDataManager.SETTINGS_DATA[\"graphics\"] = GRAPHICS_SETTINGS_CACHE.duplicate(true)
+	SettingsDataManager.SETTINGS_DATA[name] = GRAPHICS_SETTINGS_CACHE.duplicate(true)
+	SettingsDataManager.save_data()
 	emit_signal(\"apply_settings\")
 "
 
@@ -60,6 +67,8 @@ size_flags_vertical = 3
 
 [node name="DisplayMode" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_mr6e7")]
 layout_mode = 2
+defaultValue = "Windowed"
 
 [node name="Resolution" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_5bpi0")]
 layout_mode = 2
+defaultValue = "1280x720"

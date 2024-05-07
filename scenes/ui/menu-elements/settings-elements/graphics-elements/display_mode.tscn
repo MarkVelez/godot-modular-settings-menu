@@ -6,10 +6,10 @@ script/source = "extends HBoxContainer
 
 @onready var options: OptionButton = %Options
 
-@export var defaultValue: String
+@export_enum(\"Fullscreen\", \"Windowed\", \"Borderless Windowed\") var defaultValue: String
 
 var selectedId: int
-var currentDisplayMode: String = defaultValue
+var currentValue: String
 
 var DISPLAY_MODES: Dictionary = {
 	\"Fullscreen\": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
@@ -20,9 +20,12 @@ var DISPLAY_MODES: Dictionary = {
 
 func _ready():
 	options.connect(\"item_selected\", mode_selected)
-	SettingsDataManager.connect(\"set_default_value\", set_default_value)
-	owner.REFERENCE_TABLE[\"displayMode\"] = self
-	initialize_modes()
+	owner.connect(\"apply_settings\", apply_settings)
+	owner.connect(\"get_default_settings\", get_default_settings)
+	SettingsDataManager.connect(\"load_settings\", load_settings)
+	
+	owner.REFERENCE_TABLE[name] = self
+	load_settings()
 
 
 func initialize_modes() -> void:
@@ -30,7 +33,7 @@ func initialize_modes() -> void:
 	
 	for mode in DISPLAY_MODES:
 		options.add_item(mode, id)
-		if mode == currentDisplayMode:
+		if mode == currentValue:
 			options.select(id)
 			selectedId = id
 		
@@ -38,12 +41,20 @@ func initialize_modes() -> void:
 
 
 func mode_selected(index: int) -> void:
-	owner.GRAPHICS_SETTINGS_CACHE[\"displayMode\"] = options.get_item_text(index)
+	owner.GRAPHICS_SETTINGS_CACHE[name] = options.get_item_text(index)
 	selectedId = index
 	owner.settings_changed()
+	
+	if owner.REFERENCE_TABLE.has(\"Resolution\"):
+		var resolution = owner.REFERENCE_TABLE[\"Resolution\"]
+		
+		if options.get_item_text(index) != \"Windowed\":
+			resolution.options.set_disabled(true)
+		else:
+			resolution.options.set_disabled(false)
 
 
-func on_apply_settings() -> void:
+func apply_settings() -> void:
 	var selected: String = options.get_item_text(selectedId)
 	
 	if selected == \"Borderless Windowed\":
@@ -54,8 +65,18 @@ func on_apply_settings() -> void:
 	DisplayServer.window_set_mode(DISPLAY_MODES[selected])
 
 
-func set_default_value() -> void:
-	SettingsDataManager.DEFAULT_SETTINGS[\"graphics\"][\"displayMode\"] = defaultValue
+func load_settings() -> void:
+	if SettingsDataManager.noSaveFile:
+		currentValue = defaultValue
+	else:
+		currentValue = SettingsDataManager.SETTINGS_DATA[owner.name][name]
+	
+	initialize_modes()
+	apply_settings()
+
+
+func get_default_settings() -> void:
+	owner.GRAPHICS_SETTINGS_CACHE[name] = currentValue
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

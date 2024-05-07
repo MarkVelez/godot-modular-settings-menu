@@ -1,24 +1,23 @@
 extends Node
 
-signal set_default_value
 signal load_settings
 
-var DEFAULT_SETTINGS: Dictionary
 var SETTINGS_DATA: Dictionary
 
 const dataFolder = "user://"
 const fileName = "settings.cfg"
 var path = dataFolder + fileName
 
+var noSaveFile: bool
+
 
 func _ready() -> void:
 	DirAccess.make_dir_absolute(dataFolder)
-	if !FileAccess.file_exists(path):
-		emit_signal("set_default_value")
-		SETTINGS_DATA = DEFAULT_SETTINGS.duplicate(true)
-		save_data()
-	else:
+	
+	if FileAccess.file_exists(path):
 		get_data()
+	else:
+		noSaveFile = true
 
 
 func save_data() -> void:
@@ -32,6 +31,10 @@ func save_data() -> void:
 	
 	if err != OK:
 		print("Failed to save data!")
+		return
+	
+	if noSaveFile:
+		noSaveFile = false
 
 
 func get_data() -> void:
@@ -46,5 +49,3 @@ func get_data() -> void:
 		SETTINGS_DATA[section] = {}
 		for key in config.get_section_keys(section):
 			SETTINGS_DATA[section][key] = config.get_value(section, key)
-	
-	emit_signal("load_settings")

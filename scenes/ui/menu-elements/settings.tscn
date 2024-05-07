@@ -5,24 +5,16 @@
 [ext_resource type="PackedScene" uid="uid://dtiki8x56j1tu" path="res://scenes/ui/menu-elements/settings-elements/controls.tscn" id="3_yucxh"]
 [ext_resource type="PackedScene" uid="uid://bdgbsm4a85jy5" path="res://scenes/ui/menu-elements/settings-elements/audio.tscn" id="4_s7xsc"]
 
-[sub_resource type="GDScript" id="GDScript_ha1g1"]
+[sub_resource type="GDScript" id="GDScript_eua2a"]
 resource_name = "settings"
 script/source = "extends Control
+
+signal get_settings
 
 @onready var settingsPanel = %SettingsPanel
 @onready var settingsTabs = %SettingsTabs
 @onready var discardChangesPopup = %DiscardChangesPopup
 @onready var applyButton = %ApplyButton
-
-var SETTINGS_CACHE: Dictionary
-
-
-func _ready():
-	SettingsDataManager.connect(\"load_settings\", load_settings)
-
-
-func load_settings() -> void:
-	SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA.duplicate(true)
 
 
 func back_button_pressed() -> void:
@@ -32,11 +24,11 @@ func back_button_pressed() -> void:
 
 func apply_button_pressed() -> void:
 	applyButton.disabled = true
-	settingsTabs.get_child(settingsTabs.current_tab).apply_settings()
+	settingsTabs.get_child(settingsTabs.current_tab).on_apply_settings()
 
 
-func settings_changed() -> void:
-	if SETTINGS_CACHE == SettingsDataManager.SETTINGS_DATA:
+func settings_changed(CACHE: Dictionary, section: String) -> void:
+	if CACHE == SettingsDataManager.SETTINGS_DATA[section]:
 		applyButton.set_disabled(true)
 	else:
 		applyButton.set_disabled(false)
@@ -52,7 +44,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-script = SubResource("GDScript_ha1g1")
+script = SubResource("GDScript_eua2a")
 
 [node name="SettingsPanel" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
