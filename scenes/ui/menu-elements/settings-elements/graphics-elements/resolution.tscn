@@ -54,12 +54,15 @@ func apply_settings() -> void:
 	var selected: String = options.get_item_text(selectedId)
 	var resolution: Vector2i = RESOLUTION_LIST[selected]
 	
-	# Update window size and center window
-	DisplayServer.window_set_size(resolution)
-	get_window().move_to_center()
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
+		return
 	
-	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+	if DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_BORDERLESS):
+		DisplayServer.window_set_size(DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()))
+	else:
 		DisplayServer.window_set_size(resolution)
+	
+	get_window().move_to_center()
 
 
 func load_settings() -> void:
