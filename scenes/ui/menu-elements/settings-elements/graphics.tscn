@@ -10,7 +10,6 @@ resource_name = "graphics"
 script/source = "extends TabBar
 
 signal apply_settings
-signal get_default_settings
 
 var REFERENCE_TABLE: Dictionary
 var GRAPHICS_SETTINGS_CACHE: Dictionary
@@ -18,16 +17,17 @@ var GRAPHICS_SETTINGS_CACHE: Dictionary
 
 func _ready():
 	owner.connect(\"get_settings\", get_settings)
-	SettingsDataManager.SETTINGS_DATA = {
-		name: {}
-	}
+	if SettingsDataManager.noSaveFile:
+		SettingsDataManager.SETTINGS_DATA = {
+			name: {}
+		}
 
 
 func get_settings() -> void:
+	GRAPHICS_SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA[name].duplicate(true)
+	
 	if SettingsDataManager.noSaveFile:
-		emit_signal(\"get_default_settings\")
-	else:
-		GRAPHICS_SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA[name].duplicate(true)
+		SettingsDataManager.call_deferred(\"save_data\")
 
 
 func settings_changed() -> void:

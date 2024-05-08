@@ -21,11 +21,9 @@ var DISPLAY_MODES: Dictionary = {
 func _ready():
 	options.connect(\"item_selected\", mode_selected)
 	owner.connect(\"apply_settings\", apply_settings)
-	owner.connect(\"get_default_settings\", get_default_settings)
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
 	owner.REFERENCE_TABLE[name] = self
-	load_settings()
 
 
 func initialize_modes() -> void:
@@ -68,15 +66,13 @@ func apply_settings() -> void:
 func load_settings() -> void:
 	if SettingsDataManager.noSaveFile:
 		currentValue = defaultValue
+		SettingsDataManager.SETTINGS_DATA[owner.name][name] = currentValue
 	else:
 		currentValue = SettingsDataManager.SETTINGS_DATA[owner.name][name]
 	
 	initialize_modes()
 	apply_settings()
 
-
-func get_default_settings() -> void:
-	owner.GRAPHICS_SETTINGS_CACHE[name] = currentValue
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

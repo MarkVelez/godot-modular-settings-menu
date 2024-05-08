@@ -23,11 +23,9 @@ const RESOLUTION_LIST: Dictionary = {
 func _ready():
 	options.connect(\"item_selected\", resolution_selected)
 	owner.connect(\"apply_settings\", apply_settings)
-	owner.connect(\"get_default_settings\", get_default_settings)
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
 	owner.REFERENCE_TABLE[name] = self
-	load_settings()
 
 
 # Add all the resolution options
@@ -67,15 +65,12 @@ func apply_settings() -> void:
 func load_settings() -> void:
 	if SettingsDataManager.noSaveFile:
 		currentValue = defaultValue
+		SettingsDataManager.SETTINGS_DATA[owner.name][name] = currentValue
 	else:
 		currentValue = SettingsDataManager.SETTINGS_DATA[owner.name][name]
 	
 	initialize_resolutions()
 	apply_settings()
-
-
-func get_default_settings() -> void:
-	owner.GRAPHICS_SETTINGS_CACHE[name] = currentValue
 "
 
 [node name="Resolution" type="HBoxContainer"]

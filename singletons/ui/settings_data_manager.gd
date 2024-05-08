@@ -18,6 +18,8 @@ func _ready() -> void:
 		get_data()
 	else:
 		noSaveFile = true
+	
+	call_deferred("emit_signal", "load_settings")
 
 
 func save_data() -> void:
