@@ -4,11 +4,14 @@
 resource_name = "resolution"
 script/source = "extends HBoxContainer
 
+@onready var section: String = owner.name
+@onready var element: String = name
 @onready var options: OptionButton = %Options
+var elementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
 @export_enum(\"3840x2160\", \"2560x1440\", \"1920x1080\", \"1280x720\", \"960x540\") var defaultValue: String
 
-var selectedId: int
+var selectedIndex: int
 var currentValue: String
 
 const RESOLUTION_LIST: Dictionary = {
@@ -28,30 +31,14 @@ func _ready():
 	owner.REFERENCE_TABLE[name] = self
 
 
-# Add all the resolution options
-func initialize_resolutions() -> void:
-	var id: int = 0
-	
-	for resolution in RESOLUTION_LIST:
-		options.add_item(resolution, id)
-		# Select the current resolution
-		if resolution == currentValue:
-			options.select(id)
-			selectedId = id
-		
-		id += 1
-
-
 func resolution_selected(index: int) -> void:
 	# Update the resolution in the settings cache
-	owner.GRAPHICS_SETTINGS_CACHE[name] = options.get_item_text(index)
-	selectedId = index
-	owner.settings_changed()
+	elementResource.option_selected(owner.GRAPHICS_SETTINGS_CACHE, owner, self, index)
 
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
-	var selected: String = options.get_item_text(selectedId)
+	var selected: String = options.get_item_text(selectedIndex)
 	var resolution: Vector2i = RESOLUTION_LIST[selected]
 	
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
@@ -66,13 +53,9 @@ func apply_settings() -> void:
 
 
 func load_settings() -> void:
-	if SettingsDataManager.noSaveFile:
-		currentValue = defaultValue
-		SettingsDataManager.SETTINGS_DATA[owner.name][name] = currentValue
-	else:
-		currentValue = SettingsDataManager.SETTINGS_DATA[owner.name][name]
+	currentValue = elementResource.load_element_settings(defaultValue, section, element)
+	selectedIndex = elementResource.init_option_button_element(RESOLUTION_LIST, options, currentValue)
 	
-	initialize_resolutions()
 	apply_settings()
 "
 
