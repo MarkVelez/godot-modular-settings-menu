@@ -7,7 +7,8 @@ script/source = "extends HBoxContainer
 @onready var section: String = owner.name
 @onready var element: String = name
 @onready var options: OptionButton = %Options
-var elementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+
+const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
 @export_enum(\"Fullscreen\", \"Windowed\", \"Borderless Windowed\") var defaultValue: String
 
@@ -29,20 +30,18 @@ func _ready():
 	owner.REFERENCE_TABLE[name] = self
 
 
-func mode_selected(index: int) -> void:
-	elementResource.option_selected(owner.GRAPHICS_SETTINGS_CACHE, owner, self, index)
+func load_settings() -> void:
+	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	selectedIndex = ElementResource.init_option_button_element(DISPLAY_MODE_LIST, options, currentValue)
 	
+	apply_settings()
 	check_resolution()
 
 
-func check_resolution() -> void:
-	if owner.REFERENCE_TABLE.has(\"Resolution\"):
-		var resolution = owner.REFERENCE_TABLE[\"Resolution\"]
-		
-		if options.get_item_text(selectedIndex) != \"Windowed\":
-			resolution.options.set_disabled(true)
-		else:
-			resolution.options.set_disabled(false)
+func mode_selected(index: int) -> void:
+	ElementResource.option_selected(owner.GRAPHICS_SETTINGS_CACHE, owner, self, index)
+	
+	check_resolution()
 
 
 func apply_settings() -> void:
@@ -56,12 +55,14 @@ func apply_settings() -> void:
 	DisplayServer.window_set_mode(DISPLAY_MODE_LIST[selected])
 
 
-func load_settings() -> void:
-	currentValue = elementResource.load_element_settings(defaultValue, section, element)
-	selectedIndex = elementResource.init_option_button_element(DISPLAY_MODE_LIST, options, currentValue)
-	
-	apply_settings()
-	check_resolution()
+func check_resolution() -> void:
+	if owner.REFERENCE_TABLE.has(\"Resolution\"):
+		var resolution = owner.REFERENCE_TABLE[\"Resolution\"]
+		
+		if options.get_item_text(selectedIndex) != \"Windowed\":
+			resolution.options.set_disabled(true)
+		else:
+			resolution.options.set_disabled(false)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

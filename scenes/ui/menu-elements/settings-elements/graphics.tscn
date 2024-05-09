@@ -1,48 +1,14 @@
 [gd_scene load_steps=5 format=3 uid="uid://buqq0kms2dbb4"]
 
+[ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_5jv5p"]
 [ext_resource type="PackedScene" uid="uid://byff0jwaicxvr" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/display_mode.tscn" id="1_mr6e7"]
 [ext_resource type="PackedScene" uid="uid://cn8r63dmvd55c" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/resolution.tscn" id="2_5bpi0"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v0fou"]
 
-[sub_resource type="GDScript" id="GDScript_kywvr"]
-resource_name = "graphics"
-script/source = "extends TabBar
-
-signal apply_settings
-
-var REFERENCE_TABLE: Dictionary
-var GRAPHICS_SETTINGS_CACHE: Dictionary
-
-
-func _ready():
-	owner.connect(\"get_settings\", get_settings)
-	if SettingsDataManager.noSaveFile:
-		SettingsDataManager.SETTINGS_DATA = {
-			name: {}
-		}
-
-
-func get_settings() -> void:
-	GRAPHICS_SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA[name].duplicate(true)
-	
-	if SettingsDataManager.noSaveFile:
-		SettingsDataManager.call_deferred(\"save_data\")
-
-
-func settings_changed() -> void:
-	owner.settings_changed(GRAPHICS_SETTINGS_CACHE, name)
-
-
-func on_apply_settings() -> void:
-	SettingsDataManager.SETTINGS_DATA[name] = GRAPHICS_SETTINGS_CACHE.duplicate(true)
-	SettingsDataManager.save_data()
-	emit_signal(\"apply_settings\")
-"
-
 [node name="Graphics" type="TabBar"]
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_v0fou")
-script = SubResource("GDScript_kywvr")
+script = ExtResource("1_5jv5p")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1

@@ -10,6 +10,7 @@ resource_name = "settings"
 script/source = "extends Control
 
 signal get_settings
+signal clear_cache
 
 @onready var settingsPanel = %SettingsPanel
 @onready var settingsTabs = %SettingsTabs
@@ -20,18 +21,12 @@ signal get_settings
 func back_button_pressed() -> void:
 	visible = false
 	owner.menu.visible = true
+	emit_signal(\"clear_cache\")
 
 
 func apply_button_pressed() -> void:
 	applyButton.disabled = true
 	settingsTabs.get_child(settingsTabs.current_tab).on_apply_settings()
-
-
-func settings_changed(CACHE: Dictionary, section: String) -> void:
-	if CACHE == SettingsDataManager.SETTINGS_DATA[section]:
-		applyButton.set_disabled(true)
-	else:
-		applyButton.set_disabled(false)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kwbsm"]
