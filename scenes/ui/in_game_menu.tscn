@@ -12,14 +12,14 @@ script/source = "extends Control
 
 
 func resume_button_pressed():
-	visible = false
+	hide()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	Engine.time_scale = 1
 
 
 func settings_button_pressed():
-	menu.visible = false
-	settings.visible = true
+	menu.hide()
+	settings.show()
 	settings.emit_signal(\"get_settings\")
 
 

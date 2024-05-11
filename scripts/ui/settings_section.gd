@@ -5,7 +5,7 @@ signal apply_settings
 @onready var section: String = name
 
 var REFERENCE_TABLE: Dictionary
-var SETTINGS_CACHE: Dictionary
+var SETTINGS_SECTION_CACHE: Dictionary
 
 
 func _ready():
@@ -19,24 +19,24 @@ func _ready():
 
 
 func get_settings() -> void:
-	SETTINGS_CACHE = SettingsDataManager.SETTINGS_DATA[section].duplicate(true)
+	SETTINGS_SECTION_CACHE = SettingsDataManager.SETTINGS_DATA[section].duplicate(true)
 	
 	if SettingsDataManager.noSaveFile:
 		SettingsDataManager.call_deferred("save_data")
 
 
 func clear_cache() -> void:
-	SETTINGS_CACHE.clear()
+	SETTINGS_SECTION_CACHE.clear()
 
 
 func settings_changed() -> void:
-	if SETTINGS_CACHE == SettingsDataManager.SETTINGS_DATA[section]:
+	if SETTINGS_SECTION_CACHE == SettingsDataManager.SETTINGS_DATA[section]:
 		owner.applyButton.set_disabled(true)
 	else:
 		owner.applyButton.set_disabled(false)
 
 
 func on_apply_settings() -> void:
-	SettingsDataManager.SETTINGS_DATA[section] = SETTINGS_CACHE.duplicate(true)
+	SettingsDataManager.SETTINGS_DATA[section] = SETTINGS_SECTION_CACHE.duplicate(true)
 	SettingsDataManager.save_data()
 	emit_signal("apply_settings")

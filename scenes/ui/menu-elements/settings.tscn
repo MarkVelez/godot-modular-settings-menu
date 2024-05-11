@@ -19,8 +19,8 @@ signal clear_cache
 
 
 func back_button_pressed() -> void:
-	visible = false
-	owner.menu.visible = true
+	hide()
+	owner.menu.show()
 	emit_signal(\"clear_cache\")
 
 

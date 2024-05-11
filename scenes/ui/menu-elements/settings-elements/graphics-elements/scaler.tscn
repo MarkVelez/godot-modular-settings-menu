@@ -1,0 +1,134 @@
+[gd_scene load_steps=5 format=3 uid="uid://b3w7qpn4nhmu2"]
+
+[ext_resource type="PackedScene" uid="uid://ha87l3hl643g" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/resolution_scale.tscn" id="1_4irey"]
+[ext_resource type="PackedScene" uid="uid://5dydkttc2fww" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/fsr_options.tscn" id="2_kekww"]
+
+[sub_resource type="GDScript" id="GDScript_mdyud"]
+resource_name = "scaler"
+script/source = "extends VBoxContainer
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: String = sectionRef.name
+# The name of the settings element
+@onready var element: String = name
+
+@onready var options: OptionButton = $\"ScalerOptions/Options\"
+@onready var resolutionScale: HBoxContainer = $ResolutionScale
+@onready var fsrOptions: HBoxContainer = $FSROptions
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+
+@export_enum(
+	\"None\", 
+	\"Bilinear\", 
+	\"FSR 2.2\"
+) var defaultValue: String = \"None\"
+
+var currentValue: String
+var selectedIndex: int
+
+# List of options related to the settings element
+const OPTION_LIST: Dictionary = {
+	\"None\": Viewport.SCALING_3D_MODE_BILINEAR,
+	\"Bilinear\": Viewport.SCALING_3D_MODE_BILINEAR,
+	\"FSR 2.2\": Viewport.SCALING_3D_MODE_FSR2
+}
+
+
+func _ready():
+	# Neccessary signals
+	options.connect(\"item_selected\", option_selected)
+	sectionRef.connect(\"apply_settings\", apply_settings)
+	SettingsDataManager.connect(\"load_settings\", load_settings)
+	
+	# Add an entry of the settings element to the section's reference table
+	sectionRef.REFERENCE_TABLE[element] = self
+	
+	# Give section information to Resolution Scale sub module
+	resolutionScale.sectionRef = sectionRef
+	resolutionScale.section = section
+	
+	# Give section information to FSR Options sub module
+	fsrOptions.sectionRef = sectionRef
+	fsrOptions.section = section
+
+
+func load_settings() -> void:
+	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
+	
+	apply_settings()
+
+
+func option_selected(index: int) -> void:
+	# Update the resolution in the settings cache
+	ElementResource.option_selected(sectionRef, self, index)
+	
+	match currentValue:
+		\"None\":
+			resolutionScale.hide()
+			fsrOptions.hide()
+		\"Bilinear\":
+			fsrOptions.hide()
+			resolutionScale.show()
+		\"FSR 2.2\":
+			resolutionScale.hide()
+			fsrOptions.show()
+		
+
+
+# Called to apply the settings in the settings cache
+func apply_settings() -> void:
+	get_viewport().set_scaling_3d_mode(OPTION_LIST[currentValue])
+	
+	match currentValue:
+		\"None\":
+			get_viewport().set_scaling_3d_scale(1.0)
+		\"Bilinear\":
+			resolutionScale.apply_settings()
+		\"FSR 2.2\":
+			fsrOptions.apply_settings()
+	
+	
+"
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
+
+[node name="Scaler" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+script = SubResource("GDScript_mdyud")
+
+[node name="ScalerOptions" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="ScalerOptions"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Scaler"
+vertical_alignment = 1
+
+[node name="Options" type="OptionButton" parent="ScalerOptions"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_drjjf")
+
+[node name="ResolutionScale" parent="." instance=ExtResource("1_4irey")]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FSROptions" parent="." instance=ExtResource("2_kekww")]
+visible = false
+layout_mode = 2

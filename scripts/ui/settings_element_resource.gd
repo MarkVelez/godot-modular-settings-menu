@@ -29,7 +29,13 @@ func init_option_button_element(OPTION_LIST: Dictionary, optionButton: OptionBut
 	return selectedIndex
 
 
-func option_selected(SECTION_CACHE: Dictionary, sectionRef: Node, elementRef: Node, index: int) -> void:
-	SECTION_CACHE[elementRef.name] = elementRef.options.get_item_text(index)
+func option_selected(sectionRef: TabBar, elementRef: Node, index: int) -> void:
+	sectionRef.SETTINGS_SECTION_CACHE[elementRef.name] = elementRef.options.get_item_text(index)
 	sectionRef.settings_changed()
+	elementRef.currentValue = elementRef.options.get_item_text(index)
 	elementRef.selectedIndex = index
+
+
+func value_changed(sectionRef: TabBar, elementRef: Node, value: float) -> void:
+	sectionRef.SETTINGS_SECTION_CACHE[elementRef.name] = value
+	sectionRef.settings_changed()

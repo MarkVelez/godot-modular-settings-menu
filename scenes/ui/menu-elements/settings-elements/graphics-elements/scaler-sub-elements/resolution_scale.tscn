@@ -1,0 +1,86 @@
+[gd_scene load_steps=5 format=3 uid="uid://ha87l3hl643g"]
+
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_ss3so"]
+
+[sub_resource type="GDScript" id="GDScript_7dhl4"]
+resource_name = "resolution_scale"
+script/source = "extends HBoxContainer
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar
+# The section the settings element is under
+@onready var section: String
+# The name of the settings element
+@onready var element: String = name
+
+@onready var sliderValue: HBoxContainer = $SliderValue
+
+const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+
+@export var minValue: float = 0.5
+@export var maxValue: float = 2.0
+@export var stepValue: float = 0.05
+@export var defaultValue: float = 1.0
+
+var currentValue: float
+
+
+func _ready():
+	SettingsDataManager.connect(\"load_settings\", load_settings)
+
+
+func load_settings() -> void:
+	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	sliderValue.init_slider()
+
+
+func value_changed() -> void:
+	ElementResource.value_changed(sectionRef, self, currentValue)
+
+
+func apply_settings() -> void:
+	get_viewport().set_scaling_3d_scale(currentValue)
+"
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
+size = Vector2(0, 0)
+
+[sub_resource type="Theme" id="Theme_0xoq4"]
+SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
+
+[node name="ResolutionScale" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_7dhl4")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Resolution Scale"
+vertical_alignment = 1
+
+[node name="SliderValue" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("1_ss3so")
+
+[node name="Slider" type="HSlider" parent="SliderValue"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 0.0
+step = 0.0
+ticks_on_borders = true
+
+[node name="Value" type="SpinBox" parent="SliderValue"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = SubResource("Theme_0xoq4")
+max_value = 0.0
+step = 0.0
+alignment = 1

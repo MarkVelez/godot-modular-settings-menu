@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bh7hetspcaxp0"]
+[gd_scene load_steps=17 format=3 uid="uid://bh7hetspcaxp0"]
 
 [ext_resource type="PackedScene" uid="uid://becfhb65goqg6" path="res://scenes/ui/in_game_menu.tscn" id="1_6olxy"]
 
@@ -13,25 +13,151 @@ sky = SubResource("Sky_mdnst")
 sky_rotation = Vector3(0, 0, -0.225147)
 ambient_light_source = 3
 
+[sub_resource type="GDScript" id="GDScript_lw3sa"]
+resource_name = "control_panel"
+script/source = "extends PanelContainer
+
+@onready var camera: Camera3D = $\"../../Camera3D\"
+@onready var menu: Control = $\"../InGameMenu\"
+
+@onready var defaultCameraPosition: Vector3 = camera.position
+var animated: bool = false
+
+
+func _process(delta):
+	var moveAmount: float = 2
+	var moveFreq: float = 0.001
+	
+	if animated:
+		camera.position.x = lerp(camera.position.x, defaultCameraPosition.x + sin(Time.get_ticks_msec() * moveFreq) * moveAmount, delta/2)
+		camera.position.z = lerp(camera.position.z, defaultCameraPosition.z + sin(Time.get_ticks_msec() * moveFreq * 0.5) * moveAmount, delta/2)
+		camera.position.y = lerp(camera.position.y, defaultCameraPosition.y + sin(Time.get_ticks_msec() * moveFreq * 0.5) * moveAmount/2, delta/2)
+	else:
+		if camera.position != defaultCameraPosition:
+			camera.position = camera.position.lerp(defaultCameraPosition, delta * 5)
+
+
+func _on_toggle_animation_toggled(toggled_on):
+	animated = toggled_on
+
+
+func _on_hide_menu_toggled(toggled_on):
+	menu.visible = !toggled_on
+"
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ym35m"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8lbeg"]
+albedo_color = Color(0.268536, 0.670061, 0.227251, 1)
+roughness = 0.3
+
+[sub_resource type="SphereMesh" id="SphereMesh_1thse"]
+material = SubResource("StandardMaterial3D_8lbeg")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8q8uo"]
+albedo_color = Color(1, 0.564706, 0.415686, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tecy0"]
+material = SubResource("StandardMaterial3D_8q8uo")
+size = Vector3(15, 0.5, 15)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kqh6p"]
+albedo_color = Color(0.239095, 0.542137, 0.849241, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_g1tso"]
+material = SubResource("StandardMaterial3D_kqh6p")
+size = Vector3(3.5, 3, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ht2m6"]
+material = SubResource("StandardMaterial3D_kqh6p")
+size = Vector3(5, 3, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_g8j6u"]
+material = SubResource("StandardMaterial3D_kqh6p")
+size = Vector3(5, 0.2, 3.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0pi3j"]
+albedo_color = Color(0.831373, 0.345098, 1, 1)
+emission_enabled = true
+emission = Color(5, 0, 5, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_a0pb3"]
+material = SubResource("StandardMaterial3D_0pi3j")
+top_radius = 0.05
+bottom_radius = 0.05
+radial_segments = 8
+
 [node name="Node3D" type="Node3D"]
-
-[node name="GUI" type="CanvasLayer" parent="."]
-
-[node name="InGameMenu" parent="GUI" instance=ExtResource("1_6olxy")]
-
-[node name="Camera3D" type="Camera3D" parent="."]
-
-[node name="CSGBox3D" type="CSGSphere3D" parent="."]
-transform = Transform3D(0.854921, 0, 0.518758, 0, 1, 0, -0.518758, 0, 0.854921, 0, -0.682839, -2.45244)
-radial_segments = 48
-rings = 24
-
-[node name="CSGBox3D2" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.40856, -6.17434)
-size = Vector3(10, 0.5, 10)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_snm0g")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.715053, 0.331086, -0.615696, 0.351323, 0.59124, 0.725953, 0.604377, -0.735403, 0.30645, -4.13041, 4.14287, -0.369184)
+transform = Transform3D(0.905658, -0.0180046, -0.423627, 0.250551, 0.828736, 0.500421, 0.342065, -0.55935, 0.755062, -3.04957, 2.46832, 1.0767)
+light_energy = 0.5
+shadow_enabled = true
+
+[node name="GUI" type="CanvasLayer" parent="."]
+
+[node name="InGameMenu" parent="GUI" instance=ExtResource("1_6olxy")]
+
+[node name="ControlPanel" type="PanelContainer" parent="GUI"]
+offset_right = 199.0
+offset_bottom = 40.0
+script = SubResource("GDScript_lw3sa")
+
+[node name="MarginContainer" type="MarginContainer" parent="GUI/ControlPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GUI/ControlPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="HideMenu" type="CheckButton" parent="GUI/ControlPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Hide Menu
+"
+
+[node name="ToggleAnimation" type="CheckButton" parent="GUI/ControlPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ym35m")
+text = "Toggle Animation"
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="ball" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.854921, 0, 0.518758, 0, 1, 0, -0.518758, 0, 0.854921, 0, -0.153776, -3.51229)
+mesh = SubResource("SphereMesh_1thse")
+
+[node name="floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.40856, -6.17434)
+mesh = SubResource("BoxMesh_tecy0")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 2.39809, 0.165802, -3.80972)
+mesh = SubResource("BoxMesh_g1tso")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.163491, -5.43965)
+mesh = SubResource("BoxMesh_ht2m6")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2.58522, 0.161893, -3.80296)
+mesh = SubResource("BoxMesh_g1tso")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.114113, 1.56223, -3.79209)
+mesh = SubResource("BoxMesh_g8j6u")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62941, 0.184332, -4.30836)
+mesh = SubResource("CylinderMesh_a0pb3")
+
+[connection signal="toggled" from="GUI/ControlPanel/MarginContainer/VBoxContainer/HideMenu" to="GUI/ControlPanel" method="_on_hide_menu_toggled"]
+[connection signal="toggled" from="GUI/ControlPanel/MarginContainer/VBoxContainer/ToggleAnimation" to="GUI/ControlPanel" method="_on_toggle_animation_toggled"]

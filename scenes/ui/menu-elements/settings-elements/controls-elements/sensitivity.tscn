@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://f5anrphbj5o2"]
+[gd_scene load_steps=4 format=3 uid="uid://f5anrphbj5o2"]
 
 [sub_resource type="GDScript" id="GDScript_3hywj"]
 resource_name = "sensitivity"
@@ -43,6 +43,12 @@ func sensitivity_value_value_changed(newValue: float):
 	owner.owner.SETTINGS_CACHE[\"controls\"][\"sensitivity\"] = newValue
 "
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
+size = Vector2(0, 0)
+
+[sub_resource type="Theme" id="Theme_0xoq4"]
+SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
+
 [node name="Sensitivity" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -77,6 +83,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
+theme = SubResource("Theme_0xoq4")
 min_value = 0.01
 max_value = 10.0
 step = 0.01

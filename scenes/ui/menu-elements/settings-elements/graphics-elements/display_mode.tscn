@@ -4,18 +4,29 @@
 resource_name = "display_mode"
 script/source = "extends HBoxContainer
 
-@onready var section: String = owner.name
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: String = sectionRef.name
+# The name of the settings element
 @onready var element: String = name
-@onready var options: OptionButton = %Options
 
+@onready var options: OptionButton = $Options
+
+# Resource for common functions between settings elements
 const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
-@export_enum(\"Fullscreen\", \"Windowed\", \"Borderless Windowed\") var defaultValue: String
+@export_enum(
+	\"Fullscreen\", 
+	\"Windowed\", 
+	\"Borderless Windowed\"
+) var defaultValue: String = \"Fullscreen\"
 
 var selectedIndex: int
 var currentValue: String
 
-var DISPLAY_MODE_LIST: Dictionary = {
+# List of options related to the settings element
+var OPTION_LIST: Dictionary = {
 	\"Fullscreen\": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
 	\"Windowed\": DisplayServer.WINDOW_MODE_WINDOWED, 
 	\"Borderless Windowed\": DisplayServer.WINDOW_MODE_WINDOWED
@@ -23,23 +34,25 @@ var DISPLAY_MODE_LIST: Dictionary = {
 
 
 func _ready():
-	options.connect(\"item_selected\", mode_selected)
-	owner.connect(\"apply_settings\", apply_settings)
+	# Neccessary signals
+	options.connect(\"item_selected\", option_selected)
+	sectionRef.connect(\"apply_settings\", apply_settings)
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
-	owner.REFERENCE_TABLE[name] = self
+	# Add an entry of the settings element to the section's reference table
+	sectionRef.REFERENCE_TABLE[element] = self
 
 
 func load_settings() -> void:
 	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
-	selectedIndex = ElementResource.init_option_button_element(DISPLAY_MODE_LIST, options, currentValue)
+	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
 	apply_settings()
 	check_resolution()
 
 
-func mode_selected(index: int) -> void:
-	ElementResource.option_selected(owner.GRAPHICS_SETTINGS_CACHE, owner, self, index)
+func option_selected(index: int) -> void:
+	ElementResource.option_selected(sectionRef, self, index)
 	
 	check_resolution()
 
@@ -52,12 +65,12 @@ func apply_settings() -> void:
 	else:
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 	
-	DisplayServer.window_set_mode(DISPLAY_MODE_LIST[selected])
+	DisplayServer.window_set_mode(OPTION_LIST[selected])
 
 
 func check_resolution() -> void:
-	if owner.REFERENCE_TABLE.has(\"Resolution\"):
-		var resolution = owner.REFERENCE_TABLE[\"Resolution\"]
+	if sectionRef.REFERENCE_TABLE.has(\"Resolution\"):
+		var resolution = sectionRef.REFERENCE_TABLE[\"Resolution\"]
 		
 		if options.get_item_text(selectedIndex) != \"Windowed\":
 			resolution.options.set_disabled(true)
@@ -83,7 +96,6 @@ text = "Display Mode"
 vertical_alignment = 1
 
 [node name="Options" type="OptionButton" parent="."]
-unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
