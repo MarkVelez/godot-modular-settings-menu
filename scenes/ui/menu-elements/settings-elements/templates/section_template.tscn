@@ -1,10 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://dtiki8x56j1tu"]
+[gd_scene load_steps=3 format=3 uid="uid://ejplmui1twn4"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1rjnm"]
+[ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_aglse"]
 
-[node name="Controls" type="TabBar"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e0spm"]
+
+[node name="SectionTemplate" type="TabBar"]
 visible = false
-theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_1rjnm")
+theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_e0spm")
+script = ExtResource("1_aglse")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1

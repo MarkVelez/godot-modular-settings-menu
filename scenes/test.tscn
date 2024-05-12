@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bh7hetspcaxp0"]
+[gd_scene load_steps=18 format=3 uid="uid://bh7hetspcaxp0"]
 
 [ext_resource type="PackedScene" uid="uid://becfhb65goqg6" path="res://scenes/ui/in_game_menu.tscn" id="1_6olxy"]
 
@@ -19,6 +19,7 @@ script/source = "extends PanelContainer
 
 @onready var camera: Camera3D = $\"../../Camera3D\"
 @onready var menu: Control = $\"../InGameMenu\"
+@onready var fpsCounter: Label = $MarginContainer/VBoxContainer/FPSCounter
 
 @onready var defaultCameraPosition: Vector3 = camera.position
 var animated: bool = false
@@ -27,6 +28,8 @@ var animated: bool = false
 func _process(delta):
 	var moveAmount: float = 2
 	var moveFreq: float = 0.001
+	
+	fpsCounter.set_text(\"FPS: \" + str(Engine.get_frames_per_second()))
 	
 	if animated:
 		camera.position.x = lerp(camera.position.x, defaultCameraPosition.x + sin(Time.get_ticks_msec() * moveFreq) * moveAmount, delta/2)
@@ -44,6 +47,8 @@ func _on_toggle_animation_toggled(toggled_on):
 func _on_hide_menu_toggled(toggled_on):
 	menu.visible = !toggled_on
 "
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_omi2h"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ym35m"]
 
@@ -116,8 +121,13 @@ theme_override_constants/margin_bottom = 4
 [node name="VBoxContainer" type="VBoxContainer" parent="GUI/ControlPanel/MarginContainer"]
 layout_mode = 2
 
+[node name="FPSCounter" type="Label" parent="GUI/ControlPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
 [node name="HideMenu" type="CheckButton" parent="GUI/ControlPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_omi2h")
 text = "Hide Menu
 "
 

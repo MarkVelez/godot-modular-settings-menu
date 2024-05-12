@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://byff0jwaicxvr"]
+[gd_scene load_steps=3 format=3 uid="uid://dc1yif146sxav"]
 
-[sub_resource type="GDScript" id="GDScript_duwn0"]
-resource_name = "display_mode"
+[sub_resource type="GDScript" id="GDScript_tdxr6"]
+resource_name = "option_element_template"
 script/source = "extends HBoxContainer
 
 # Reference to the section the settings element is under
@@ -18,19 +18,15 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 
 # Default values for the element
 @export_enum(
-	\"Fullscreen\", 
-	\"Windowed\", 
-	\"Borderless Windowed\"
-) var defaultValue: String = \"Fullscreen\"
+	\"Example\"
+) var defaultValue: String = \"Example\"
 
 var selectedIndex: int
 var currentValue: String
 
 # List of options related to the settings element
 var OPTION_LIST: Dictionary = {
-	\"Fullscreen\": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
-	\"Windowed\": DisplayServer.WINDOW_MODE_WINDOWED, 
-	\"Borderless Windowed\": DisplayServer.WINDOW_MODE_WINDOWED
+	\"Example\": \"Value\"
 }
 
 
@@ -51,8 +47,6 @@ func load_settings() -> void:
 	# Initialize the option button
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
-	# Check if the resolution element should be disabled
-	check_resolution()
 	# Apply the loaded values to the game
 	apply_settings()
 
@@ -60,49 +54,22 @@ func load_settings() -> void:
 func option_selected(index: int) -> void:
 	# Update the settings cache
 	ElementResource.option_selected(sectionRef, self, index)
-	
-	# Check if the resolution element should be disabled
-	check_resolution()
 
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
-	# Get the selected option as a string
-	var selected: String = options.get_item_text(selectedIndex)
-	
-	# Check if Borderless Windowed has been selected and toggle the flag accordingly
-	if selected == \"Borderless Windowed\":
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
-	else:
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
-	
-	# Change the display mode to the selected option
-	DisplayServer.window_set_mode(OPTION_LIST[selected])
-
-
-# Called to check if the resolution element should be disabled
-func check_resolution() -> void:
-	# Check if the the resolution element exists
-	if sectionRef.REFERENCE_TABLE.has(\"Resolution\"):
-		# Get the reference for it
-		var resolution = sectionRef.REFERENCE_TABLE[\"Resolution\"]
-		
-		# Check if the selected option is not Windowed and toggle the resolution element accordingly
-		if options.get_item_text(selectedIndex) != \"Windowed\":
-			resolution.options.set_disabled(true)
-		else:
-			resolution.options.set_disabled(false)
+	pass
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="DisplayMode" type="HBoxContainer"]
+[node name="OptionElementTemplate" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_duwn0")
+script = SubResource("GDScript_tdxr6")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2

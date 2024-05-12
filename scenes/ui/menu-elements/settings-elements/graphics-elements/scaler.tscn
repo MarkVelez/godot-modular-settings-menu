@@ -15,12 +15,15 @@ script/source = "extends VBoxContainer
 @onready var element: String = name
 
 @onready var options: OptionButton = $\"ScalerOptions/Options\"
+
+# Reference to sub elements
 @onready var resolutionScale: HBoxContainer = $ResolutionScale
 @onready var fsrOptions: HBoxContainer = $FSROptions
 
 # Resource for common functions between settings elements
 const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
+# Default values for the element
 @export_enum(
 	\"None\", 
 	\"Bilinear\", 
@@ -47,26 +50,38 @@ func _ready():
 	# Add an entry of the settings element to the section's reference table
 	sectionRef.REFERENCE_TABLE[element] = self
 	
-	# Give section information to Resolution Scale sub module
+	# Give section information to Resolution Scale sub element
 	resolutionScale.sectionRef = sectionRef
 	resolutionScale.section = section
 	
-	# Give section information to FSR Options sub module
+	# Give section information to FSR Options sub element
 	fsrOptions.sectionRef = sectionRef
 	fsrOptions.section = section
 
 
+# Loads the saved/default values of the element
 func load_settings() -> void:
+	# Get the current value for the element
 	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	# Initialize the option button
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
+	# Show the appropriate sub element when loading
+	match currentValue:
+		\"Bilinear\":
+			resolutionScale.show()
+		\"FSR 2.2\":
+			fsrOptions.show()
+	
+	# Apply the loaded values to the game
 	apply_settings()
 
 
 func option_selected(index: int) -> void:
-	# Update the resolution in the settings cache
+	# Update the settings cache
 	ElementResource.option_selected(sectionRef, self, index)
 	
+	# Show the appropriate sub element based on the selected option
 	match currentValue:
 		\"None\":
 			resolutionScale.hide()
@@ -82,8 +97,10 @@ func option_selected(index: int) -> void:
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
+	# Change the scaling mode of the game to the selected option
 	get_viewport().set_scaling_3d_mode(OPTION_LIST[currentValue])
 	
+	# Apply the appropriate scaling and additional settings
 	match currentValue:
 		\"None\":
 			get_viewport().set_scaling_3d_scale(1.0)

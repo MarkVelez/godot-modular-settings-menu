@@ -21,11 +21,13 @@ signal clear_cache
 func back_button_pressed() -> void:
 	hide()
 	owner.menu.show()
+	# Clear the settings cache
 	emit_signal(\"clear_cache\")
 
 
 func apply_button_pressed() -> void:
-	applyButton.disabled = true
+	applyButton.set_disabled(true)
+	# Apply the settings of the current section
 	settingsTabs.get_child(settingsTabs.current_tab).on_apply_settings()
 "
 

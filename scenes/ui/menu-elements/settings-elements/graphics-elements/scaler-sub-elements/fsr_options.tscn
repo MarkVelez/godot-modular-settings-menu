@@ -63,7 +63,7 @@ script = SubResource("GDScript_usma2")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Scaler"
+text = "Mode"
 vertical_alignment = 1
 
 [node name="Options" type="OptionButton" parent="."]

@@ -16,6 +16,7 @@ script/source = "extends HBoxContainer
 # Resource for common functions between settings elements
 const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
+# Default values for the element
 @export_enum(
 	\"3840x2160\", 
 	\"2560x1440\", 
@@ -47,31 +48,42 @@ func _ready():
 	sectionRef.REFERENCE_TABLE[element] = self
 
 
+# Loads the saved/default values of the element
 func load_settings() -> void:
+	# Get the current value for the element
 	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	# Initialize the option button
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
+	# Apply the loaded values to the game
 	apply_settings()
 
 
 func option_selected(index: int) -> void:
-	# Update the resolution in the settings cache
+	# Update the settings cache
 	ElementResource.option_selected(sectionRef, self, index)
 
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
+	# Get the selected option as a string
 	var selected: String = options.get_item_text(selectedIndex)
+	# Get the resolution vector from the option list for the selected option
 	var resolution: Vector2i = OPTION_LIST[selected]
 	
+	# Do nothing if the game is in fullscreen mode
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
 		return
 	
+	# Check if the game is in borderless mode
 	if DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_BORDERLESS):
+		# Change the window size to the display's current resolution
 		DisplayServer.window_set_size(DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()))
 	else:
+		# Change the window size to the selected resolution
 		DisplayServer.window_set_size(resolution)
 	
+	# Center the game window
 	get_window().move_to_center()
 "
 

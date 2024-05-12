@@ -1,9 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://ha87l3hl643g"]
+[gd_scene load_steps=5 format=3 uid="uid://slb45swj1cwp"]
 
-[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_ss3so"]
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_hrgtw"]
 
-[sub_resource type="GDScript" id="GDScript_7dhl4"]
-resource_name = "resolution_scale"
+[sub_resource type="GDScript" id="GDScript_3mlf3"]
+resource_name = "slider_sub_element_template"
 script/source = "extends HBoxContainer
 
 # Reference to the section the settings element is under
@@ -19,9 +19,9 @@ script/source = "extends HBoxContainer
 const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
 # Default values for the element
-@export var minValue: float = 0.5
-@export var maxValue: float = 2.0
-@export var stepValue: float = 0.05
+@export var minValue: float = 0.0
+@export var maxValue: float = 1.0
+@export var stepValue: float = 0.01
 @export var defaultValue: float = 1.0
 
 var currentValue: float
@@ -41,13 +41,12 @@ func load_settings() -> void:
 
 
 func value_changed() -> void:
-	# Update the settings cache
 	ElementResource.value_changed(sectionRef, self, currentValue)
+
 
 # Element specific script for applying its value to the game
 func apply_settings() -> void:
-	# Apply the current value as the resolution scale
-	get_viewport().set_scaling_3d_scale(currentValue)
+	pass
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
@@ -56,13 +55,13 @@ size = Vector2(0, 0)
 [sub_resource type="Theme" id="Theme_0xoq4"]
 SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
 
-[node name="ResolutionScale" type="HBoxContainer"]
+[node name="SliderSubElementTemplate" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_7dhl4")
+script = SubResource("GDScript_3mlf3")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
@@ -74,7 +73,7 @@ vertical_alignment = 1
 [node name="SliderValue" type="HBoxContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("1_ss3so")
+script = ExtResource("1_hrgtw")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2
