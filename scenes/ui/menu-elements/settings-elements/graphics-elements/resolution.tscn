@@ -66,11 +66,6 @@ func option_selected(index: int) -> void:
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
-	# Get the selected option as a string
-	var selected: String = options.get_item_text(selectedIndex)
-	# Get the resolution vector from the option list for the selected option
-	var resolution: Vector2i = OPTION_LIST[selected]
-	
 	# Do nothing if the game is in fullscreen mode
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
 		return
@@ -81,7 +76,7 @@ func apply_settings() -> void:
 		DisplayServer.window_set_size(DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()))
 	else:
 		# Change the window size to the selected resolution
-		DisplayServer.window_set_size(resolution)
+		DisplayServer.window_set_size(OPTION_LIST[currentValue])
 	
 	# Center the game window
 	get_window().move_to_center()

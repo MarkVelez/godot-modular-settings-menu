@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://buqq0kms2dbb4"]
+[gd_scene load_steps=8 format=3 uid="uid://buqq0kms2dbb4"]
 
 [ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_5jv5p"]
 [ext_resource type="PackedScene" uid="uid://byff0jwaicxvr" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/display_mode.tscn" id="1_mr6e7"]
 [ext_resource type="PackedScene" uid="uid://cn8r63dmvd55c" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/resolution.tscn" id="2_5bpi0"]
 [ext_resource type="PackedScene" uid="uid://b3w7qpn4nhmu2" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/scaler.tscn" id="4_g2t2s"]
 [ext_resource type="PackedScene" uid="uid://dghfxwcbi5ig" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/max_fps.tscn" id="5_82fyi"]
+[ext_resource type="PackedScene" uid="uid://idtbqnsqlvb6" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/vsync.tscn" id="6_2rh1a"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v0fou"]
 
@@ -51,6 +52,9 @@ layout_mode = 2
 defaultValue = "1280x720"
 
 [node name="Scaler" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("4_g2t2s")]
+layout_mode = 2
+
+[node name="VSync" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("6_2rh1a")]
 layout_mode = 2
 
 [node name="MaxFPS" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("5_82fyi")]

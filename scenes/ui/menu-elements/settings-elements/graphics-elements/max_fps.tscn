@@ -71,7 +71,13 @@ func value_changed(newValue: int) -> void:
 
 # Element specific script for applying its value to the game
 func apply_settings() -> void:
-	Engine.set_max_fps(currentValue)
+	# Check if the vsync element exists and check if it's current value is not disabled
+	if sectionRef.REFERENCE_TABLE.has(\"VSync\") && sectionRef.REFERENCE_TABLE[\"VSync\"].currentValue != \"Disabled\":
+		# Set the fps limit to unlimited
+		Engine.set_max_fps(0)
+	else:
+		# Set the fps limit to the selected value
+		Engine.set_max_fps(currentValue)
 "
 
 [node name="MaxFPS" type="HBoxContainer"]
@@ -104,7 +110,7 @@ step = 0.0
 ticks_on_borders = true
 
 [node name="Value" type="Label" parent="SliderValue"]
-custom_minimum_size = Vector2(80, 0)
+custom_minimum_size = Vector2(80, 31)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 1
