@@ -1,15 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://slb45swj1cwp"]
+[gd_scene load_steps=5 format=3 uid="uid://bjcuw6amean2"]
 
-[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_hrgtw"]
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_m4flt"]
 
-[sub_resource type="GDScript" id="GDScript_3mlf3"]
-resource_name = "slider_sub_element_template"
+[sub_resource type="GDScript" id="GDScript_i57rt"]
+resource_name = "slider_element_template"
 script/source = "extends HBoxContainer
 
 # Reference to the section the settings element is under
-@onready var sectionRef: TabBar
+@onready var sectionRef: TabBar = owner
 # The section the settings element is under
-@onready var section: String
+@onready var section: String = sectionRef.name
 # The name of the settings element
 @onready var element: String = name
 
@@ -20,16 +20,23 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 
 # Default values for the element
 @export var minValue: float = 0.0
-@export var maxValue: float = 1.0
-@export var stepValue: float = 0.01
-@export var defaultValue: float = 1.0
+@export var maxValue: float = 100.0
+@export var stepValue: float = 1.0
+@export var defaultValue: float = 100.0
+
+# An extra suffix for the value (optional)
+@export var valueSuffix: String
 
 var currentValue: float
 
 
 func _ready():
 	# Connect neccessary signals
+	sectionRef.connect(\"apply_settings\", apply_settings)
 	SettingsDataManager.connect(\"load_settings\", load_settings)
+	
+	# Add an entry of the settings element to the section's reference table
+	sectionRef.REFERENCE_TABLE[element] = self
 
 
 # Loads the saved/default values of the element
@@ -37,10 +44,16 @@ func load_settings() -> void:
 	# Get the current value for the element
 	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
 	# Initialize the slider of the element
-	sliderValue.init_slider()
+	sliderValue.init_slider(minValue, maxValue, stepValue, currentValue)
+	
+	# Apply the loaded values to the game
+	apply_settings()
 
 
-func value_changed() -> void:
+func value_changed(newValue: float) -> void:
+	currentValue = newValue
+	
+	# Update the settings cache
 	ElementResource.value_changed(sectionRef, self, currentValue)
 
 
@@ -52,28 +65,29 @@ func apply_settings() -> void:
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
 size = Vector2(0, 0)
 
-[sub_resource type="Theme" id="Theme_0xoq4"]
+[sub_resource type="Theme" id="Theme_4i2xw"]
 SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
 
-[node name="SliderSubElementTemplate" type="HBoxContainer"]
+[node name="SliderElementTemplate" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_3mlf3")
+script = SubResource("GDScript_i57rt")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Resolution Scale"
+text = "Max FPS"
 vertical_alignment = 1
 
 [node name="SliderValue" type="HBoxContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("1_hrgtw")
+theme_override_constants/separation = 6
+script = ExtResource("1_m4flt")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2
@@ -87,7 +101,7 @@ ticks_on_borders = true
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme = SubResource("Theme_0xoq4")
+theme = SubResource("Theme_4i2xw")
 max_value = 0.0
 step = 0.0
-alignment = 1
+alignment = 2

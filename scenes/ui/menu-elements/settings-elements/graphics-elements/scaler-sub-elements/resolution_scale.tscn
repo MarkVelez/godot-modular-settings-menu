@@ -24,6 +24,9 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 @export var stepValue: float = 0.05
 @export var defaultValue: float = 1.0
 
+# An extra suffix for the value (optional)
+@export var valueSuffix: String = \"%\"
+
 var currentValue: float
 
 
@@ -37,10 +40,13 @@ func load_settings() -> void:
 	# Get the current value for the element
 	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
 	# Initialize the slider of the element
-	sliderValue.init_slider()
+	sliderValue.init_slider(minValue * 100, maxValue * 100, stepValue * 100, currentValue * 100)
 
 
-func value_changed() -> void:
+func value_changed(newValue: float) -> void:
+	# Change the value to a precentage value
+	currentValue = newValue / 100
+	
 	# Update the settings cache
 	ElementResource.value_changed(sectionRef, self, currentValue)
 
@@ -50,11 +56,11 @@ func apply_settings() -> void:
 	get_viewport().set_scaling_3d_scale(currentValue)
 "
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hae3h"]
 size = Vector2(0, 0)
 
 [sub_resource type="Theme" id="Theme_0xoq4"]
-SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
+SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hae3h")
 
 [node name="ResolutionScale" type="HBoxContainer"]
 anchors_preset = 15
@@ -74,6 +80,7 @@ vertical_alignment = 1
 [node name="SliderValue" type="HBoxContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 20
 script = ExtResource("1_ss3so")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
@@ -91,4 +98,4 @@ size_flags_vertical = 4
 theme = SubResource("Theme_0xoq4")
 max_value = 0.0
 step = 0.0
-alignment = 1
+alignment = 2

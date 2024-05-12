@@ -1,34 +1,49 @@
 extends HBoxContainer
 
 @onready var slider: HSlider = $Slider
-@onready var valueBox: SpinBox = $Value
+@onready var valueBox := $Value
 
 
 # Called to initialize the slider/spin box of the element
-func init_slider() -> void:
+func init_slider(minValue: float, maxValue: float, stepValue: float, currentValue: float) -> void:
 	# Apply the min/max/step/current value of the slider
-	slider.min_value = owner.minValue * 100
-	slider.max_value = owner.maxValue * 100
-	slider.step = owner.stepValue * 100
-	slider.value = owner.currentValue * 100
+	slider.min_value = minValue
+	slider.max_value = maxValue
+	slider.step = stepValue
+	slider.value = currentValue
 	
-	# Apply the min/max/step/current value of the spin box
-	valueBox.min_value = owner.minValue * 100
-	valueBox.max_value = owner.maxValue * 100
-	valueBox.step = owner.stepValue * 100
-	valueBox.value = owner.currentValue * 100
-	
-	# Connect the value changed signals of the two nodes
+	# Connect the value changed signal for the slider
 	slider.connect("value_changed", slider_value_changed)
-	valueBox.connect("value_changed", value_changed)
+	
+	# Check if the value box is a spin box or a label
+	if valueBox is SpinBox:
+		# Apply the min/max/step/current value of the spin box
+		valueBox.min_value = minValue
+		valueBox.max_value = maxValue
+		valueBox.step = stepValue
+		valueBox.value = currentValue
+		
+		# Add caret blink to spin box
+		valueBox.get_line_edit().caret_blink = true
+		
+		valueBox.suffix = owner.valueSuffix
+		
+		# Connect the value changed signal of the spin box
+		valueBox.connect("value_changed", value_changed)
+	else:
+		# Set the text as the current value
+		valueBox.set_text(str(currentValue) + owner.valueSuffix)
 
 
-func slider_value_changed(value: float) -> void:
-	valueBox.value = value
+func slider_value_changed(value) -> void:
+	if valueBox is SpinBox:
+		valueBox.value = value
+	else:
+		valueBox.set_text(str(value) + owner.valueSuffix)
+	
+	# Pass the new value up to the element
+	owner.value_changed(value)
 
 
-func value_changed(value: float) -> void:
+func value_changed(value) -> void:
 	slider.value = value
-	# Pass the new value up to the element (divided by hundred because the assigned values are percentage)
-	owner.currentValue = value / 100
-	owner.value_changed()

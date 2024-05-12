@@ -51,7 +51,7 @@ func option_selected(sectionRef: TabBar, elementRef: Node, index: int) -> void:
 
 
 # Used to update values of the section cache the element is under (used for slider elements)
-func value_changed(sectionRef: TabBar, elementRef: Node, value: float) -> void:
+func value_changed(sectionRef: TabBar, elementRef: Node, value) -> void:
 	# Update the settings cache with the new slider value
 	sectionRef.SETTINGS_SECTION_CACHE[elementRef.name] = value
 	# Check if the new value is different than the saved value
