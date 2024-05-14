@@ -1,6 +1,7 @@
-[gd_scene load_steps=18 format=3 uid="uid://bh7hetspcaxp0"]
+[gd_scene load_steps=19 format=3 uid="uid://bh7hetspcaxp0"]
 
 [ext_resource type="PackedScene" uid="uid://becfhb65goqg6" path="res://scenes/ui/in_game_menu.tscn" id="1_6olxy"]
+[ext_resource type="Texture2D" uid="uid://h7awm5rksxsf" path="res://assets/floorTexture.png" id="2_y6wmg"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qs1ik"]
 sky_energy_multiplier = 15.0
@@ -59,11 +60,12 @@ roughness = 0.3
 [sub_resource type="SphereMesh" id="SphereMesh_1thse"]
 material = SubResource("StandardMaterial3D_8lbeg")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8q8uo"]
-albedo_color = Color(1, 0.564706, 0.415686, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_owuq1"]
+albedo_texture = ExtResource("2_y6wmg")
+uv1_triplanar = true
 
 [sub_resource type="BoxMesh" id="BoxMesh_tecy0"]
-material = SubResource("StandardMaterial3D_8q8uo")
+material = SubResource("StandardMaterial3D_owuq1")
 size = Vector3(15, 0.5, 15)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kqh6p"]

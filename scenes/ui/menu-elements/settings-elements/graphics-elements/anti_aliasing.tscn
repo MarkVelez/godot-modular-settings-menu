@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://idtbqnsqlvb6"]
+[gd_scene load_steps=3 format=3 uid="uid://csg6c3uuct1ls"]
 
-[sub_resource type="GDScript" id="GDScript_kwfgn"]
-resource_name = "vsync"
+[sub_resource type="GDScript" id="GDScript_5w56l"]
+resource_name = "anti_aliasing"
 script/source = "extends HBoxContainer
 
 # Reference to the section the settings element is under
@@ -19,20 +19,25 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 # Default values for the element
 @export_enum(
 	\"Disabled\",
-	\"Enabled\",
-	\"Adaptive\",
-	\"Mailbox\"
+	\"FXAA\",
+	\"2x MSAA\",
+	\"4x MSAA\",
+	\"8x MSAA\",
+	\"TAA\"
 ) var defaultValue: String = \"Disabled\"
 
 var selectedIndex: int
 var currentValue: String
 
 # List of options related to the settings element
-var OPTION_LIST: Dictionary = {
-	\"Disabled\": DisplayServer.VSYNC_DISABLED,
-	\"Enabled\": DisplayServer.VSYNC_ENABLED,
-	\"Adaptive\": DisplayServer.VSYNC_ADAPTIVE
-}
+var OPTION_LIST: Array[String] = [
+	\"Disabled\",
+	\"FXAA\",
+	\"2x MSAA\",
+	\"4x MSAA\",
+	\"8x MSAA\",
+	\"TAA\"
+]
 
 
 func _ready():
@@ -54,58 +59,53 @@ func load_settings() -> void:
 	
 	# Apply the loaded values to the game
 	apply_settings()
-	
-	# Toggle the max fps element
-	toggle_max_fps()
 
 
 func option_selected(index: int) -> void:
 	# Update the settings cache
 	ElementResource.option_selected(sectionRef, self, index)
-	
-	# Toggle the max fps element
-	toggle_max_fps()
 
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
-	# Set the vsync mode to the selected option
-	DisplayServer.window_set_vsync_mode(OPTION_LIST[currentValue])
+	# Enables the selected anti aliasing
+	match currentValue:
+		\"Disabled\":
+			set_anti_aliasing_mode()
+		\"FXAA\":
+			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_FXAA)
+		\"2x MSAA\":
+			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_2X)
+		\"4x MSAA\":
+			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_4X)
+		\"8x MSAA\":
+			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_8X)
+		\"TAA\":
+			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_DISABLED, true)
 
 
-# Disable/Enable the max fps element according to if vsync is on or not
-func toggle_max_fps() -> void:
-	# Check if the max fps element exists
-	if sectionRef.REFERENCE_TABLE.has(\"MaxFPS\"):
-		# Reference to the slider value node of the max fps element
-		var sliderValue: HBoxContainer = sectionRef.REFERENCE_TABLE[\"MaxFPS\"].sliderValue
-		
-		# Check if vsync is disabled
-		if currentValue == \"Disabled\":
-			# Enable the max fps element
-			sliderValue.slider.set_editable(true)
-			sliderValue.valueBox.modulate = Color.WHITE
-		else:
-			# Disable the max fps element
-			sliderValue.slider.set_editable(false)
-			sliderValue.valueBox.modulate = Color.GRAY
+# Sets the anti aliasing mode according to the values provided
+func set_anti_aliasing_mode(fxaaMode: Viewport.ScreenSpaceAA = Viewport.SCREEN_SPACE_AA_DISABLED, msaaMode: Viewport.MSAA = Viewport.MSAA_DISABLED, taaMode: bool = false) -> void:
+	get_viewport().set_screen_space_aa(fxaaMode)
+	get_viewport().set_msaa_3d(msaaMode)
+	get_viewport().set_use_taa(taaMode)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="VSync" type="HBoxContainer"]
+[node name="AntiAliasing" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_kwfgn")
+script = SubResource("GDScript_5w56l")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "V-Sync"
+text = "Anti Aliasing"
 vertical_alignment = 1
 
 [node name="Options" type="OptionButton" parent="."]

@@ -20,7 +20,7 @@ func load_element_settings(defaultValue, section: String, element: String):
 
 
 # Used to initialize an option button element
-func init_option_button_element(OPTION_LIST: Dictionary, optionButton: OptionButton, currentValue) -> int:
+func init_option_button_element(OPTION_LIST, optionButton: OptionButton, currentValue) -> int:
 	var index: int = 0
 	var selectedIndex: int
 	
