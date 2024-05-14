@@ -6,9 +6,9 @@ signal load_settings
 var SETTINGS_DATA: Dictionary
 
 # Path to the settings save file
-const dataFolder = "user://"
-const fileName = "settings.cfg"
-var path = dataFolder + fileName
+const dataFolder: String = "user://"
+const fileName: String = "settings.cfg"
+var path: String = dataFolder + fileName
 
 # Flag for checking if a save file exists
 var noSaveFile: bool

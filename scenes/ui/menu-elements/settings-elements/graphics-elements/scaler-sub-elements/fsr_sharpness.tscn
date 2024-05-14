@@ -9,9 +9,9 @@ script/source = "extends HBoxContainer
 # Reference to the section the settings element is under
 @onready var sectionRef: TabBar
 # The section the settings element is under
-@onready var section: String
+@onready var section: StringName
 # The name of the settings element
-@onready var element: String = name
+@onready var element: StringName = name
 
 @onready var sliderValue: HBoxContainer = $SliderValue
 

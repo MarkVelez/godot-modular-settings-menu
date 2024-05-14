@@ -7,9 +7,9 @@ script/source = "extends HBoxContainer
 # Reference to the section the settings element is under
 @onready var sectionRef: TabBar = owner
 # The section the settings element is under
-@onready var section: String = sectionRef.name
+@onready var section: StringName = sectionRef.name
 # The name of the settings element
-@onready var element: String = name
+@onready var element: StringName = name
 
 @onready var options: OptionButton = $Options
 
@@ -89,6 +89,9 @@ func check_resolution() -> void:
 			resolution.options.set_disabled(true)
 		else:
 			resolution.options.set_disabled(false)
+			
+			if !sectionRef.CHANGED_ELEMENTS.has(\"Resolution\"):
+				sectionRef.CHANGED_ELEMENTS.append(\"Resolution\")
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

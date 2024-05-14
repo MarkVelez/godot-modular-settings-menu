@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://px6a2dg8cawb"]
+[gd_scene load_steps=9 format=3 uid="uid://px6a2dg8cawb"]
 
 [ext_resource type="PackedScene" uid="uid://baaurgnw10lsy" path="res://scenes/ui/menu-elements/settings-elements/gameplay.tscn" id="1_k4yar"]
 [ext_resource type="PackedScene" uid="uid://buqq0kms2dbb4" path="res://scenes/ui/menu-elements/settings-elements/graphics.tscn" id="2_gtlr3"]
@@ -12,17 +12,22 @@ script/source = "extends Control
 signal get_settings
 signal clear_cache
 
-@onready var settingsPanel = %SettingsPanel
-@onready var settingsTabs = %SettingsTabs
-@onready var discardChangesPopup = %DiscardChangesPopup
-@onready var applyButton = %ApplyButton
+@onready var settingsPanel: VBoxContainer = %SettingsPanel
+@onready var settingsTabs: TabContainer = %SettingsTabs
+@onready var discardChangesPopup: PanelContainer = %DiscardChangesPopup
+@onready var applyButton: Button = %ApplyButton
 
 
 func back_button_pressed() -> void:
-	hide()
-	owner.menu.show()
-	# Clear the settings cache
-	emit_signal(\"clear_cache\")
+	# Check if there have been any changes made
+	if applyButton.is_disabled():
+		hide()
+		owner.menu.show()
+		# Clear the settings cache
+		emit_signal(\"clear_cache\")
+	else:
+		# Display the discard changes popup
+		discardChangesPopup.show()
 
 
 func apply_button_pressed() -> void:
@@ -32,6 +37,34 @@ func apply_button_pressed() -> void:
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kwbsm"]
+
+[sub_resource type="GDScript" id="GDScript_sciva"]
+resource_name = "discard_changes_popup"
+script/source = "extends PanelContainer
+
+
+func yes_button_pressed():
+	var currentTab: TabBar = owner.settingsTabs.get_child(owner.settingsTabs.current_tab)
+	
+	for element in currentTab.CHANGED_ELEMENTS:
+		currentTab.REFERENCE_TABLE[element].load_settings()
+	
+	currentTab.CHANGED_ELEMENTS.clear()
+	owner.applyButton.set_disabled(true)
+	owner.back_button_pressed()
+	hide()
+
+
+func no_button_pressed():
+	hide()
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qc1g8"]
+bg_color = Color(0.162066, 0.162066, 0.162065, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="Settings" type="Control"]
 layout_mode = 3
@@ -96,47 +129,50 @@ text = "Back"
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = SubResource("GDScript_sciva")
 
-[node name="MarginContainer" type="MarginContainer" parent="DiscardChangesPopup"]
+[node name="PopupWindow" type="PanelContainer" parent="DiscardChangesPopup"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_qc1g8")
+
+[node name="MarginContainer" type="MarginContainer" parent="DiscardChangesPopup/PopupWindow"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="DiscardChangesPopup/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="DiscardChangesPopup/PopupWindow/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Text" type="Label" parent="DiscardChangesPopup/MarginContainer/VBoxContainer"]
+[node name="Text" type="Label" parent="DiscardChangesPopup/PopupWindow/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Would you like to discard
 all changes done?"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="DiscardChangesPopup/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="DiscardChangesPopup/PopupWindow/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="YesButton" type="Button" parent="DiscardChangesPopup/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="YesButton" type="Button" parent="DiscardChangesPopup/PopupWindow/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Yes"
 
-[node name="NoButton" type="Button" parent="DiscardChangesPopup/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="NoButton" type="Button" parent="DiscardChangesPopup/PopupWindow/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "No"
 
 [connection signal="pressed" from="SettingsPanel/HBoxContainer/ApplyButton" to="." method="apply_button_pressed"]
 [connection signal="pressed" from="SettingsPanel/HBoxContainer/BackButton" to="." method="back_button_pressed"]
+[connection signal="pressed" from="DiscardChangesPopup/PopupWindow/MarginContainer/VBoxContainer/HBoxContainer/YesButton" to="DiscardChangesPopup" method="yes_button_pressed"]
+[connection signal="pressed" from="DiscardChangesPopup/PopupWindow/MarginContainer/VBoxContainer/HBoxContainer/NoButton" to="DiscardChangesPopup" method="no_button_pressed"]

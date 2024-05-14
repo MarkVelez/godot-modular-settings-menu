@@ -7,9 +7,9 @@ script/source = "extends HBoxContainer
 # Reference to the section the settings element is under
 @onready var sectionRef: TabBar = owner
 # The section the settings element is under
-@onready var section: String = sectionRef.name
+@onready var section: StringName = sectionRef.name
 # The name of the settings element
-@onready var element: String = name
+@onready var element: StringName = name
 
 @onready var options: OptionButton = $Options
 

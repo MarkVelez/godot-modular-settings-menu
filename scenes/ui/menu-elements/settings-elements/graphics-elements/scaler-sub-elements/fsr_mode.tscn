@@ -7,9 +7,9 @@ script/source = "extends HBoxContainer
 # Reference to the section the settings element is under
 @onready var sectionRef: TabBar
 # The section the settings element is under
-@onready var section: String
+@onready var section: StringName
 # The name of the settings element
-@onready var element: String = name
+@onready var element: StringName = name
 
 @onready var options: OptionButton = $Options
 
@@ -55,7 +55,7 @@ func apply_settings() -> void:
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="FSROptions" type="HBoxContainer"]
+[node name="FSRMode" type="HBoxContainer"]
 size_flags_vertical = 3
 script = SubResource("GDScript_usma2")
 

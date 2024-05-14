@@ -2,7 +2,7 @@ extends Resource
 class_name SettingsElementResource
 
 # Used for loading saved/default value for an element
-func load_element_settings(defaultValue, section: String, element: String):
+func load_element_settings(defaultValue, section: StringName, element: StringName):
 	var currentValue
 	
 	# Check if no save file exists
@@ -41,9 +41,9 @@ func init_option_button_element(OPTION_LIST, optionButton: OptionButton, current
 # Used to update values of the section cache the element is under (used for option button elements)
 func option_selected(sectionRef: TabBar, elementRef: Node, index: int) -> void:
 	# Update the settings cache with the selected option
-	sectionRef.SETTINGS_SECTION_CACHE[elementRef.name] = elementRef.options.get_item_text(index)
+	sectionRef.SETTINGS_SECTION_CACHE[elementRef.element] = elementRef.options.get_item_text(index)
 	# Check if the selected value is different than the saved value
-	sectionRef.settings_changed()
+	sectionRef.settings_changed(elementRef.element)
 	
 	# Update the element's values
 	elementRef.currentValue = elementRef.options.get_item_text(index)
@@ -53,6 +53,6 @@ func option_selected(sectionRef: TabBar, elementRef: Node, index: int) -> void:
 # Used to update values of the section cache the element is under (used for slider elements)
 func value_changed(sectionRef: TabBar, elementRef: Node, value) -> void:
 	# Update the settings cache with the new slider value
-	sectionRef.SETTINGS_SECTION_CACHE[elementRef.name] = value
+	sectionRef.SETTINGS_SECTION_CACHE[elementRef.element] = value
 	# Check if the new value is different than the saved value
-	sectionRef.settings_changed()
+	sectionRef.settings_changed(elementRef.element)

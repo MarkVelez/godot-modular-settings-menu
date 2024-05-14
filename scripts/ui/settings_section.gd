@@ -3,12 +3,14 @@ extends TabBar
 signal apply_settings
 
 # Name of the settings section (used as the key for the section in the settings data)
-@onready var section: String = name
+@onready var section: StringName = name
 
 # Reference table of all elements under the section (does not include sub elements)
 var REFERENCE_TABLE: Dictionary
 # Cache of all the settings values for the section
 var SETTINGS_SECTION_CACHE: Dictionary
+# A list of all the elements that were changed since the settings were last applied
+var CHANGED_ELEMENTS: Array[StringName]
 
 
 func _ready():
@@ -19,7 +21,7 @@ func _ready():
 	# Add section to the settings data if no save file exists
 	if SettingsDataManager.noSaveFile:
 		SettingsDataManager.SETTINGS_DATA = {
-			name: {}
+			section: {}
 		}
 
 
@@ -39,11 +41,13 @@ func clear_cache() -> void:
 
 
 # Called to check for changes between the cache and the settings data
-func settings_changed() -> void:
-	# Enable/disable the apply button if there are or aren't differences
+func settings_changed(element: String) -> void:
+	# Check if there are differences between the cache and the settings data
 	if SETTINGS_SECTION_CACHE == SettingsDataManager.SETTINGS_DATA[section]:
 		owner.applyButton.set_disabled(true)
 	else:
+		if !CHANGED_ELEMENTS.has(element):
+			CHANGED_ELEMENTS.append(element)
 		owner.applyButton.set_disabled(false)
 
 
@@ -51,4 +55,8 @@ func settings_changed() -> void:
 func on_apply_settings() -> void:
 	SettingsDataManager.SETTINGS_DATA[section] = SETTINGS_SECTION_CACHE.duplicate(true)
 	SettingsDataManager.save_data()
-	emit_signal("apply_settings")
+	
+	for element in CHANGED_ELEMENTS:
+		REFERENCE_TABLE[element].apply_settings()
+	
+	CHANGED_ELEMENTS.clear()
