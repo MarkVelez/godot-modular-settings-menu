@@ -1,52 +1,72 @@
-[gd_scene load_steps=4 format=3 uid="uid://f5anrphbj5o2"]
+[gd_scene load_steps=5 format=3 uid="uid://cy8n6yalxprb7"]
 
-[sub_resource type="GDScript" id="GDScript_3hywj"]
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_ut0oh"]
+
+[sub_resource type="GDScript" id="GDScript_s1j2c"]
 resource_name = "sensitivity"
 script/source = "extends HBoxContainer
 
-@onready var slider: HSlider = %SenitivitySlider
-@onready var value: SpinBox = %SensitivityValue
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
 
-@export var minSensitivity: float = 0.01
-@export var maxSensitivity: float = 10
-@export var defaultSensitivity: float = 5
+@onready var sliderValue: HBoxContainer = $SliderValue
 
-var userSensitivity: float
+# Resource for common functions between settings elements
+const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+
+# Default values for the element
+@export var minValue: float = 0.01
+@export var maxValue: float = 5.0
+@export var stepValue: float = 0.01
+@export var defaultValue: float = 1.0
+
+# An extra suffix for the value (optional)
+@export var valueSuffix: String
+
+var currentValue: float
 
 
 func _ready():
-	slider.connect(\"value_changed\", sensitivity_slider_value_changed)
-	value.connect(\"value_changed\", sensitivity_value_value_changed)
+	# Connect neccessary signals
+	sectionRef.connect(\"apply_settings\", apply_settings)
+	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
-	value.get_line_edit().caret_blink = true
-	
-	if owner.owner.SETTINGS_CACHE[\"controls\"][\"sensitivity\"] == defaultSensitivity:
-		userSensitivity = defaultSensitivity
-	else:
-		userSensitivity = owner.owner.SETTINGS_CACHE[\"controls\"][\"sensitivity\"]
-	
-	value.min_value = minSensitivity
-	value.max_value = maxSensitivity
-	value.value = userSensitivity
-	
-	slider.min_value = minSensitivity
-	slider.max_value = maxSensitivity
-	slider.value = userSensitivity
+	# Add an entry of the settings element to the section's reference table
+	sectionRef.REFERENCE_TABLE[element] = self
 
 
-func sensitivity_slider_value_changed(newValue: float):
-	value.value = newValue
+# Loads the saved/default values of the element
+func load_settings() -> void:
+	# Get the current value for the element
+	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	# Initialize the slider of the element
+	sliderValue.init_slider(minValue, maxValue, stepValue, currentValue)
+	
+	# Apply the loaded values to the game
+	call_deferred(\"apply_settings\")
 
 
-func sensitivity_value_value_changed(newValue: float):
-	slider.value = newValue
-	owner.owner.SETTINGS_CACHE[\"controls\"][\"sensitivity\"] = newValue
+func value_changed(newValue: float) -> void:
+	currentValue = newValue
+	
+	# Update the settings cache
+	ElementResource.value_changed(sectionRef, self, currentValue)
+
+
+# Element specific script for applying its value to the game
+func apply_settings() -> void:
+	if sectionRef.owner.isInGameMenu:
+		SettingsDataManager.call_deferred(\"emit_signal\", \"apply_game_settings\", element)
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
 size = Vector2(0, 0)
 
-[sub_resource type="Theme" id="Theme_0xoq4"]
+[sub_resource type="Theme" id="Theme_4i2xw"]
 SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
 
 [node name="Sensitivity" type="HBoxContainer"]
@@ -55,37 +75,34 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_3hywj")
+script = SubResource("GDScript_s1j2c")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Sensitivity"
+text = "Mouse Sensitivity"
 vertical_alignment = 1
 
-[node name="Value" type="HBoxContainer" parent="."]
+[node name="SliderValue" type="HBoxContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 6
+script = ExtResource("1_ut0oh")
 
-[node name="SenitivitySlider" type="HSlider" parent="Value"]
-unique_name_in_owner = true
+[node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-min_value = 0.01
-max_value = 10.0
-step = 0.01
-value = 5.0
+max_value = 0.0
+step = 0.0
+ticks_on_borders = true
 
-[node name="SensitivityValue" type="SpinBox" parent="Value"]
-unique_name_in_owner = true
+[node name="Value" type="SpinBox" parent="SliderValue"]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme = SubResource("Theme_0xoq4")
-min_value = 0.01
-max_value = 10.0
-step = 0.01
-value = 5.0
-alignment = 1
+theme = SubResource("Theme_4i2xw")
+max_value = 0.0
+step = 0.0
+alignment = 2

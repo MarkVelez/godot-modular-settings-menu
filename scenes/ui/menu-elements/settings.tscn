@@ -1,9 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://px6a2dg8cawb"]
+[gd_scene load_steps=8 format=3 uid="uid://px6a2dg8cawb"]
 
-[ext_resource type="PackedScene" uid="uid://baaurgnw10lsy" path="res://scenes/ui/menu-elements/settings-elements/gameplay.tscn" id="1_k4yar"]
+[ext_resource type="PackedScene" uid="uid://c66v42g6gs7gr" path="res://scenes/ui/menu-elements/settings-elements/gameplay.tscn" id="1_5exwk"]
 [ext_resource type="PackedScene" uid="uid://buqq0kms2dbb4" path="res://scenes/ui/menu-elements/settings-elements/graphics.tscn" id="2_gtlr3"]
-[ext_resource type="PackedScene" uid="uid://dtiki8x56j1tu" path="res://scenes/ui/menu-elements/settings-elements/controls.tscn" id="3_yucxh"]
-[ext_resource type="PackedScene" uid="uid://bdgbsm4a85jy5" path="res://scenes/ui/menu-elements/settings-elements/audio.tscn" id="4_s7xsc"]
+[ext_resource type="PackedScene" uid="uid://dfswr81erouhj" path="res://scenes/ui/menu-elements/settings-elements/controls.tscn" id="3_yucxh"]
 
 [sub_resource type="GDScript" id="GDScript_eua2a"]
 resource_name = "settings"
@@ -11,6 +10,8 @@ script/source = "extends Control
 
 signal get_settings
 signal clear_cache
+
+@export var isInGameMenu: bool = true	## Used to check if gameplay related settings should be applied
 
 @onready var settingsPanel: VBoxContainer = %SettingsPanel
 @onready var settingsTabs: TabContainer = %SettingsTabs
@@ -96,8 +97,9 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(640, 505)
 layout_mode = 2
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
+current_tab = 1
 
-[node name="Gameplay" parent="SettingsPanel/SettingsTabs" instance=ExtResource("1_k4yar")]
+[node name="Gameplay" parent="SettingsPanel/SettingsTabs" instance=ExtResource("1_5exwk")]
 layout_mode = 2
 
 [node name="Graphics" parent="SettingsPanel/SettingsTabs" instance=ExtResource("2_gtlr3")]
@@ -105,9 +107,7 @@ visible = false
 layout_mode = 2
 
 [node name="Controls" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_yucxh")]
-layout_mode = 2
-
-[node name="Audio" parent="SettingsPanel/SettingsTabs" instance=ExtResource("4_s7xsc")]
+visible = false
 layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel"]

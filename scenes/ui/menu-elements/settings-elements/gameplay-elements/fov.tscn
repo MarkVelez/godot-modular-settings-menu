@@ -1,9 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://bjcuw6amean2"]
+[gd_scene load_steps=5 format=3 uid="uid://elu1vc0ox472"]
 
-[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_m4flt"]
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_gnmf1"]
 
-[sub_resource type="GDScript" id="GDScript_i57rt"]
-resource_name = "slider_element_template"
+[sub_resource type="GDScript" id="GDScript_1rk38"]
+resource_name = "fov"
 script/source = "extends HBoxContainer
 
 # Reference to the section the settings element is under
@@ -20,12 +20,12 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 
 # Default values for the element
 @export var minValue: float = 0.0
-@export var maxValue: float = 100.0
+@export var maxValue: float = 120.0
 @export var stepValue: float = 1.0
-@export var defaultValue: float = 100.0
+@export var defaultValue: float = 75.0
 
 # An extra suffix for the value (optional)
-@export var valueSuffix: String
+@export var valueSuffix: String = \"°\"
 
 var currentValue: float
 
@@ -59,7 +59,8 @@ func value_changed(newValue: float) -> void:
 
 # Element specific script for applying its value to the game
 func apply_settings() -> void:
-	pass
+	if sectionRef.owner.isInGameMenu:
+		SettingsDataManager.call_deferred(\"emit_signal\", \"apply_game_settings\", element)
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
@@ -68,26 +69,26 @@ size = Vector2(0, 0)
 [sub_resource type="Theme" id="Theme_4i2xw"]
 SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
 
-[node name="SliderElementTemplate" type="HBoxContainer"]
+[node name="FOV" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_i57rt")
+script = SubResource("GDScript_1rk38")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Slider Element"
+text = "Field of View"
 vertical_alignment = 1
 
 [node name="SliderValue" type="HBoxContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
-script = ExtResource("1_m4flt")
+script = ExtResource("1_gnmf1")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2

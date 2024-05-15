@@ -48,7 +48,7 @@ func load_settings() -> void:
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
 	# Apply the loaded values to the game
-	apply_settings()
+	call_deferred(\"apply_settings\")
 
 
 func option_selected(index: int) -> void:
@@ -75,7 +75,7 @@ script = SubResource("GDScript_sk6j2")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Display Mode"
+text = "Option Element"
 vertical_alignment = 1
 
 [node name="Options" type="OptionButton" parent="."]

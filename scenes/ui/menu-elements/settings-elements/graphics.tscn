@@ -11,6 +11,11 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v0fou"]
 
 [node name="Graphics" type="TabBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_v0fou")
 script = ExtResource("1_5jv5p")
 
@@ -35,7 +40,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
@@ -43,23 +47,53 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/separation = 24
 
-[node name="DisplayMode" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("1_mr6e7")]
+[node name="BasicSettings" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList"]
+layout_mode = 2
+
+[node name="SubSectionName" type="Label" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Basic Settings"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings"]
+layout_mode = 2
+
+[node name="SubSectionElements" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings"]
+layout_mode = 2
+
+[node name="DisplayMode" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/SubSectionElements" instance=ExtResource("1_mr6e7")]
 layout_mode = 2
 defaultValue = "Windowed"
 
-[node name="Resolution" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("2_5bpi0")]
+[node name="Resolution" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/SubSectionElements" instance=ExtResource("2_5bpi0")]
 layout_mode = 2
 defaultValue = "1280x720"
 
-[node name="Scaler" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("4_g2t2s")]
+[node name="MaxFPS" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/BasicSettings/SubSectionElements" instance=ExtResource("5_82fyi")]
 layout_mode = 2
 
-[node name="VSync" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("6_2rh1a")]
+[node name="AdvancedSettings" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList"]
 layout_mode = 2
 
-[node name="MaxFPS" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("5_82fyi")]
+[node name="SubSectionName" type="Label" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Advanced Settings
+"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings"]
 layout_mode = 2
 
-[node name="AntiAliasing" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("7_r8hxv")]
+[node name="SubSectionElements" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings"]
+layout_mode = 2
+
+[node name="Scaler" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("4_g2t2s")]
+layout_mode = 2
+
+[node name="AntiAliasing" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("7_r8hxv")]
+layout_mode = 2
+
+[node name="VSync" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("6_2rh1a")]
 layout_mode = 2

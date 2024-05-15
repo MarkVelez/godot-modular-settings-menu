@@ -21,7 +21,6 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 	\"Disabled\",
 	\"Enabled\",
 	\"Adaptive\",
-	\"Mailbox\"
 ) var defaultValue: String = \"Disabled\"
 
 var selectedIndex: int
@@ -53,8 +52,7 @@ func load_settings() -> void:
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
 	# Apply the loaded values to the game
-	apply_settings()
-	
+	call_deferred(\"apply_settings\")
 	# Toggle the max fps element
 	toggle_max_fps()
 

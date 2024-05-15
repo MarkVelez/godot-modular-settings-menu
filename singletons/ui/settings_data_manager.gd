@@ -1,6 +1,7 @@
 extends Node
 
 signal load_settings
+signal apply_game_settings(setting: StringName)
 
 # Dictionary that stores all settings data
 var SETTINGS_DATA: Dictionary

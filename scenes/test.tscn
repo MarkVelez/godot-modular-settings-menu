@@ -1,18 +1,36 @@
-[gd_scene load_steps=19 format=3 uid="uid://bh7hetspcaxp0"]
+[gd_scene load_steps=21 format=3 uid="uid://bh7hetspcaxp0"]
 
 [ext_resource type="PackedScene" uid="uid://becfhb65goqg6" path="res://scenes/ui/in_game_menu.tscn" id="1_6olxy"]
 [ext_resource type="Texture2D" uid="uid://h7awm5rksxsf" path="res://assets/floorTexture.png" id="2_y6wmg"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qs1ik"]
-sky_energy_multiplier = 15.0
+[sub_resource type="GDScript" id="GDScript_35nie"]
+resource_name = "test_scene"
+script/source = "extends Node3D
 
-[sub_resource type="Sky" id="Sky_mdnst"]
-sky_material = SubResource("ProceduralSkyMaterial_qs1ik")
+@export var cameraRef: Camera3D
+
+@onready var currentFov: float = cameraRef.get_fov()
+
+
+func _ready():
+	SettingsDataManager.connect(\"apply_game_settings\", apply_game_settings)
+
+
+func apply_game_settings(setting: StringName) -> void:
+	match setting:
+		&\"FOV\":
+			cameraRef.set_fov(SettingsDataManager.SETTINGS_DATA[\"Gameplay\"][\"FOV\"])
+"
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1cg2s"]
+
+[sub_resource type="Sky" id="Sky_s1kgf"]
+sky_material = SubResource("ProceduralSkyMaterial_1cg2s")
 
 [sub_resource type="Environment" id="Environment_snm0g"]
-sky = SubResource("Sky_mdnst")
-sky_rotation = Vector3(0, 0, -0.225147)
-ambient_light_source = 3
+background_mode = 2
+background_energy_multiplier = 2.0
+sky = SubResource("Sky_s1kgf")
 
 [sub_resource type="GDScript" id="GDScript_lw3sa"]
 resource_name = "control_panel"
@@ -52,6 +70,9 @@ func _on_hide_menu_toggled(toggled_on):
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_omi2h"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ym35m"]
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lwned"]
+dof_blur_far_distance = 6.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8lbeg"]
 albedo_color = Color(0.268536, 0.670061, 0.227251, 1)
@@ -94,14 +115,15 @@ top_radius = 0.05
 bottom_radius = 0.05
 radial_segments = 8
 
-[node name="Node3D" type="Node3D"]
+[node name="TestScene" type="Node3D" node_paths=PackedStringArray("cameraRef")]
+script = SubResource("GDScript_35nie")
+cameraRef = NodePath("Camera3D")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_snm0g")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.905658, -0.0180046, -0.423627, 0.250551, 0.828736, 0.500421, 0.342065, -0.55935, 0.755062, -3.04957, 2.46832, 1.0767)
-light_energy = 0.5
+transform = Transform3D(0.905658, -0.0180051, -0.423627, 0.250551, 0.828736, 0.500421, 0.342065, -0.55935, 0.755062, -3.04957, 2.46832, 3.17313)
 shadow_enabled = true
 
 [node name="GUI" type="CanvasLayer" parent="."]
@@ -140,6 +162,8 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_ym35m")
 text = "Toggle Animation"
 
 [node name="Camera3D" type="Camera3D" parent="."]
+attributes = SubResource("CameraAttributesPractical_lwned")
+current = true
 
 [node name="ball" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.854921, 0, 0.518758, 0, 1, 0, -0.518758, 0, 0.854921, 0, -0.153776, -3.51229)

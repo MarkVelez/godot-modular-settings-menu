@@ -54,7 +54,7 @@ func load_settings() -> void:
 	# Check if the resolution element should be disabled
 	check_resolution()
 	# Apply the loaded values to the game
-	apply_settings()
+	call_deferred(\"apply_settings\")
 
 
 func option_selected(index: int) -> void:

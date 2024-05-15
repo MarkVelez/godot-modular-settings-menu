@@ -20,9 +20,7 @@ func _ready():
 	
 	# Add section to the settings data if no save file exists
 	if SettingsDataManager.noSaveFile:
-		SettingsDataManager.SETTINGS_DATA = {
-			section: {}
-		}
+		SettingsDataManager.SETTINGS_DATA[section] = {}
 
 
 # Called when opening the settings menu to fill the settings cache

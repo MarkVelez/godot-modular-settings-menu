@@ -52,7 +52,7 @@ func load_settings() -> void:
 		sliderValue.valueBox.set_text(\"Unlimited\")
 	
 	# Apply the loaded values to the game
-	apply_settings()
+	call_deferred(\"apply_settings\")
 
 
 func value_changed(newValue: int) -> void:
@@ -72,12 +72,14 @@ func value_changed(newValue: int) -> void:
 # Element specific script for applying its value to the game
 func apply_settings() -> void:
 	# Check if the vsync element exists and check if it's current value is not disabled
-	if sectionRef.REFERENCE_TABLE.has(\"VSync\") && sectionRef.REFERENCE_TABLE[\"VSync\"].currentValue != \"Disabled\":
-		# Set the fps limit to unlimited
-		Engine.set_max_fps(0)
-	else:
-		# Set the fps limit to the selected value
-		Engine.set_max_fps(currentValue)
+	if sectionRef.REFERENCE_TABLE.has(\"VSync\"):
+		if sectionRef.REFERENCE_TABLE[\"VSync\"].currentValue != \"Disabled\":
+			# Set the fps limit to unlimited
+			Engine.set_max_fps(0)
+			return
+	
+	# Set the fps limit to the selected value
+	Engine.set_max_fps(currentValue)
 "
 
 [node name="MaxFPS" type="HBoxContainer"]

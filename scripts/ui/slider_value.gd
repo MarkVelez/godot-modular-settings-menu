@@ -13,7 +13,8 @@ func init_slider(minValue: float, maxValue: float, stepValue: float, currentValu
 	slider.value = currentValue
 	
 	# Connect the value changed signal for the slider
-	slider.connect("value_changed", slider_value_changed)
+	if !slider.is_connected("value_changed", slider_value_changed):
+		slider.connect("value_changed", slider_value_changed)
 	
 	# Check if the value box is a spin box or a label
 	if valueBox is SpinBox:
@@ -29,7 +30,8 @@ func init_slider(minValue: float, maxValue: float, stepValue: float, currentValu
 		valueBox.suffix = owner.valueSuffix
 		
 		# Connect the value changed signal of the spin box
-		valueBox.connect("value_changed", value_changed)
+		if !valueBox.is_connected("value_changed", value_box_value_changed):
+			valueBox.connect("value_changed", value_box_value_changed)
 	else:
 		# Set the text as the current value
 		valueBox.set_text(str(currentValue) + owner.valueSuffix)
@@ -45,5 +47,5 @@ func slider_value_changed(value) -> void:
 	owner.value_changed(value)
 
 
-func value_changed(value) -> void:
+func value_box_value_changed(value) -> void:
 	slider.value = value
