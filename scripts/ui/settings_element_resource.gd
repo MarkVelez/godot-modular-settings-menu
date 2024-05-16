@@ -56,3 +56,10 @@ func value_changed(sectionRef: TabBar, elementRef: Node, value) -> void:
 	sectionRef.SETTINGS_SECTION_CACHE[elementRef.element] = value
 	# Check if the new value is different than the saved value
 	sectionRef.settings_changed(elementRef.element)
+
+
+func apply_in_game_setting(sectionRef: Node, elementRef: Node) -> void:
+	if sectionRef.owner.isInGameMenu:
+		SettingsDataManager.call_deferred("emit_signal", "apply_in_game_settings", elementRef.section, elementRef.element)
+	else:
+		SettingsDataManager.IN_GAME_SETTINGS[elementRef.element] = elementRef

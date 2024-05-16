@@ -1,10 +1,13 @@
 extends Node
 
 signal load_settings
-signal apply_game_settings(setting: StringName)
+signal apply_in_game_settings(section: StringName, setting: StringName)
 
 # Dictionary that stores all settings data
 var SETTINGS_DATA: Dictionary
+# List of settings that need to be applied when the game scene has been loaded
+# Used when the settings menu is not an in game one
+var IN_GAME_SETTINGS: Dictionary
 
 # Path to the settings save file
 const dataFolder: String = "user://"

@@ -47,7 +47,7 @@ func load_settings() -> void:
 	sliderValue.init_slider(minValue, maxValue + 1, stepValue, currentValue)
 	
 	# Check if current value is above max value
-	if currentValue > maxValue:
+	if currentValue == 0:
 		# Set the value box text to Unlimited
 		sliderValue.valueBox.set_text(\"Unlimited\")
 	

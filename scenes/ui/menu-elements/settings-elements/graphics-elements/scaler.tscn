@@ -55,14 +55,17 @@ func _ready():
 	# Give section information to Resolution Scale sub element
 	resolutionScale.sectionRef = sectionRef
 	resolutionScale.section = section
+	sectionRef.REFERENCE_TABLE[resolutionScale.element] = resolutionScale
 	
 	# Give section information to FSR Options sub element
 	fsrMode.sectionRef = sectionRef
 	fsrMode.section = section
+	sectionRef.REFERENCE_TABLE[fsrMode.element] = fsrMode
 	
 	# Give section information to FSR Sharpness sub element
 	fsrSharpness.sectionRef = sectionRef
 	fsrSharpness.section = section
+	sectionRef.REFERENCE_TABLE[fsrSharpness.element] = fsrSharpness
 
 
 # Loads the saved/default values of the element

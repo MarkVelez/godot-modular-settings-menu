@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://px6a2dg8cawb"]
+[gd_scene load_steps=10 format=3 uid="uid://px6a2dg8cawb"]
 
 [ext_resource type="PackedScene" uid="uid://c66v42g6gs7gr" path="res://scenes/ui/menu-elements/settings-elements/gameplay.tscn" id="1_5exwk"]
 [ext_resource type="PackedScene" uid="uid://buqq0kms2dbb4" path="res://scenes/ui/menu-elements/settings-elements/graphics.tscn" id="2_gtlr3"]
@@ -38,6 +38,10 @@ func apply_button_pressed() -> void:
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kwbsm"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ntlmy"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qp71p"]
 
 [sub_resource type="GDScript" id="GDScript_sciva"]
 resource_name = "discard_changes_popup"
@@ -100,10 +104,10 @@ theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
 current_tab = 1
 
 [node name="Gameplay" parent="SettingsPanel/SettingsTabs" instance=ExtResource("1_5exwk")]
+visible = false
 layout_mode = 2
 
 [node name="Graphics" parent="SettingsPanel/SettingsTabs" instance=ExtResource("2_gtlr3")]
-visible = false
 layout_mode = 2
 
 [node name="Controls" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_yucxh")]
@@ -117,12 +121,14 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ntlmy")
 disabled = true
 text = "Apply"
 
 [node name="BackButton" type="Button" parent="SettingsPanel/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_qp71p")
 text = "Back"
 
 [node name="DiscardChangesPopup" type="PanelContainer" parent="."]

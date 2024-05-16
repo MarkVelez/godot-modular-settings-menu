@@ -59,8 +59,8 @@ func value_changed(newValue: float) -> void:
 
 # Element specific script for applying its value to the game
 func apply_settings() -> void:
-	if sectionRef.owner.isInGameMenu:
-		SettingsDataManager.call_deferred(\"emit_signal\", \"apply_game_settings\", element)
+	# Apply in game settings or add to the load list
+	ElementResource.apply_in_game_setting(sectionRef, self)
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
