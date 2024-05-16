@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://buqq0kms2dbb4"]
+[gd_scene load_steps=11 format=3 uid="uid://buqq0kms2dbb4"]
 
 [ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_5jv5p"]
 [ext_resource type="PackedScene" uid="uid://byff0jwaicxvr" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/display_mode.tscn" id="1_mr6e7"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://idtbqnsqlvb6" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/vsync.tscn" id="6_2rh1a"]
 [ext_resource type="PackedScene" uid="uid://csg6c3uuct1ls" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/anti_aliasing.tscn" id="7_r8hxv"]
 [ext_resource type="PackedScene" uid="uid://3ckate3v614f" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/depth_of_field.tscn" id="8_28f8l"]
+[ext_resource type="PackedScene" uid="uid://cgqiotob5aaoq" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/shadow_quality.tscn" id="9_1x78v"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v0fou"]
 
@@ -100,4 +101,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="DepthOfField" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("8_28f8l")]
+layout_mode = 2
+
+[node name="ShadowQuality" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("9_1x78v")]
 layout_mode = 2

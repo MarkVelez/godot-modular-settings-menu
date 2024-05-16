@@ -10,8 +10,8 @@ var SETTINGS_DATA: Dictionary
 var IN_GAME_SETTINGS: Dictionary
 
 # Path to the settings save file
-const dataFolder: String = "user://"
-const fileName: String = "settings.cfg"
+var dataFolder: String = OS.get_user_data_dir()
+var fileName: String = "settings.cfg"
 var path: String = dataFolder + fileName
 
 # Flag for checking if a save file exists
