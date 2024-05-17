@@ -19,7 +19,7 @@ script/source = "extends HBoxContainer
 const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
 # Default values for the element
-@export var minValue: float = 0.0
+@export var minValue: float = 30.0
 @export var maxValue: float = 120.0
 @export var stepValue: float = 1.0
 @export var defaultValue: float = 75.0

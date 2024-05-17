@@ -21,5 +21,4 @@ SettingsDataManager="*res://singletons/ui/settings_data_manager.gd"
 
 [display]
 
-window/size/mode=3
 window/size/resizable=false

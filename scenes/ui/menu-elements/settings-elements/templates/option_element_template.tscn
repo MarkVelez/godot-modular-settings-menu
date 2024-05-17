@@ -25,7 +25,7 @@ var selectedIndex: int
 var currentValue: String
 
 # List of options related to the settings element
-var OPTION_LIST: Dictionary = {
+const OPTION_LIST: Dictionary = {
 	\"Example\": \"Value\"
 }
 

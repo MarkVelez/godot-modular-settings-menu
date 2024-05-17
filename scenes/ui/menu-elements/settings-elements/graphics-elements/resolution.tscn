@@ -56,7 +56,8 @@ func load_settings() -> void:
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
 	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	if !check_applied_settings():
+		call_deferred(\"apply_settings\")
 
 
 func option_selected(index: int) -> void:
@@ -80,6 +81,11 @@ func apply_settings() -> void:
 	
 	# Center the game window
 	get_window().move_to_center()
+
+
+# Checks if the current setting has already been applied
+func check_applied_settings() -> bool:
+	return DisplayServer.window_get_size() == OPTION_LIST[currentValue]
 "
 
 [node name="Resolution" type="HBoxContainer"]

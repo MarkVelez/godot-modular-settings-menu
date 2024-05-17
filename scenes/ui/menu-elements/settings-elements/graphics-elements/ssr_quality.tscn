@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://3ckate3v614f"]
+[gd_scene load_steps=3 format=3 uid="uid://cqfr01uk73ce5"]
 
-[sub_resource type="GDScript" id="GDScript_mnbyt"]
-resource_name = "depth_of_field"
+[sub_resource type="GDScript" id="GDScript_v8qca"]
+resource_name = "ssr_quality"
 script/source = "extends HBoxContainer
 
 # Reference to the section the settings element is under
@@ -30,16 +30,24 @@ var currentValue: String
 # List of options related to the settings element
 const OPTION_LIST: Dictionary = {
 	\"Disabled\": null,
-	\"Low\": RenderingServer.DOF_BLUR_QUALITY_LOW,
-	\"Medium\": RenderingServer.DOF_BLUR_QUALITY_MEDIUM,
-	\"High\": RenderingServer.DOF_BLUR_QUALITY_HIGH
-}
-
-# List of index values for equivalent option in project settings
-const PROJECT_SETTINGS_VALUES: Dictionary = {
-	\"Low\": 1,
-	\"Medium\": 2,
-	\"High\": 3
+	\"Low\": {
+		\"roughnessQuality\": RenderingServer.ENV_SSR_ROUGHNESS_QUALITY_LOW,
+		\"maxSteps\": 32,
+		\"fadeIn\": 0.3,
+		\"fadeOut\": 1.0
+	},
+	\"Medium\": {
+		\"roughnessQuality\": RenderingServer.ENV_SSR_ROUGHNESS_QUALITY_MEDIUM,
+		\"maxSteps\": 64,
+		\"fadeIn\": 0.15,
+		\"fadeOut\": 2.0
+	},
+	\"High\": {
+		\"roughnessQuality\": RenderingServer.ENV_SSR_ROUGHNESS_QUALITY_HIGH,
+		\"maxSteps\": 128,
+		\"fadeIn\": 0.075,
+		\"fadeOut\": 4.0
+	}
 }
 
 
@@ -72,39 +80,32 @@ func option_selected(index: int) -> void:
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
 	# Apply in game settings or add to the load list
-	ElementResource.apply_in_game_setting(sectionRef, self)
+	ElementResource.apply_in_game_setting(sectionRef, self, OPTION_LIST[currentValue])
 	
 	# Return if the selected option is disabled
 	if currentValue == \"Disabled\":
 		return
 	
-	# Set the DOF quality according to the selected option
-	RenderingServer.camera_attributes_set_dof_blur_quality(OPTION_LIST[currentValue], true)
-
-
-# Checks if the current setting has already been applied
-func check_applied_settings() -> void:
-	var dofQuality = ProjectSettings.get_setting(\"rendering/camera/depth_of_field/depth_of_field_bokeh_quality\")
-	
-	if dofQuality != PROJECT_SETTINGS_VALUES[currentValue]:
-		RenderingServer.camera_attributes_set_dof_blur_quality(OPTION_LIST[currentValue], true)
+	# Set ssr roughness quality
+	RenderingServer.environment_set_ssr_roughness_quality(OPTION_LIST[currentValue][\"roughnessQuality\"])
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="DepthOfField" type="HBoxContainer"]
+[node name="SSRQuality" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_mnbyt")
+tooltip_text = "Screen Space Reflection"
+script = SubResource("GDScript_v8qca")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Depth of Field"
+text = "SSR Quality"
 vertical_alignment = 1
 
 [node name="Options" type="OptionButton" parent="."]

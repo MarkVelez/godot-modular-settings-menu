@@ -52,7 +52,8 @@ func load_settings() -> void:
 		sliderValue.valueBox.set_text(\"Unlimited\")
 	
 	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	if !check_applied_settings():
+		call_deferred(\"apply_settings\")
 
 
 func value_changed(newValue: int) -> void:
@@ -80,6 +81,11 @@ func apply_settings() -> void:
 	
 	# Set the fps limit to the selected value
 	Engine.set_max_fps(currentValue)
+
+
+# Checks if the current setting has already been applied
+func check_applied_settings() -> bool:
+	return Engine.get_max_fps() == currentValue
 "
 
 [node name="MaxFPS" type="HBoxContainer"]

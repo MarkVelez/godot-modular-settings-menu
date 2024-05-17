@@ -27,7 +27,7 @@ var selectedIndex: int
 var currentValue: String
 
 # List of options related to the settings element
-var OPTION_LIST: Dictionary = {
+const OPTION_LIST: Dictionary = {
 	\"Disabled\": DisplayServer.VSYNC_DISABLED,
 	\"Enabled\": DisplayServer.VSYNC_ENABLED,
 	\"Adaptive\": DisplayServer.VSYNC_ADAPTIVE
@@ -52,7 +52,8 @@ func load_settings() -> void:
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
 	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	if !check_applied_settings():
+		call_deferred(\"apply_settings\")
 	# Toggle the max fps element
 	toggle_max_fps()
 
@@ -69,6 +70,11 @@ func option_selected(index: int) -> void:
 func apply_settings() -> void:
 	# Set the vsync mode to the selected option
 	DisplayServer.window_set_vsync_mode(OPTION_LIST[currentValue])
+
+
+# Checks if the current setting has already been applied
+func check_applied_settings() -> bool:
+	return DisplayServer.window_get_vsync_mode() == OPTION_LIST[currentValue]
 
 
 # Disable/Enable the max fps element according to if vsync is on or not

@@ -27,10 +27,17 @@ var selectedIndex: int
 var currentValue: String
 
 # List of options related to the settings element
-var OPTION_LIST: Dictionary = {
+const OPTION_LIST: Dictionary = {
 	\"Low\": RenderingServer.SHADOW_QUALITY_SOFT_LOW,
 	\"Medium\": RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM,
 	\"High\": RenderingServer.SHADOW_QUALITY_SOFT_HIGH
+}
+
+# List of index values for equivalent option in project settings
+const PROJECT_SETTINGS_VALUES: Dictionary = {
+	\"Low\": 2,
+	\"Medium\": 3,
+	\"High\": 4
 }
 
 
@@ -52,7 +59,7 @@ func load_settings() -> void:
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
 	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	check_applied_settings()
 
 
 func option_selected(index: int) -> void:
@@ -65,6 +72,18 @@ func apply_settings() -> void:
 	# Set soft shadow quality for directional and positional lights
 	RenderingServer.directional_soft_shadow_filter_set_quality(OPTION_LIST[currentValue])
 	RenderingServer.positional_soft_shadow_filter_set_quality(OPTION_LIST[currentValue])
+
+
+# Checks if the current setting has already been applied
+func check_applied_settings() -> void:
+	var directionalShadows = ProjectSettings.get_setting(\"rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality\")
+	var positionalShadows = ProjectSettings.get_setting(\"rendering/lights_and_shadows/positional_shadow/soft_shadow_filter_quality\")
+	
+	if directionalShadows != PROJECT_SETTINGS_VALUES[currentValue]:
+		RenderingServer.directional_soft_shadow_filter_set_quality(OPTION_LIST[currentValue])
+	
+	if positionalShadows != PROJECT_SETTINGS_VALUES[currentValue]:
+		RenderingServer.positional_soft_shadow_filter_set_quality(OPTION_LIST[currentValue])
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

@@ -15,7 +15,7 @@ script/source = "extends VBoxContainer
 # The name of the settings element
 @onready var element: StringName = name
 
-@onready var options: OptionButton = $\"ScalerOptions/Options\"
+@onready var options: OptionButton = $\"ScalingOptions/Options\"
 
 # Reference to sub elements
 @onready var resolutionScale: HBoxContainer = $ResolutionScale
@@ -90,10 +90,10 @@ func load_settings() -> void:
 			fsrMode.show()
 			fsrSharpness.show()
 	
-	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
 	# Check if TAA is selected
 	call_deferred(\"check_anti_aliasing\")
+	# Apply the loaded values to the game
+	check_applied_settings()
 
 
 func option_selected(index: int) -> void:
@@ -135,6 +135,35 @@ func apply_settings() -> void:
 			fsrSharpness.apply_settings()
 
 
+# Checks if the current setting has already been applied
+func check_applied_settings() -> void:
+	# Get the current scaling mode
+	var scaler: Viewport.Scaling3DMode = get_viewport().get_scaling_3d_mode()
+	
+	# Check if the scaling mode is bilinear and if the current value is disabled
+	if scaler == Viewport.SCALING_3D_MODE_BILINEAR && currentValue == \"Disabled\":
+		# Check if the scale is at 1.0
+		if get_viewport().get_scaling_3d_scale() == 1.0:
+			return
+		else:
+			# Set the scale to 1.0
+			get_viewport().set_scaling_3d_scale(1.0)
+			return
+	
+	# Call apply settings if the current settings are different
+	if scaler != OPTION_LIST[currentValue]:
+		call_deferred(\"apply_settings\")
+		return
+	
+	# Check the values of the sub elements if the current scaling mode matches
+	match scaler:
+		Viewport.SCALING_3D_MODE_BILINEAR:
+			resolutionScale.check_applied_settings()
+		Viewport.SCALING_3D_MODE_FSR2:
+			fsrMode.check_applied_settings()
+			fsrSharpness.check_applied_settings()
+
+
 # Checks if TAA is selected while FSR 2.2 is enabled
 func check_anti_aliasing() -> void:
 	# Check if the anti aliasing element exists and has TAA
@@ -159,7 +188,7 @@ func check_anti_aliasing() -> void:
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="Scaler" type="VBoxContainer"]
+[node name="ScalingMode" type="VBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -169,18 +198,18 @@ size_flags_horizontal = 3
 size_flags_vertical = 0
 script = SubResource("GDScript_mdyud")
 
-[node name="ScalerOptions" type="HBoxContainer" parent="."]
+[node name="ScalingOptions" type="HBoxContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="ScalerOptions"]
+[node name="Label" type="Label" parent="ScalingOptions"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Scaler"
+text = "Scaling Mode"
 vertical_alignment = 1
 
-[node name="Options" type="OptionButton" parent="ScalerOptions"]
+[node name="Options" type="OptionButton" parent="ScalingOptions"]
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0

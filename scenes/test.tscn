@@ -1,36 +1,7 @@
-[gd_scene load_steps=21 format=3 uid="uid://bh7hetspcaxp0"]
+[gd_scene load_steps=22 format=3 uid="uid://bh7hetspcaxp0"]
 
 [ext_resource type="PackedScene" uid="uid://becfhb65goqg6" path="res://scenes/ui/in_game_menu.tscn" id="1_6olxy"]
 [ext_resource type="Texture2D" uid="uid://h7awm5rksxsf" path="res://assets/floorTexture.png" id="2_y6wmg"]
-
-[sub_resource type="GDScript" id="GDScript_35nie"]
-resource_name = "test_scene"
-script/source = "extends Node3D
-
-@export var cameraRef: Camera3D
-
-@onready var currentFov: float = cameraRef.get_fov()
-
-
-func _ready():
-	SettingsDataManager.connect(\"apply_in_game_settings\", apply_in_game_settings)
-
-
-func apply_in_game_settings(section: StringName, element: StringName) -> void:
-	match element:
-		&\"FOV\":
-			cameraRef.set_fov(SettingsDataManager.SETTINGS_DATA[section][element])
-		&\"DepthOfField\":
-			var value: bool
-			
-			if SettingsDataManager.SETTINGS_DATA[section][element] == \"Disabled\":
-				value = false
-			else:
-				value = true
-			
-			cameraRef.attributes.set_dof_blur_far_enabled(value)
-			cameraRef.attributes.set_dof_blur_near_enabled(value)
-"
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1cg2s"]
 
@@ -41,6 +12,77 @@ sky_material = SubResource("ProceduralSkyMaterial_1cg2s")
 background_mode = 2
 background_energy_multiplier = 2.0
 sky = SubResource("Sky_s1kgf")
+ssr_enabled = true
+
+[sub_resource type="GDScript" id="GDScript_jn46l"]
+resource_name = "world_environment"
+script/source = "extends WorldEnvironment
+
+
+func _ready():
+	SettingsDataManager.connect(\"apply_in_game_settings\", apply_in_game_settings)
+
+
+func apply_in_game_settings(section: StringName, element: StringName, value = null) -> void:
+	match element:
+		&\"SSRQuality\":
+			# Set SSR settings to recieved values
+			set_ssr_settings(section, element, value)
+
+
+# Used to set the SSR settings
+func set_ssr_settings(section: StringName, element: StringName, value) -> void:
+	# Get the value of the element
+	var elementValue: String = SettingsDataManager.SETTINGS_DATA[section][element]
+	
+	# Check if the element value is disabled
+	if elementValue == \"Disabled\":
+		# Disable SSR and return
+		environment.set_ssr_enabled(false)
+		return
+	
+	# Enable SSR
+	environment.set_ssr_enabled(true)
+	# Set max steps for SSR
+	environment.set_ssr_max_steps(value[\"maxSteps\"])
+	# Set fade in distance for SSR
+	environment.set_ssr_fade_in(value[\"fadeIn\"])
+	# Set fade out distance for SSR
+	environment.set_ssr_fade_out(value[\"fadeOut\"])
+"
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lwned"]
+dof_blur_far_distance = 6.0
+
+[sub_resource type="GDScript" id="GDScript_5q5hd"]
+resource_name = "camera"
+script/source = "extends Camera3D
+
+
+func _ready():
+	# Connect neccessary signal
+	SettingsDataManager.connect(\"apply_in_game_settings\", apply_in_game_settings)
+
+
+# Called to apply in game settings for the specific node
+func apply_in_game_settings(section: StringName, element: StringName, _value) -> void:
+	match element:
+		&\"FOV\":
+			# Set the camera FOV to the value stored in the settings data dictionary
+			set_fov(SettingsDataManager.SETTINGS_DATA[section][element])
+		&\"DepthOfField\":
+			var enabled: bool
+			
+			# Check if the current value of the element is disabled
+			if SettingsDataManager.SETTINGS_DATA[section][element] == \"Disabled\":
+				enabled = false
+			else:
+				enabled = true
+			
+			# Disable/Enable DOF
+			attributes.set_dof_blur_far_enabled(enabled)
+			attributes.set_dof_blur_near_enabled(enabled)
+"
 
 [sub_resource type="GDScript" id="GDScript_lw3sa"]
 resource_name = "control_panel"
@@ -81,16 +123,6 @@ func _on_hide_menu_toggled(toggled_on):
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ym35m"]
 
-[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lwned"]
-dof_blur_far_distance = 6.0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8lbeg"]
-albedo_color = Color(0.268536, 0.670061, 0.227251, 1)
-roughness = 0.3
-
-[sub_resource type="SphereMesh" id="SphereMesh_1thse"]
-material = SubResource("StandardMaterial3D_8lbeg")
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_owuq1"]
 albedo_texture = ExtResource("2_y6wmg")
 uv1_triplanar = true
@@ -114,6 +146,13 @@ size = Vector3(5, 3, 0.2)
 material = SubResource("StandardMaterial3D_kqh6p")
 size = Vector3(5, 0.2, 3.5)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8lbeg"]
+albedo_color = Color(0.268536, 0.670061, 0.227251, 1)
+roughness = 0.3
+
+[sub_resource type="SphereMesh" id="SphereMesh_1thse"]
+material = SubResource("StandardMaterial3D_8lbeg")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0pi3j"]
 albedo_color = Color(0.831373, 0.345098, 1, 1)
 emission_enabled = true
@@ -125,15 +164,27 @@ top_radius = 0.05
 bottom_radius = 0.05
 radial_segments = 8
 
-[node name="TestScene" type="Node3D" node_paths=PackedStringArray("cameraRef")]
-script = SubResource("GDScript_35nie")
-cameraRef = NodePath("Camera3D")
+[node name="TestScene" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_snm0g")
+script = SubResource("GDScript_jn46l")
+
+[node name="ReflectionProbes" type="Node3D" parent="."]
+
+[node name="ReflectionProbe" type="ReflectionProbe" parent="ReflectionProbes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0276005, 0, -2.11342)
+size = Vector3(14.9817, 20, 6.90343)
+origin_offset = Vector3(0, 0, -0.513672)
+box_projection = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+attributes = SubResource("CameraAttributesPractical_lwned")
+current = true
+script = SubResource("GDScript_5q5hd")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.905658, -0.0180051, -0.423627, 0.250551, 0.828736, 0.500421, 0.342065, -0.55935, 0.755062, -3.04957, 2.46832, 3.17313)
+transform = Transform3D(0.905658, -0.0180052, -0.423627, 0.250551, 0.828736, 0.500421, 0.342065, -0.55935, 0.755062, -3.04957, 2.46832, 3.17313)
 shadow_enabled = true
 
 [node name="GUI" type="CanvasLayer" parent="."]
@@ -171,37 +222,37 @@ focus_mode = 0
 theme_override_styles/focus = SubResource("StyleBoxEmpty_ym35m")
 text = "Toggle Animation"
 
-[node name="Camera3D" type="Camera3D" parent="."]
-attributes = SubResource("CameraAttributesPractical_lwned")
-current = true
-
-[node name="ball" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.854921, 0, 0.518758, 0, 1, 0, -0.518758, 0, 0.854921, 0, -0.153776, -3.51229)
-mesh = SubResource("SphereMesh_1thse")
-
-[node name="floor" type="MeshInstance3D" parent="."]
+[node name="Floor" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.40856, -6.17434)
 mesh = SubResource("BoxMesh_tecy0")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+[node name="Box" type="Node3D" parent="."]
+
+[node name="RightWall" type="MeshInstance3D" parent="Box"]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 2.39809, 0.165802, -3.80972)
 mesh = SubResource("BoxMesh_g1tso")
-skeleton = NodePath("../MeshInstance3D")
+skeleton = NodePath("../BackWall")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="BackWall" type="MeshInstance3D" parent="Box"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.163491, -5.43965)
 mesh = SubResource("BoxMesh_ht2m6")
+skeleton = NodePath("../..")
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+[node name="LeftWall" type="MeshInstance3D" parent="Box"]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2.58522, 0.161893, -3.80296)
 mesh = SubResource("BoxMesh_g1tso")
-skeleton = NodePath("../MeshInstance3D")
+skeleton = NodePath("../BackWall")
 
-[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+[node name="Ceiling" type="MeshInstance3D" parent="Box"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.114113, 1.56223, -3.79209)
 mesh = SubResource("BoxMesh_g8j6u")
+skeleton = NodePath("../..")
 
-[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+[node name="Ball" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.854921, 0, 0.518758, 0, 1, 0, -0.518758, 0, 0.854921, 0, -0.153776, -3.51229)
+mesh = SubResource("SphereMesh_1thse")
+
+[node name="GlowRod" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62941, 0.184332, -4.30836)
 mesh = SubResource("CylinderMesh_a0pb3")
 

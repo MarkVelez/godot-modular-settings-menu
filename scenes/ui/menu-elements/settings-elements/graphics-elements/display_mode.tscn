@@ -27,7 +27,7 @@ var selectedIndex: int
 var currentValue: String
 
 # List of options related to the settings element
-var OPTION_LIST: Dictionary = {
+const OPTION_LIST: Dictionary = {
 	\"Fullscreen\": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
 	\"Windowed\": DisplayServer.WINDOW_MODE_WINDOWED, 
 	\"Borderless Windowed\": DisplayServer.WINDOW_MODE_WINDOWED
@@ -54,7 +54,8 @@ func load_settings() -> void:
 	# Check if the resolution element should be disabled
 	check_resolution()
 	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	if !check_applied_settings():
+		call_deferred(\"apply_settings\")
 
 
 func option_selected(index: int) -> void:
@@ -75,6 +76,25 @@ func apply_settings() -> void:
 	
 	# Change the display mode to the selected option
 	DisplayServer.window_set_mode(OPTION_LIST[currentValue])
+
+
+# Checks if the current setting has already been applied
+func check_applied_settings() -> bool:
+	var appliedSettings: bool = false
+	
+	# Compare the current window mode to the one in the settings
+	if DisplayServer.window_get_mode() == OPTION_LIST[currentValue]:
+		appliedSettings = true
+	
+	# Check if the current mode is Borderless Windowed
+	if currentValue == \"Borderless Windowed\":
+		# Check if the the borderless flag is true
+		if DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_BORDERLESS):
+			appliedSettings = true
+		else:
+			appliedSettings = false
+	
+	return appliedSettings
 
 
 # Called to check if the resolution element should be disabled

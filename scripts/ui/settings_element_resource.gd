@@ -58,8 +58,8 @@ func value_changed(sectionRef: TabBar, elementRef: Node, value) -> void:
 	sectionRef.settings_changed(elementRef.element)
 
 
-func apply_in_game_setting(sectionRef: Node, elementRef: Node) -> void:
+func apply_in_game_setting(sectionRef: Node, elementRef: Node, value = null) -> void:
 	if sectionRef.owner.isInGameMenu:
-		SettingsDataManager.call_deferred("emit_signal", "apply_in_game_settings", elementRef.section, elementRef.element)
+		SettingsDataManager.call_deferred("emit_signal", "apply_in_game_settings", elementRef.section, elementRef.element, value)
 	else:
 		SettingsDataManager.IN_GAME_SETTINGS[elementRef.element] = elementRef

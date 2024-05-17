@@ -54,6 +54,13 @@ func value_changed(newValue: float) -> void:
 func apply_settings() -> void:
 	# Apply the current value as the fsr sharpness
 	get_viewport().set_fsr_sharpness(currentValue)
+
+
+# Checks if the current setting has already been applied
+func check_applied_settings() -> void:
+	# Check if the current fsr sharpness is different
+	if get_viewport().get_fsr_sharpness() != currentValue:
+		apply_settings()
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hae3h"]
