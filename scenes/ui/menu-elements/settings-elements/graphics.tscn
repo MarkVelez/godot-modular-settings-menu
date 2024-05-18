@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://buqq0kms2dbb4"]
+[gd_scene load_steps=16 format=3 uid="uid://buqq0kms2dbb4"]
 
 [ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_5jv5p"]
 [ext_resource type="PackedScene" uid="uid://byff0jwaicxvr" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/display_mode.tscn" id="1_mr6e7"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://3ckate3v614f" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/depth_of_field.tscn" id="8_28f8l"]
 [ext_resource type="PackedScene" uid="uid://cgqiotob5aaoq" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/shadow_quality.tscn" id="9_1x78v"]
 [ext_resource type="PackedScene" uid="uid://cqfr01uk73ce5" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/ssr_quality.tscn" id="10_cfuis"]
+[ext_resource type="PackedScene" uid="uid://du5urp5d2dyjb" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/glow_quality.tscn" id="10_m0pim"]
 [ext_resource type="PackedScene" uid="uid://bk5ky60jln7ag" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/ssao_quality.tscn" id="11_xa1gl"]
 [ext_resource type="PackedScene" uid="uid://bmnvig4gfqj0c" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/ssil_quality.tscn" id="12_jqvyp"]
 [ext_resource type="PackedScene" uid="uid://ddykljx6ndodi" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/sdfgi_quality.tscn" id="13_ifeh4"]
@@ -108,6 +109,9 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="ShadowQuality" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("9_1x78v")]
+layout_mode = 2
+
+[node name="GlowQuality" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("10_m0pim")]
 layout_mode = 2
 
 [node name="SSRQuality" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/AdvancedSettings/SubSectionElements" instance=ExtResource("10_cfuis")]

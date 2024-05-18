@@ -36,6 +36,9 @@ func apply_in_game_settings(section: StringName, element: StringName, value = nu
 		&\"SDFGIQuality\":
 			# Set SDFGI settings
 			set_sdfgi_settings(section, element)
+		&\"GlowQuality\":
+			# Set Glow settings
+			set_glow_settings(section, element)
 
 
 # Used to set the SSR settings
@@ -102,6 +105,21 @@ func set_sdfgi_settings(section: StringName, element: StringName) -> void:
 	
 	# Enable SDFGI
 	environment.set_sdfgi_enabled(true)
+
+
+# Used to set the Glow settings
+func set_glow_settings(section: StringName, element: StringName) -> void:
+	# Get the value of the element
+	var elementValue: String = SettingsDataManager.SETTINGS_DATA[section][element]
+	
+	# Check if the element value is disabled
+	if elementValue == \"Disabled\":
+		# Disable Glow and return
+		environment.set_glow_enabled(false)
+		return
+	
+	# Enable Glow
+	environment.set_glow_enabled(true)
 "
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lwned"]
