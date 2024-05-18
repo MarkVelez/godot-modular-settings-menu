@@ -12,8 +12,6 @@ sky_material = SubResource("ProceduralSkyMaterial_1cg2s")
 background_mode = 2
 background_energy_multiplier = 2.0
 sky = SubResource("Sky_s1kgf")
-ssr_enabled = true
-ssao_enabled = true
 
 [sub_resource type="GDScript" id="GDScript_jn46l"]
 resource_name = "world_environment"
@@ -29,6 +27,15 @@ func apply_in_game_settings(section: StringName, element: StringName, value = nu
 		&\"SSRQuality\":
 			# Set SSR settings to recieved values
 			set_ssr_settings(section, element, value)
+		&\"SSAOQuality\":
+			# Set SSAO settings
+			set_ssao_settings(section, element)
+		&\"SSILQuality\":
+			# Set SSIL settings
+			set_ssil_settings(section, element)
+		&\"SDFGIQuality\":
+			# Set SDFGI settings
+			set_sdfgi_settings(section, element)
 
 
 # Used to set the SSR settings
@@ -50,6 +57,51 @@ func set_ssr_settings(section: StringName, element: StringName, value) -> void:
 	environment.set_ssr_fade_in(value[\"fadeIn\"])
 	# Set fade out distance for SSR
 	environment.set_ssr_fade_out(value[\"fadeOut\"])
+
+
+# Used to set the SSAO settings
+func set_ssao_settings(section: StringName, element: StringName) -> void:
+	# Get the value of the element
+	var elementValue: String = SettingsDataManager.SETTINGS_DATA[section][element]
+	
+	# Check if the element value is disabled
+	if elementValue == \"Disabled\":
+		# Disable SSAO and return
+		environment.set_ssao_enabled(false)
+		return
+	
+	# Enable SSAO
+	environment.set_ssao_enabled(true)
+
+
+# Used to set the SSIL settings
+func set_ssil_settings(section: StringName, element: StringName) -> void:
+	# Get the value of the element
+	var elementValue: String = SettingsDataManager.SETTINGS_DATA[section][element]
+	
+	# Check if the element value is disabled
+	if elementValue == \"Disabled\":
+		# Disable SSIL and return
+		environment.set_ssil_enabled(false)
+		return
+	
+	# Enable SSIL
+	environment.set_ssil_enabled(true)
+
+
+# Used to set the SDFGI settings
+func set_sdfgi_settings(section: StringName, element: StringName) -> void:
+	# Get the value of the element
+	var elementValue: String = SettingsDataManager.SETTINGS_DATA[section][element]
+	
+	# Check if the element value is disabled
+	if elementValue == \"Disabled\":
+		# Disable SDFGI and return
+		environment.set_sdfgi_enabled(false)
+		return
+	
+	# Enable SDFGI
+	environment.set_sdfgi_enabled(true)
 "
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lwned"]
