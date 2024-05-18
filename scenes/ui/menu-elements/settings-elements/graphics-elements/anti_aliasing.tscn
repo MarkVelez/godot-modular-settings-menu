@@ -58,8 +58,7 @@ func load_settings() -> void:
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 	
 	# Apply the loaded values to the game
-	if !check_applied_settings():
-		call_deferred(\"apply_settings\")
+	call_deferred(\"apply_settings\")
 
 
 func option_selected(index: int) -> void:
@@ -83,37 +82,6 @@ func apply_settings() -> void:
 			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_8X)
 		\"TAA\":
 			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_DISABLED, true)
-
-
-# Checks if the current setting has already been applied
-func check_applied_settings() -> bool:
-	# Check the current anti aliasing mode
-	var fxaaMode: bool = get_viewport().get_screen_space_aa() == Viewport.SCREEN_SPACE_AA_FXAA
-	var msaaMode: String
-	var taaMode: bool = get_viewport().is_using_taa()
-	var appliedSettings: String = \"Disabled\"
-	
-	# Get the MSAA mode
-	match get_viewport().get_msaa_3d():
-		Viewport.MSAA_DISABLED:
-			msaaMode = \"Disabled\"
-		Viewport.MSAA_2X:
-			msaaMode = \"2x MSAA\"
-		Viewport.MSAA_4X:
-			msaaMode = \"4x MSAA\"
-		Viewport.MSAA_8X:
-			msaaMode = \"8x MSAA\"
-	
-	# Determine the current anti aliasing setting as a string
-	if fxaaMode:
-		appliedSettings = \"FXAA\"
-	elif taaMode:
-		appliedSettings = \"TAA\"
-	else:
-		appliedSettings = msaaMode
-	
-	# Check if the current setting matches the saved setting
-	return appliedSettings == currentValue
 
 
 # Sets the anti aliasing mode according to the values provided

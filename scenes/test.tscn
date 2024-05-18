@@ -13,6 +13,7 @@ background_mode = 2
 background_energy_multiplier = 2.0
 sky = SubResource("Sky_s1kgf")
 ssr_enabled = true
+ssao_enabled = true
 
 [sub_resource type="GDScript" id="GDScript_jn46l"]
 resource_name = "world_environment"

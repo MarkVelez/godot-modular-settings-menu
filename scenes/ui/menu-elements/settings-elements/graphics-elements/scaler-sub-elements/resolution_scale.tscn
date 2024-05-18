@@ -54,13 +54,6 @@ func value_changed(newValue: float) -> void:
 func apply_settings() -> void:
 	# Apply the current value as the resolution scale
 	get_viewport().set_scaling_3d_scale(currentValue)
-
-
-# Checks if the current setting has already been applied
-func check_applied_settings() -> void:
-	# Check if the current scale is different
-	if get_viewport().get_scaling_3d_scale() != currentValue:
-		apply_settings()
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hae3h"]

@@ -22,7 +22,7 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 @export var minValue: float = 0.0
 @export var maxValue: float = 1.0
 @export var stepValue: float = 0.01
-@export var defaultValue: float = 0.2
+@export var defaultValue: float = 0.9
 
 # An extra suffix for the value (optional)
 @export var valueSuffix: String = \"%\"
@@ -45,7 +45,7 @@ func load_settings() -> void:
 
 func value_changed(newValue: float) -> void:
 	# Change the value to a precentage value and invert it
-	currentValue = (maxValue - (newValue / 100.0)) * 2.0
+	currentValue = newValue / 100.0
 	
 	# Update the settings cache
 	ElementResource.value_changed(sectionRef, self, currentValue)
@@ -53,14 +53,7 @@ func value_changed(newValue: float) -> void:
 # Element specific script for applying its value to the game
 func apply_settings() -> void:
 	# Apply the current value as the fsr sharpness
-	get_viewport().set_fsr_sharpness(currentValue)
-
-
-# Checks if the current setting has already been applied
-func check_applied_settings() -> void:
-	# Check if the current fsr sharpness is different
-	if get_viewport().get_fsr_sharpness() != currentValue:
-		apply_settings()
+	get_viewport().set_fsr_sharpness((maxValue - currentValue) * 2.0)
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hae3h"]

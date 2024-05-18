@@ -35,13 +35,6 @@ const OPTION_LIST: Dictionary = {
 	\"High\": RenderingServer.DOF_BLUR_QUALITY_HIGH
 }
 
-# List of index values for equivalent option in project settings
-const PROJECT_SETTINGS_VALUES: Dictionary = {
-	\"Low\": 1,
-	\"Medium\": 2,
-	\"High\": 3
-}
-
 
 func _ready():
 	# Neccessary signals
@@ -80,14 +73,6 @@ func apply_settings() -> void:
 	
 	# Set the DOF quality according to the selected option
 	RenderingServer.camera_attributes_set_dof_blur_quality(OPTION_LIST[currentValue], true)
-
-
-# Checks if the current setting has already been applied
-func check_applied_settings() -> void:
-	var dofQuality = ProjectSettings.get_setting(\"rendering/camera/depth_of_field/depth_of_field_bokeh_quality\")
-	
-	if dofQuality != PROJECT_SETTINGS_VALUES[currentValue]:
-		RenderingServer.camera_attributes_set_dof_blur_quality(OPTION_LIST[currentValue], true)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

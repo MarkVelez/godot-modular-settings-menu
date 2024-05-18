@@ -93,7 +93,7 @@ func load_settings() -> void:
 	# Check if TAA is selected
 	call_deferred(\"check_anti_aliasing\")
 	# Apply the loaded values to the game
-	check_applied_settings()
+	call_deferred(\"apply_settings\")
 
 
 func option_selected(index: int) -> void:
@@ -133,35 +133,6 @@ func apply_settings() -> void:
 		\"FSR 2.2\":
 			fsrMode.apply_settings()
 			fsrSharpness.apply_settings()
-
-
-# Checks if the current setting has already been applied
-func check_applied_settings() -> void:
-	# Get the current scaling mode
-	var scaler: Viewport.Scaling3DMode = get_viewport().get_scaling_3d_mode()
-	
-	# Check if the scaling mode is bilinear and if the current value is disabled
-	if scaler == Viewport.SCALING_3D_MODE_BILINEAR && currentValue == \"Disabled\":
-		# Check if the scale is at 1.0
-		if get_viewport().get_scaling_3d_scale() == 1.0:
-			return
-		else:
-			# Set the scale to 1.0
-			get_viewport().set_scaling_3d_scale(1.0)
-			return
-	
-	# Call apply settings if the current settings are different
-	if scaler != OPTION_LIST[currentValue]:
-		call_deferred(\"apply_settings\")
-		return
-	
-	# Check the values of the sub elements if the current scaling mode matches
-	match scaler:
-		Viewport.SCALING_3D_MODE_BILINEAR:
-			resolutionScale.check_applied_settings()
-		Viewport.SCALING_3D_MODE_FSR2:
-			fsrMode.check_applied_settings()
-			fsrSharpness.check_applied_settings()
 
 
 # Checks if TAA is selected while FSR 2.2 is enabled

@@ -31,6 +31,8 @@ func get_settings() -> void:
 	# If no save file exists saved the default values retrieved from the section's elements
 	if SettingsDataManager.noSaveFile:
 		SettingsDataManager.call_deferred("save_data")
+	
+	CHANGED_ELEMENTS.clear()
 
 
 # Called to clear the section's cache
