@@ -18,9 +18,13 @@ func _ready():
 	owner.connect("get_settings", get_settings)
 	owner.connect("clear_cache", clear_cache)
 	
-	# Add section to the settings data if no save file exists
+	# Check if a save file exists
 	if SettingsDataManager.noSaveFile:
+		# Add the section to the settings data dictionary
 		SettingsDataManager.SETTINGS_DATA[section] = {}
+	else:
+		# Add the section to the valid settings dictionary
+		SettingsDataManager.VALID_SETTINGS[section] = []
 
 
 # Called when opening the settings menu to fill the settings cache
@@ -29,7 +33,7 @@ func get_settings() -> void:
 	SETTINGS_SECTION_CACHE = SettingsDataManager.SETTINGS_DATA[section].duplicate(true)
 	
 	# If no save file exists saved the default values retrieved from the section's elements
-	if SettingsDataManager.noSaveFile:
+	if SettingsDataManager.noSaveFile || SettingsDataManager.invalidSaveFile:
 		SettingsDataManager.call_deferred("save_data")
 	
 	CHANGED_ELEMENTS.clear()

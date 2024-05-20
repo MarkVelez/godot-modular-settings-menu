@@ -40,8 +40,17 @@ func _ready():
 	options.connect(\"item_selected\", option_selected)
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 
+# Loads the saved/default values of the element
 func load_settings() -> void:
-	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	# List of values for the element
+	var VALUES: Dictionary = {
+		\"defaultValue\": defaultValue,
+		\"validOptions\": OPTION_LIST
+	}
+	
+	# Get the current value for the element
+	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	# Initialize the option button
 	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
 
 

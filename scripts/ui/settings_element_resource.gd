@@ -2,21 +2,73 @@ extends Resource
 class_name SettingsElementResource
 
 # Used for loading saved/default value for an element
-func load_element_settings(defaultValue, section: StringName, element: StringName):
+func load_element_settings(VALUES: Dictionary, section: StringName, element: StringName):
 	var currentValue
 	
 	# Check if no save file exists
 	if SettingsDataManager.noSaveFile:
 		# Assign default value as current value
-		currentValue = defaultValue
+		currentValue = VALUES["defaultValue"]
 		# Add default value of element to the settings data
 		SettingsDataManager.SETTINGS_DATA[section][element] = currentValue
 	else:
-		# Get the current value from the settings data
-		currentValue = SettingsDataManager.SETTINGS_DATA[section][element]
+		# Verify the existance and validity of the element in the settings data
+		if verify_settings_data(VALUES, section, element):
+			# Get the current value from the settings data
+			currentValue = SettingsDataManager.SETTINGS_DATA[section][element]
+		else:
+			# Assign default value as current value
+			currentValue = VALUES["defaultValue"]
+			# Add default value of element to the settings data
+			SettingsDataManager.SETTINGS_DATA[section][element] = currentValue
+			SettingsDataManager.invalidSaveFile = true
+	
+	# Add the element to the valid settings dictionary
+	SettingsDataManager.VALID_SETTINGS[section].append(element)
 	
 	# Return the retrieved current value
 	return currentValue
+
+
+# Used for verifying the integrity of the save file
+func verify_settings_data(VALUES: Dictionary, section: StringName, element: StringName) -> bool:
+	# Check if the section exists in settings data
+	if SettingsDataManager.SETTINGS_DATA.has(section):
+		# Check if the element exists in the settings data
+		if !SettingsDataManager.SETTINGS_DATA[section].has(element):
+			print("Settings element does not exist!")
+			return false
+	else:
+		print("Settings section does not exist!")
+		return false
+	
+	# Get the value of the element
+	var retrievedValue = SettingsDataManager.SETTINGS_DATA[section][element]
+	
+	# Check if the retrieved value is the correct type
+	if typeof(retrievedValue) != typeof(VALUES["defaultValue"]):
+		print("Invalid value type ", type_string(typeof(retrievedValue)), " for element ", element, " expected value type ", type_string(typeof(VALUES["defaultValue"])), "!")
+		return false
+	
+	# Check if the retrieved value is a string
+	if typeof(VALUES["defaultValue"]) == TYPE_STRING:
+		# Check if the retrieved value is valid
+		if !VALUES["validOptions"].has(retrievedValue):
+			print("Invalid value ", retrievedValue, " for element ", element, " expected values ", VALUES["validOptions"], "!")
+			return false
+	
+	# Check if the retrieved value is a number
+	if typeof(VALUES["defaultValue"]) == TYPE_FLOAT || typeof(VALUES["defaultValue"]) == TYPE_INT:
+		# Check if the retrieved value is valid
+		if retrievedValue < VALUES["minValue"] || retrievedValue > VALUES["maxValue"]:
+			# Special check if max fps is set to 0 (unlimited)
+			if element == "MaxFPS" && retrievedValue == 0:
+				return true
+			
+			print("Invalid value ", retrievedValue, " for element ", element, " expected values between ", VALUES["minValue"], " and ", VALUES["maxValue"], "!")
+			return false
+	
+	return true
 
 
 # Used to initialize an option button element

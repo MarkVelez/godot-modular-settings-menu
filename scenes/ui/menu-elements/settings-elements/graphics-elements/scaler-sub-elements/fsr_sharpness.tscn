@@ -37,8 +37,15 @@ func _ready():
 
 # Loads the saved/default values of the element
 func load_settings() -> void:
+	# List of values for the element
+	var VALUES: Dictionary = {
+		\"defaultValue\": defaultValue,
+		\"minValue\": minValue,
+		\"maxValue\": maxValue,
+	}
+	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(defaultValue, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, section, element)
 	# Initialize the slider of the element
 	sliderValue.init_slider(minValue * 100, maxValue * 100, stepValue * 100, currentValue * 100)
 
