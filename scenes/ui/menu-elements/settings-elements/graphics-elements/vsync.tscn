@@ -41,7 +41,7 @@ func _ready():
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
 	# Add an entry of the settings element to the section's reference table
-	sectionRef.REFERENCE_TABLE[element] = self
+	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
 
 
 # Loads the saved/default values of the element
@@ -84,9 +84,9 @@ func apply_settings() -> void:
 # Disable/Enable the max fps element according to if vsync is on or not
 func toggle_max_fps() -> void:
 	# Check if the max fps element exists
-	if sectionRef.REFERENCE_TABLE.has(\"MaxFPS\"):
+	if sectionRef.ELEMENT_REFERENCE_TABLE.has(\"MaxFPS\"):
 		# Reference to the slider value node of the max fps element
-		var sliderValue: HBoxContainer = sectionRef.REFERENCE_TABLE[\"MaxFPS\"].sliderValue
+		var sliderValue: HBoxContainer = sectionRef.ELEMENT_REFERENCE_TABLE[\"MaxFPS\"].sliderValue
 		
 		# Check if vsync is disabled
 		if currentValue == \"Disabled\":

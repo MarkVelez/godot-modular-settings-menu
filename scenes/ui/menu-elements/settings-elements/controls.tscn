@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dfswr81erouhj"]
+[gd_scene load_steps=6 format=3 uid="uid://dfswr81erouhj"]
 
 [ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_mk2d8"]
 [ext_resource type="PackedScene" uid="uid://cy8n6yalxprb7" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/sensitivity.tscn" id="2_qcqml"]
+[ext_resource type="PackedScene" uid="uid://c2tgt7fu0n5wp" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/invert_y.tscn" id="3_8np8q"]
+[ext_resource type="PackedScene" uid="uid://i0w5gftb0j16" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input_settings.tscn" id="4_bejag"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e0spm"]
 
@@ -42,6 +44,7 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/separation = 24
 
 [node name="MouseSettings" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList"]
 layout_mode = 2
@@ -58,4 +61,24 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Sensitivity" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/MouseSettings/SubSectionElements" instance=ExtResource("2_qcqml")]
+layout_mode = 2
+
+[node name="InvertY" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/MouseSettings/SubSectionElements" instance=ExtResource("3_8np8q")]
+layout_mode = 2
+
+[node name="KeyboardSettings" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList"]
+layout_mode = 2
+
+[node name="SubSectionName" type="Label" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/KeyboardSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Keyboard Settings"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/KeyboardSettings"]
+layout_mode = 2
+
+[node name="SubSectionElements" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/KeyboardSettings"]
+layout_mode = 2
+
+[node name="InputSettings" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/KeyboardSettings/SubSectionElements" instance=ExtResource("4_bejag")]
 layout_mode = 2

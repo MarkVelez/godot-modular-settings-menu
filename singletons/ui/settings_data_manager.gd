@@ -5,6 +5,8 @@ signal apply_in_game_settings(section: StringName, setting: StringName, value)
 
 # Dictionary that stores all settings data
 var SETTINGS_DATA: Dictionary
+
+var SECTION_REFERENCE_TABLE: Dictionary
 # Used to check for unused sections and elements in settings data
 var VALID_SETTINGS: Dictionary
 # List of settings that need to be applied when the game scene has been loaded
@@ -18,7 +20,7 @@ var path: String = dataFolder + fileName
 
 # Flag for checking if a save file exists
 var noSaveFile: bool
-# Flat for checking if an invalid value was found in the save file
+# Flag for checking if an invalid value was found in the save file
 var invalidSaveFile: bool = false
 
 
@@ -54,8 +56,7 @@ func save_data() -> void:
 	
 	# Check for errors
 	if err != OK:
-		print("Failed to save data!")
-		print(err)
+		push_error("Failed to save data: ", err)
 		return
 	
 	# Disable the no save file flag if it was enabled
@@ -76,8 +77,7 @@ func get_data() -> void:
 	
 	# Check for errors
 	if err != OK:
-		print("Failed to load settings data!")
-		print(err)
+		push_error("Failed to load settings data: ", err)
 		return
 	
 	# Add the retrieved data to the settings data dictionary
@@ -98,7 +98,7 @@ func verify_settings_data() -> void:
 		if !VALID_SETTINGS.has(section):
 			# Add the invalid section to the invalid entries list
 			INVALID_ENTRIES[section] = []
-			print("Invalid section ", section, " found!")
+			push_warning("Invalid section ", section, " found")
 		else:
 			# Itterate through all the elements in the section
 			for element in SETTINGS_DATA[section]:
@@ -111,7 +111,7 @@ func verify_settings_data() -> void:
 					
 					# Add the invalid element to the invalid entries list
 					INVALID_ENTRIES[section].append(element)
-					print("Invalid element ", element, " found in section ", section, "!")
+					push_warning("Invalid element ", element, " found in section ", section)
 	
 	# Check if there are any invalid entries
 	if INVALID_ENTRIES.size() > 0:

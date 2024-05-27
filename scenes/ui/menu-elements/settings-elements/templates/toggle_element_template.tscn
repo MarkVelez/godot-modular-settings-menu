@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://du5urp5d2dyjb"]
+[gd_scene load_steps=3 format=3 uid="uid://cxaxyqer0af21"]
 
-[sub_resource type="GDScript" id="GDScript_7hlvr"]
-resource_name = "glow_quality"
+[sub_resource type="GDScript" id="GDScript_bpxmf"]
+resource_name = "toggle_element_template"
 script/source = "extends HBoxContainer
 
 # Reference to the section the settings element is under
@@ -11,32 +11,19 @@ script/source = "extends HBoxContainer
 # The name of the settings element
 @onready var element: StringName = name
 
-@onready var options: OptionButton = $Options
+@onready var toggle: CheckButton = $Toggle
 
 # Resource for common functions between settings elements
 const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
 
-# Default values for the element
-@export_enum(
-	\"Disabled\",
-	\"Low\",
-	\"High\"
-) var defaultValue: String = \"Disabled\"
+@export var defaultValue: bool = false
 
-var selectedIndex: int
-var currentValue: String
-
-# List of options related to the settings element
-const OPTION_LIST: Array[String] = [
-	\"Disabled\",
-	\"Low\",
-	\"High\"
-]
+var currentValue: bool
 
 
 func _ready():
 	# Neccessary signals
-	options.connect(\"item_selected\", option_selected)
+	toggle.connect(\"toggled\", toggled)
 	sectionRef.connect(\"apply_settings\", apply_settings)
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
@@ -49,57 +36,47 @@ func load_settings() -> void:
 	# List of values for the element
 	var VALUES: Dictionary = {
 		\"defaultValue\": defaultValue,
-		\"validOptions\": OPTION_LIST
+		\"validOptions\": [true, false]
 	}
 	
 	# Get the current value for the element
 	currentValue = ElementResource.load_element_settings(VALUES, section, element)
-	# Initialize the option button
-	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
+	
+	# Set the state of the toggle button
+	toggle.set_pressed(currentValue)
 	
 	# Apply the loaded values to the game
 	call_deferred(\"apply_settings\")
 
 
-func option_selected(index: int) -> void:
+func toggled(state: bool) -> void:
 	# Update the settings cache
-	ElementResource.option_selected(sectionRef, self, index)
+	ElementResource.option_selected(sectionRef, self, state)
 
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
-	# Apply in game settings or add to the load list
-	ElementResource.apply_in_game_setting(sectionRef, self)
-	
-	# Return if the selected option is disabled
-	if currentValue == \"Disabled\":
-		return
-	
-	match currentValue:
-		\"Low\":
-			RenderingServer.environment_glow_set_use_bicubic_upscale(false)
-		\"High\":
-			RenderingServer.environment_glow_set_use_bicubic_upscale(true)
+	pass
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="GlowQuality" type="HBoxContainer"]
+[node name="ToggleElementTemplate" type="HBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_7hlvr")
+script = SubResource("GDScript_bpxmf")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "Glow Quality"
+text = "Toggle Element"
 vertical_alignment = 1
 
-[node name="Options" type="OptionButton" parent="."]
+[node name="Toggle" type="CheckButton" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0

@@ -1,157 +1,177 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqqhgk8ufkmqa"]
+[gd_scene load_steps=2 format=3 uid="uid://i0w5gftb0j16"]
 
-[sub_resource type="GDScript" id="GDScript_0eq0v"]
-script/source = "extends Control
+[sub_resource type="GDScript" id="GDScript_te2ja"]
+resource_name = "input_settings"
+script/source = "extends Button
 
-@onready var inputButtonScene = preload(\"input_button.tscn\")
-@onready var actionList = %actionList
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
 
-var isRemapping: bool = false
-var actionToRemap = null
-var remappingButton = null
+# Reference to the element's panel
+const ElementPanel: PackedScene = preload(\"input-settings-panel/input_settings_panel.tscn\")
 
-var inputActions: Dictionary = {
-	\"up\": \"Forward\",
-	\"down\": \"Backward\",
+# List of actions to make remappable and how the name they should display
+@export var ACTION_LIST: Dictionary = {
+	\"up\": \"Up\",
+	\"down\": \"Down\",
 	\"left\": \"Left\",
 	\"right\": \"Right\",
-	\"jump\": \"Jump\",
-	\"exit\": \"Pause\"
 }
+
+var INPUT_SETTINGS_DATA: Dictionary
+
+var elementPanelRef: Node
+
+# Path to the settings save file
+var dataFolder: String = OS.get_user_data_dir()
+var fileName: String = \"/keybinds.json\"
+var path: String = dataFolder + fileName
+
+# Flag for checking if a save file exists for input settings
+var noSaveFile: bool
+# Flag for checking if an invalid value was found in the save file
+var invalidSaveFile: bool = false
 
 
 func _ready():
-	createActionList()
-
-
-func createActionList():
-	InputMap.load_from_project_settings()
-	for item in actionList.get_children():
-		item.queue_free()
+	# Neccessary signals
+	connect(\"pressed\", pressed)
+	sectionRef.connect(\"apply_settings\", apply_settings)
+	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
-	for action in inputActions:
-		var button = inputButtonScene.instantiate()
-		var actionLabel = button.find_child(\"labelAction\")
-		var inputLabel = button.find_child(\"labelInput\")
-		
-		actionLabel.text = inputActions[action]
-		
-		
-		var events = InputMap.action_get_events(action)
-		if events.size() > 0:
-			inputLabel.text = events[0].as_text().trim_suffix(\" (Physical)\")
+	# Add an entry of the settings element to the section's reference table
+	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	
+	# Verify the directory
+	DirAccess.make_dir_absolute(dataFolder)
+	
+	# Check if a save file exists
+	if not FileAccess.file_exists(path):
+		# Enable the no save file flag
+		noSaveFile = true
+
+
+# Loads the saved/default values of the element
+func load_settings() -> void:
+	# Create the element panel in the scene tree
+	create_element_panel()
+	
+	# Get the current value for the element
+	if noSaveFile:
+		INPUT_SETTINGS_DATA = elementPanelRef.get_events(ACTION_LIST)
+		save_input_settings()
+	else:
+		get_input_settings()
+	
+	if invalidSaveFile:
+		INPUT_SETTINGS_DATA = elementPanelRef.get_events(ACTION_LIST)
+		save_input_settings()
+	else:
+		# Apply the loaded values to the game
+		call_deferred(\"apply_settings\")
+
+
+func pressed() -> void:
+	# Check if a save file exists
+	if not FileAccess.file_exists(path):
+		# Enable the no save file flag
+		noSaveFile = true
+	
+	elementPanelRef.create_action_list()
+	sectionRef.owner.settingsPanel.hide()
+	elementPanelRef.show()
+
+
+# Called to apply the settings in the settings cache
+func apply_settings() -> void:
+	elementPanelRef.update_action_events(INPUT_SETTINGS_DATA)
+
+
+func panel_settings_changed(NEW_VALUE: Dictionary) -> void:
+	INPUT_SETTINGS_DATA = NEW_VALUE.duplicate()
+	save_input_settings()
+
+
+func save_input_settings() -> void:
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	var DATA: Dictionary = {}
+	
+	for input in INPUT_SETTINGS_DATA:
+		match INPUT_SETTINGS_DATA[input].get_class():
+			\"InputEventKey\":
+				DATA[input] = {
+					\"type\": \"keyboard\",
+					\"key\": INPUT_SETTINGS_DATA[input].get_physical_keycode()
+				}
+			\"InputEventMouseButton\":
+				DATA[input] = {
+					\"type\": \"mouse\",
+					\"button\": INPUT_SETTINGS_DATA[input].get_button_index()
+				}
+	
+	var jsonString: String = JSON.stringify(DATA, \"\\t\")
+	file.store_string(jsonString)
+	file.close()
+	
+	# Disable the no save file flag if it was enabled
+	if noSaveFile:
+		noSaveFile = false
+
+
+func get_input_settings() -> void:
+	var file := FileAccess.open(path, FileAccess.READ)
+	var content: String = file.get_as_text()
+	var DATA = JSON.parse_string(content)
+	
+	file.close()
+	
+	if DATA == null || DATA.size() == 0:
+		push_error(\"Failed to parse input settings\")
+		invalidSaveFile = true
+		return
+	
+	verify_settings_data(DATA)
+
+
+# Used for verifying the integrity of the save file
+func verify_settings_data(DATA: Dictionary) -> void:
+	for input in DATA:
+		if ACTION_LIST.has(input):
+			match DATA[input][\"type\"]:
+				\"keyboard\":
+					var key: InputEventKey = InputEventKey.new()
+					
+					key.set_physical_keycode(DATA[input][\"key\"])
+					INPUT_SETTINGS_DATA[input] = key
+				\"mouse\":
+					var button: InputEventMouseButton = InputEventMouseButton.new()
+					
+					button.set_button_index(DATA[input][\"button\"])
+					INPUT_SETTINGS_DATA[input] = button
 		else:
-			inputLabel.text = \"\"
-		
-		actionList.add_child(button)
-		button.pressed.connect(inputButtonPressed.bind(button, action))
+			invalidSaveFile = true
+			push_warning(\"Invalid input settings entry: \", input)
 
 
-func inputButtonPressed(button, action):
-	if !isRemapping:
-		isRemapping = true
-		actionToRemap = action
-		remappingButton = button
-		button.find_child(\"labelInput\").text = \"Press key to bind...\"
-
-
-func _input(event):
-	if isRemapping:
-		if (event is InputEventKey || (event is InputEventMouseButton && event.pressed)):
-			if event is InputEventMouseButton && event.double_click:
-				event.double_click = false
-			
-			InputMap.action_erase_events(actionToRemap)
-			InputMap.action_add_event(actionToRemap, event)
-			updateActionList(remappingButton, event)
-			
-			isRemapping = false
-			actionToRemap = null
-			remappingButton = null
-			
-			accept_event()
-
-
-func updateActionList(button, event):
-	button.find_child(\"labelInput\").text = event.as_text().trim_suffix(\" (Physical)\")
-
-
-func resetButtonPressed():
-	createActionList()
-
-
-func backButtonPressed():
-	visible = false
-	$\"../inGameMenu\".visible = true
+func create_element_panel() -> void:
+	var elementPanels: Control = sectionRef.owner.elementPanels
+	elementPanelRef = ElementPanel.instantiate()
+	
+	elementPanelRef.panelOwner = self
+	elementPanelRef.hide()
+	elementPanels.add_child(elementPanelRef)
+	elementPanelRef.set_owner(sectionRef.owner)
 "
 
-[node name="inputSettings" type="Control"]
-layout_mode = 3
+[node name="InputSettings" type="Button"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_0eq0v")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -194.0
-offset_top = -29.0
-offset_right = 194.0
-offset_bottom = 30.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 280)
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer/MarginContainer"]
-layout_mode = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="actionList" type="VBoxContainer" parent="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="resetButton" type="Button" parent="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-focus_mode = 0
-text = "Reset to default"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="backButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_direction = 1
-layout_mode = 2
-size_flags_horizontal = 3
-focus_mode = 0
-text = "Back"
-
-[node name="applyButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_direction = 1
-layout_mode = 2
-size_flags_horizontal = 3
-focus_mode = 0
-text = "Apply"
-
-[connection signal="pressed" from="VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/resetButton" to="." method="resetButtonPressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/backButton" to="." method="backButtonPressed"]
+text = "Input Settings"
+script = SubResource("GDScript_te2ja")

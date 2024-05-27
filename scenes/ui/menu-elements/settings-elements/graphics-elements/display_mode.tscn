@@ -41,7 +41,7 @@ func _ready():
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
 	# Add an entry of the settings element to the section's reference table
-	sectionRef.REFERENCE_TABLE[element] = self
+	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
 
 
 # Loads the saved/default values of the element
@@ -86,9 +86,9 @@ func apply_settings() -> void:
 # Called to check if the resolution element should be disabled
 func check_resolution() -> void:
 	# Check if the the resolution element exists
-	if sectionRef.REFERENCE_TABLE.has(\"Resolution\"):
+	if sectionRef.ELEMENT_REFERENCE_TABLE.has(\"Resolution\"):
 		# Get the reference for it
-		var resolution = sectionRef.REFERENCE_TABLE[\"Resolution\"]
+		var resolution = sectionRef.ELEMENT_REFERENCE_TABLE[\"Resolution\"]
 		
 		# Check if the selected option is not Windowed and toggle the resolution element accordingly
 		if options.get_item_text(selectedIndex) != \"Windowed\":

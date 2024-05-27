@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://becfhb65goqg6"]
 
 [ext_resource type="PackedScene" uid="uid://px6a2dg8cawb" path="res://scenes/ui/menu-elements/settings.tscn" id="2_10un5"]
-[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input_settings.tscn" id="3_3dbjo"]
+[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input-settings-panel/input_settings_panel.tscn" id="3_3dbjo"]
 
 [sub_resource type="GDScript" id="GDScript_3xaa6"]
 script/source = "extends Control

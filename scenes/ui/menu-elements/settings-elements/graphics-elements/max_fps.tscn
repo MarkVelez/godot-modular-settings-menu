@@ -36,7 +36,7 @@ func _ready():
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
 	# Add an entry of the settings element to the section's reference table
-	sectionRef.REFERENCE_TABLE[element] = self
+	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
 
 
 # Loads the saved/default values of the element
@@ -57,6 +57,8 @@ func load_settings() -> void:
 	if currentValue == 0:
 		# Set the value box text to Unlimited
 		sliderValue.valueBox.set_text(\"Unlimited\")
+		# Set the slider value to max
+		sliderValue.slider.set_value(maxValue + 1)
 	
 	# Apply the loaded values to the game
 	call_deferred(\"apply_settings\")
@@ -79,8 +81,8 @@ func value_changed(newValue: int) -> void:
 # Element specific script for applying its value to the game
 func apply_settings() -> void:
 	# Check if the vsync element exists and check if it's current value is not disabled
-	if sectionRef.REFERENCE_TABLE.has(\"VSync\"):
-		if sectionRef.REFERENCE_TABLE[\"VSync\"].currentValue != \"Disabled\":
+	if sectionRef.ELEMENT_REFERENCE_TABLE.has(\"VSync\"):
+		if sectionRef.ELEMENT_REFERENCE_TABLE[\"VSync\"].currentValue != \"Disabled\":
 			return
 	
 	# Set the fps limit to the selected value

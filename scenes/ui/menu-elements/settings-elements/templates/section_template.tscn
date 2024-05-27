@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://ejplmui1twn4"]
+[gd_scene load_steps=6 format=3 uid="uid://ejplmui1twn4"]
 
 [ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_aglse"]
 [ext_resource type="PackedScene" uid="uid://dc1yif146sxav" path="res://scenes/ui/menu-elements/settings-elements/templates/option_element_template.tscn" id="2_ws4gk"]
 [ext_resource type="PackedScene" uid="uid://bjcuw6amean2" path="res://scenes/ui/menu-elements/settings-elements/templates/slider_element_template.tscn" id="3_o11e6"]
+[ext_resource type="PackedScene" uid="uid://cxaxyqer0af21" path="res://scenes/ui/menu-elements/settings-elements/templates/toggle_element_template.tscn" id="4_41mog"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e0spm"]
 
@@ -65,4 +66,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="SliderElementTemplate" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/SubSection/SubSectionElements" instance=ExtResource("3_o11e6")]
+layout_mode = 2
+
+[node name="ToggleElementTemplate" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/SubSection/SubSectionElements" instance=ExtResource("4_41mog")]
 layout_mode = 2

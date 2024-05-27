@@ -36,10 +36,10 @@ func verify_settings_data(VALUES: Dictionary, section: StringName, element: Stri
 	if SettingsDataManager.SETTINGS_DATA.has(section):
 		# Check if the element exists in the settings data
 		if !SettingsDataManager.SETTINGS_DATA[section].has(element):
-			print("Settings element does not exist!")
+			push_warning("Settings element does not exist")
 			return false
 	else:
-		print("Settings section does not exist!")
+		push_warning("Settings section does not exist")
 		return false
 	
 	# Get the value of the element
@@ -47,14 +47,14 @@ func verify_settings_data(VALUES: Dictionary, section: StringName, element: Stri
 	
 	# Check if the retrieved value is the correct type
 	if typeof(retrievedValue) != typeof(VALUES["defaultValue"]):
-		print("Invalid value type ", type_string(typeof(retrievedValue)), " for element ", element, " expected value type ", type_string(typeof(VALUES["defaultValue"])), "!")
+		push_warning("Invalid value type ", type_string(typeof(retrievedValue)), " for element ", element, " expected value type ", type_string(typeof(VALUES["defaultValue"])))
 		return false
 	
 	# Check if the retrieved value is a string
-	if typeof(VALUES["defaultValue"]) == TYPE_STRING:
+	if typeof(VALUES["defaultValue"]) == TYPE_STRING ||  typeof(VALUES["defaultValue"]) == TYPE_BOOL:
 		# Check if the retrieved value is valid
 		if !VALUES["validOptions"].has(retrievedValue):
-			print("Invalid value ", retrievedValue, " for element ", element, " expected values ", VALUES["validOptions"], "!")
+			push_warning("Invalid value ", retrievedValue, " for element ", element, " expected values ", VALUES["validOptions"])
 			return false
 	
 	# Check if the retrieved value is a number
@@ -65,7 +65,7 @@ func verify_settings_data(VALUES: Dictionary, section: StringName, element: Stri
 			if element == "MaxFPS" && retrievedValue == 0:
 				return true
 			
-			print("Invalid value ", retrievedValue, " for element ", element, " expected values between ", VALUES["minValue"], " and ", VALUES["maxValue"], "!")
+			push_warning("Invalid value ", retrievedValue, " for element ", element, " expected values between ", VALUES["minValue"], " and ", VALUES["maxValue"])
 			return false
 	
 	return true
@@ -108,6 +108,17 @@ func value_changed(sectionRef: TabBar, elementRef: Node, value) -> void:
 	sectionRef.SETTINGS_SECTION_CACHE[elementRef.element] = value
 	# Check if the new value is different than the saved value
 	sectionRef.settings_changed(elementRef.element)
+
+
+# Used to update values of the section cache the element is under (used for toggle elements)
+func toggled(sectionRef: TabBar, elementRef: Node, state: bool) -> void:
+	# Update the settings cache with the new toggle state
+	sectionRef.SETTINGS_SECTION_CACHE[elementRef.element] = state
+	# Check if the new state is different than the saved state
+	sectionRef.settings_changed(elementRef.element)
+	
+	# Update the element's values
+	elementRef.currentValue = state
 
 
 func apply_in_game_setting(sectionRef: Node, elementRef: Node, value = null) -> void:

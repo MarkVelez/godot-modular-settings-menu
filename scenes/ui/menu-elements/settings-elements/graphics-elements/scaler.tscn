@@ -50,22 +50,22 @@ func _ready():
 	SettingsDataManager.connect(\"load_settings\", load_settings)
 	
 	# Add an entry of the settings element to the section's reference table
-	sectionRef.REFERENCE_TABLE[element] = self
+	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
 	
 	# Give section information to Resolution Scale sub element
 	resolutionScale.sectionRef = sectionRef
 	resolutionScale.section = section
-	sectionRef.REFERENCE_TABLE[resolutionScale.element] = resolutionScale
+	sectionRef.ELEMENT_REFERENCE_TABLE[resolutionScale.element] = resolutionScale
 	
 	# Give section information to FSR Options sub element
 	fsrMode.sectionRef = sectionRef
 	fsrMode.section = section
-	sectionRef.REFERENCE_TABLE[fsrMode.element] = fsrMode
+	sectionRef.ELEMENT_REFERENCE_TABLE[fsrMode.element] = fsrMode
 	
 	# Give section information to FSR Sharpness sub element
 	fsrSharpness.sectionRef = sectionRef
 	fsrSharpness.section = section
-	sectionRef.REFERENCE_TABLE[fsrSharpness.element] = fsrSharpness
+	sectionRef.ELEMENT_REFERENCE_TABLE[fsrSharpness.element] = fsrSharpness
 
 
 # Loads the saved/default values of the element
@@ -144,9 +144,9 @@ func apply_settings() -> void:
 # Checks if TAA is selected while FSR 2.2 is enabled
 func check_anti_aliasing() -> void:
 	# Check if the anti aliasing element exists and has TAA
-	if sectionRef.REFERENCE_TABLE.has(\"AntiAliasing\") && sectionRef.REFERENCE_TABLE[\"AntiAliasing\"].OPTION_LIST.has(\"TAA\"):
+	if sectionRef.ELEMENT_REFERENCE_TABLE.has(\"AntiAliasing\") && sectionRef.ELEMENT_REFERENCE_TABLE[\"AntiAliasing\"].OPTION_LIST.has(\"TAA\"):
 		# Reference to the anti aliasing element
-		var antiAliasing: HBoxContainer = sectionRef.REFERENCE_TABLE[\"AntiAliasing\"]
+		var antiAliasing: HBoxContainer = sectionRef.ELEMENT_REFERENCE_TABLE[\"AntiAliasing\"]
 		
 		# Check if selected scaler mode is FSR 2.2
 		if currentValue == \"FSR 2.2\":

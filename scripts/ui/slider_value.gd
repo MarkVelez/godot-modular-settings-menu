@@ -7,10 +7,10 @@ extends HBoxContainer
 # Called to initialize the slider/spin box of the element
 func init_slider(minValue: float, maxValue: float, stepValue: float, currentValue: float) -> void:
 	# Apply the min/max/step/current value of the slider
-	slider.min_value = minValue
-	slider.max_value = maxValue
-	slider.step = stepValue
-	slider.value = currentValue
+	slider.set_min(minValue)
+	slider.set_max(maxValue)
+	slider.set_step(stepValue)
+	slider.set_value(currentValue)
 	
 	# Connect the value changed signal for the slider
 	if !slider.is_connected("value_changed", slider_value_changed):
@@ -19,15 +19,15 @@ func init_slider(minValue: float, maxValue: float, stepValue: float, currentValu
 	# Check if the value box is a spin box or a label
 	if valueBox is SpinBox:
 		# Apply the min/max/step/current value of the spin box
-		valueBox.min_value = minValue
-		valueBox.max_value = maxValue
-		valueBox.step = stepValue
-		valueBox.value = currentValue
+		valueBox.set_min(minValue)
+		valueBox.set_max(maxValue)
+		valueBox.set_step(stepValue)
+		valueBox.set_value(currentValue)
 		
 		# Add caret blink to spin box
-		valueBox.get_line_edit().caret_blink = true
+		valueBox.get_line_edit().set_caret_blink_enabled(true)
 		
-		valueBox.suffix = owner.valueSuffix
+		valueBox.set_suffix(owner.valueSuffix)
 		
 		# Connect the value changed signal of the spin box
 		if !valueBox.is_connected("value_changed", value_box_value_changed):
@@ -39,7 +39,7 @@ func init_slider(minValue: float, maxValue: float, stepValue: float, currentValu
 
 func slider_value_changed(value) -> void:
 	if valueBox is SpinBox:
-		valueBox.value = value
+		valueBox.set_value(value)
 	else:
 		valueBox.set_text(str(value) + owner.valueSuffix)
 	
@@ -48,4 +48,4 @@ func slider_value_changed(value) -> void:
 
 
 func value_box_value_changed(value) -> void:
-	slider.value = value
+	slider.set_value(value)

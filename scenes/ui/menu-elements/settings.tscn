@@ -17,6 +17,7 @@ signal clear_cache
 @onready var settingsTabs: TabContainer = %SettingsTabs
 @onready var discardChangesPopup: PanelContainer = %DiscardChangesPopup
 @onready var applyButton: Button = %ApplyButton
+@onready var elementPanels: Control = %ElementPanels
 
 
 func back_button_pressed() -> void:
@@ -52,7 +53,7 @@ func yes_button_pressed():
 	var currentTab: TabBar = owner.settingsTabs.get_child(owner.settingsTabs.current_tab)
 	
 	for element in currentTab.CHANGED_ELEMENTS:
-		currentTab.REFERENCE_TABLE[element].load_settings()
+		currentTab.ELEMENT_REFERENCE_TABLE[element].load_settings()
 	
 	currentTab.CHANGED_ELEMENTS.clear()
 	owner.applyButton.set_disabled(true)
@@ -130,6 +131,16 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/focus = SubResource("StyleBoxEmpty_qp71p")
 text = "Back"
+
+[node name="ElementPanels" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="DiscardChangesPopup" type="PanelContainer" parent="."]
 unique_name_in_owner = true

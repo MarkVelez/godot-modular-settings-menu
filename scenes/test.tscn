@@ -1,7 +1,26 @@
-[gd_scene load_steps=22 format=3 uid="uid://bh7hetspcaxp0"]
+[gd_scene load_steps=23 format=3 uid="uid://bh7hetspcaxp0"]
 
 [ext_resource type="PackedScene" uid="uid://becfhb65goqg6" path="res://scenes/ui/in_game_menu.tscn" id="1_6olxy"]
 [ext_resource type="Texture2D" uid="uid://h7awm5rksxsf" path="res://assets/floorTexture.png" id="2_y6wmg"]
+
+[sub_resource type="GDScript" id="GDScript_mcu2s"]
+resource_name = "test_scene"
+script/source = "extends Node3D
+
+
+func _process(_delta):
+	if Input.is_action_just_pressed(\"up\"):
+		print(\"Up button pressed\")
+	
+	if Input.is_action_just_pressed(\"down\"):
+		print(\"Down button pressed\")
+	
+	if Input.is_action_just_pressed(\"left\"):
+		print(\"Left button pressed\")
+	
+	if Input.is_action_just_pressed(\"right\"):
+		print(\"Right button pressed\")
+"
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1cg2s"]
 
@@ -236,6 +255,7 @@ bottom_radius = 0.05
 radial_segments = 8
 
 [node name="TestScene" type="Node3D"]
+script = SubResource("GDScript_mcu2s")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_snm0g")

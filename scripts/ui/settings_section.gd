@@ -5,8 +5,8 @@ signal apply_settings
 # Name of the settings section (used as the key for the section in the settings data)
 @onready var section: StringName = name
 
-# Reference table of all elements under the section (does not include sub elements)
-var REFERENCE_TABLE: Dictionary
+# Reference table of all elements under the section
+var ELEMENT_REFERENCE_TABLE: Dictionary
 # Cache of all the settings values for the section
 var SETTINGS_SECTION_CACHE: Dictionary
 # A list of all the elements that were changed since the settings were last applied
@@ -17,6 +17,9 @@ func _ready():
 	# Connect neccessary signals from the central root node for the settings
 	owner.connect("get_settings", get_settings)
 	owner.connect("clear_cache", clear_cache)
+	
+	# Add a reference of the section toe the reference table
+	SettingsDataManager.SECTION_REFERENCE_TABLE[section] = self
 	
 	# Check if a save file exists
 	if SettingsDataManager.noSaveFile:
@@ -32,7 +35,7 @@ func get_settings() -> void:
 	# Copy the settings data for the section into it's cache
 	SETTINGS_SECTION_CACHE = SettingsDataManager.SETTINGS_DATA[section].duplicate(true)
 	
-	# If no save file exists saved the default values retrieved from the section's elements
+	# If no save file exists saves the default values retrieved from the section's elements
 	if SettingsDataManager.noSaveFile || SettingsDataManager.invalidSaveFile:
 		SettingsDataManager.call_deferred("save_data")
 	
@@ -61,6 +64,6 @@ func on_apply_settings() -> void:
 	SettingsDataManager.save_data()
 	
 	for element in CHANGED_ELEMENTS:
-		REFERENCE_TABLE[element].apply_settings()
+		ELEMENT_REFERENCE_TABLE[element].apply_settings()
 	
 	CHANGED_ELEMENTS.clear()
