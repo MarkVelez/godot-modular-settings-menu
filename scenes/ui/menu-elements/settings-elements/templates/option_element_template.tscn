@@ -51,7 +51,7 @@ func load_settings() -> void:
 	# Get the current value for the element
 	currentValue = ElementResource.load_element_settings(VALUES, section, element)
 	# Initialize the option button
-	selectedIndex = ElementResource.init_option_button_element(OPTION_LIST, options, currentValue)
+	ElementResource.init_option_button_element(OPTION_LIST, options, currentValue, self)
 	
 	# Apply the loaded values to the game
 	call_deferred(\"apply_settings\")

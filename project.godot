@@ -48,4 +48,5 @@ right={
 
 [rendering]
 
+textures/vram_compression/import_s3tc_bptc=true
 reflections/sky_reflections/texture_array_reflections=false

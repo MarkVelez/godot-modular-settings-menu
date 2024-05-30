@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://i0w5gftb0j16"]
+[gd_scene load_steps=3 format=3 uid="uid://i0w5gftb0j16"]
+
+[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input-settings-panel/input_settings_panel.tscn" id="1_6pc66"]
 
 [sub_resource type="GDScript" id="GDScript_te2ja"]
 resource_name = "input_settings"
@@ -12,7 +14,7 @@ script/source = "extends Button
 @onready var element: StringName = name
 
 # Reference to the element's panel
-const ElementPanel: PackedScene = preload(\"input-settings-panel/input_settings_panel.tscn\")
+@export var ElementPanel: PackedScene
 
 # List of actions to make remappable and how the name they should display
 @export var ACTION_LIST: Dictionary = {
@@ -22,8 +24,10 @@ const ElementPanel: PackedScene = preload(\"input-settings-panel/input_settings_
 	\"right\": \"Right\",
 }
 
+# Currently stored input data
 var INPUT_SETTINGS_DATA: Dictionary
 
+# Reference to the element's extra panel
 var elementPanelRef: Node
 
 # Path to the settings save file
@@ -62,12 +66,15 @@ func load_settings() -> void:
 	
 	# Get the current value for the element
 	if noSaveFile:
+		# Get the events for the remappable actions from the project settings
 		INPUT_SETTINGS_DATA = elementPanelRef.get_events(ACTION_LIST)
 		save_input_settings()
 	else:
 		get_input_settings()
 	
+	# Check if save file is valid
 	if invalidSaveFile:
+		# Get the events for the remappable actions from the project settings
 		INPUT_SETTINGS_DATA = elementPanelRef.get_events(ACTION_LIST)
 		save_input_settings()
 	else:
@@ -81,39 +88,55 @@ func pressed() -> void:
 		# Enable the no save file flag
 		noSaveFile = true
 	
+	# Populate the element's extra panel with the remappable actions
 	elementPanelRef.create_action_list()
-	sectionRef.owner.settingsPanel.hide()
+	# Switch panels
+	sectionRef.settingsMenu.settingsPanel.hide()
 	elementPanelRef.show()
 
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
+	# Assign the events for the remappable actions
 	elementPanelRef.update_action_events(INPUT_SETTINGS_DATA)
 
 
+# Called to update the input settings data
 func panel_settings_changed(NEW_VALUE: Dictionary) -> void:
 	INPUT_SETTINGS_DATA = NEW_VALUE.duplicate()
 	save_input_settings()
 
 
+# Called to save the input settings
 func save_input_settings() -> void:
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	var DATA: Dictionary = {}
 	
+	# Itterate through the input settings
 	for input in INPUT_SETTINGS_DATA:
-		match INPUT_SETTINGS_DATA[input].get_class():
-			\"InputEventKey\":
-				DATA[input] = {
-					\"type\": \"keyboard\",
-					\"key\": INPUT_SETTINGS_DATA[input].get_physical_keycode()
-				}
-			\"InputEventMouseButton\":
-				DATA[input] = {
-					\"type\": \"mouse\",
-					\"button\": INPUT_SETTINGS_DATA[input].get_button_index()
-				}
+		# Check if the action is unbound
+		if INPUT_SETTINGS_DATA[input] != null:
+			# Check the input type
+			match INPUT_SETTINGS_DATA[input].get_class():
+				\"InputEventKey\":
+					# Add a serialized entry for the action with its event
+					DATA[input] = {
+						\"type\": \"keyboard\",
+						\"key\": INPUT_SETTINGS_DATA[input].get_physical_keycode()
+					}
+				\"InputEventMouseButton\":
+					# Add a serialized entry for the action with its event
+					DATA[input] = {
+						\"type\": \"mouse\",
+						\"button\": INPUT_SETTINGS_DATA[input].get_button_index()
+					}
+		else:
+			# Add a null entry for the unbound action
+			DATA[input] = null
 	
+	# Convert the data dictionary to a json string
 	var jsonString: String = JSON.stringify(DATA, \"\\t\")
+	# Save the string to a json file
 	file.store_string(jsonString)
 	file.close()
 	
@@ -122,47 +145,74 @@ func save_input_settings() -> void:
 		noSaveFile = false
 
 
+# Called to retrieve the input settings data from the save file
 func get_input_settings() -> void:
 	var file := FileAccess.open(path, FileAccess.READ)
+	# Get the data as a json string from the file
 	var content: String = file.get_as_text()
+	# Parse the json string to a dictionary
 	var DATA = JSON.parse_string(content)
 	
 	file.close()
 	
+	# Check if there were any errors or if the save file is empty
 	if DATA == null || DATA.size() == 0:
+		# Push an error for failing to load the save data
 		push_error(\"Failed to parse input settings\")
+		# Toggle the invalid save file flag
 		invalidSaveFile = true
 		return
 	
+	# Verify the validity of the save data
 	verify_settings_data(DATA)
 
 
 # Used for verifying the integrity of the save file
 func verify_settings_data(DATA: Dictionary) -> void:
+	# Itterate through all the retrieved data
 	for input in DATA:
+		# Check if the action is part of the remappable action
 		if ACTION_LIST.has(input):
-			match DATA[input][\"type\"]:
-				\"keyboard\":
-					var key: InputEventKey = InputEventKey.new()
-					
-					key.set_physical_keycode(DATA[input][\"key\"])
-					INPUT_SETTINGS_DATA[input] = key
-				\"mouse\":
-					var button: InputEventMouseButton = InputEventMouseButton.new()
-					
-					button.set_button_index(DATA[input][\"button\"])
-					INPUT_SETTINGS_DATA[input] = button
+			# Check if the action is no unbound
+			if DATA[input] != null:
+				# Check the input type of the action's event
+				match DATA[input][\"type\"]:
+					\"keyboard\":
+						# Create a new input event
+						var key: InputEventKey = InputEventKey.new()
+						
+						# Set the physical keycode of the new input event
+						key.set_physical_keycode(DATA[input][\"key\"])
+						# Add the input event to the input settings data
+						INPUT_SETTINGS_DATA[input] = key
+					\"mouse\":
+						# Create a new input event
+						var button: InputEventMouseButton = InputEventMouseButton.new()
+						
+						# Set the button index of the new input event
+						button.set_button_index(DATA[input][\"button\"])
+						# Add the input event to the input settings data
+						INPUT_SETTINGS_DATA[input] = button
+			else:
+				# Add an unbound action entry to the input settings data
+				INPUT_SETTINGS_DATA[input] = null
 		else:
-			invalidSaveFile = true
+			# Push a warning for an invalid entry
 			push_warning(\"Invalid input settings entry: \", input)
+			# Toggle the invalid save file flag
+			invalidSaveFile = true
 
 
+# Called to create the element's extra panel
 func create_element_panel() -> void:
-	var elementPanels: Control = sectionRef.owner.elementPanels
+	var elementPanels: Control = sectionRef.settingsMenu.elementPanels
+	# Instantiate the element panel
 	elementPanelRef = ElementPanel.instantiate()
 	
+	# Give a reference of the element
 	elementPanelRef.panelOwner = self
 	elementPanelRef.hide()
+	# Add the panel to the element panels list
 	elementPanels.add_child(elementPanelRef)
 	elementPanelRef.set_owner(sectionRef.owner)
 "
@@ -175,3 +225,4 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Input Settings"
 script = SubResource("GDScript_te2ja")
+ElementPanel = ExtResource("1_6pc66")

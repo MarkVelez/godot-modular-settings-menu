@@ -72,22 +72,22 @@ func verify_settings_data(VALUES: Dictionary, section: StringName, element: Stri
 
 
 # Used to initialize an option button element
-func init_option_button_element(OPTION_LIST, optionButton: OptionButton, currentValue) -> int:
+func init_option_button_element(OPTION_LIST, optionButton: OptionButton, currentValue, elementRef: Node) -> void:
 	var index: int = 0
-	var selectedIndex: int
+	# Get the current item count of the option button
+	var itemCount: int = optionButton.get_item_count()
 	
 	# Add the options from the received option list of the element
 	for option in OPTION_LIST:
-		optionButton.add_item(option, index)
+		# Check if the option button has not been initialized yet
+		if itemCount == 0:
+			optionButton.add_item(option, index)
 		# Select the option that was loaded
 		if option == currentValue:
 			optionButton.select(index)
-			selectedIndex = index
+			elementRef.selectedIndex = index
 		
 		index += 1
-	
-	# Return the index for the selected option
-	return selectedIndex
 
 
 # Used to update values of the section cache the element is under (used for option button elements)

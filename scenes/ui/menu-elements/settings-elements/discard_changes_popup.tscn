@@ -1,0 +1,83 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvkksl3mrnoto"]
+
+[sub_resource type="GDScript" id="GDScript_pvp7f"]
+resource_name = "discard_changes_popup"
+script/source = "extends PanelContainer
+
+@onready var yesButton: Button = $PopupWindow/MarginContainer/VBoxContainer/HBoxContainer/YesButton
+@onready var noButton: Button = $PopupWindow/MarginContainer/VBoxContainer/HBoxContainer/NoButton
+
+@export var parent: Node	## The panel the discard changes popup belongs to
+
+
+func _ready():
+	# Connect necessary signals
+	yesButton.connect(\"pressed\", yes_button_pressed)
+	noButton.connect(\"pressed\", no_button_pressed)
+
+
+func yes_button_pressed() -> void:
+	# Check if the panel this belongs to has the \"discard changes\" function
+	if parent.has_method(\"discard_changes\"):
+		parent.discard_changes()
+	
+	# Disable the panel's apply button
+	parent.applyButton.set_disabled(true)
+	parent.back_button_pressed()
+	hide()
+
+
+func no_button_pressed() -> void:
+	hide()
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8kuxy"]
+bg_color = Color(0.162066, 0.162066, 0.162065, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="DiscardChangesPopup" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_pvp7f")
+
+[node name="PopupWindow" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_8kuxy")
+
+[node name="MarginContainer" type="MarginContainer" parent="PopupWindow"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PopupWindow/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Text" type="Label" parent="PopupWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Would you like to discard
+all changes done?"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PopupWindow/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="YesButton" type="Button" parent="PopupWindow/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="PopupWindow/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No"
