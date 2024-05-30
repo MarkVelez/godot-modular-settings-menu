@@ -96,7 +96,7 @@ func check_resolution() -> void:
 		else:
 			resolution.options.set_disabled(false)
 			
-			if !sectionRef.CHANGED_ELEMENTS.has(\"Resolution\"):
+			if not sectionRef.CHANGED_ELEMENTS.has(\"Resolution\"):
 				sectionRef.CHANGED_ELEMENTS.append(\"Resolution\")
 "
 

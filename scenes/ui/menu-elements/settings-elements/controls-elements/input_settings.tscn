@@ -156,7 +156,7 @@ func get_input_settings() -> void:
 	file.close()
 	
 	# Check if there were any errors or if the save file is empty
-	if DATA == null || DATA.size() == 0:
+	if DATA == null or DATA.size() == 0:
 		# Push an error for failing to load the save data
 		push_error(\"Failed to parse input settings\")
 		# Toggle the invalid save file flag

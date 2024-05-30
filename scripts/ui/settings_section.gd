@@ -27,9 +27,6 @@ func _ready():
 	if SettingsDataManager.noSaveFile:
 		# Add the section to the settings data dictionary
 		SettingsDataManager.SETTINGS_DATA[section] = {}
-	
-	# Add the section to the valid settings dictionary
-	SettingsDataManager.VALID_SETTINGS[section] = []
 
 
 # Called when opening the settings menu to fill the settings cache
@@ -38,7 +35,7 @@ func get_settings() -> void:
 	SETTINGS_SECTION_CACHE = SettingsDataManager.SETTINGS_DATA[section].duplicate(true)
 	
 	# If no save file exists saves the default values retrieved from the section's elements
-	if SettingsDataManager.noSaveFile || SettingsDataManager.invalidSaveFile:
+	if SettingsDataManager.noSaveFile or SettingsDataManager.invalidSaveFile:
 		SettingsDataManager.call_deferred("save_data")
 	
 	CHANGED_ELEMENTS.clear()

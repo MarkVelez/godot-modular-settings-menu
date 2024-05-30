@@ -144,7 +144,7 @@ func apply_settings() -> void:
 # Checks if TAA is selected while FSR 2.2 is enabled
 func check_anti_aliasing() -> void:
 	# Check if the anti aliasing element exists and has TAA
-	if sectionRef.ELEMENT_REFERENCE_TABLE.has(\"AntiAliasing\") && sectionRef.ELEMENT_REFERENCE_TABLE[\"AntiAliasing\"].OPTION_LIST.has(\"TAA\"):
+	if sectionRef.ELEMENT_REFERENCE_TABLE.has(\"AntiAliasing\") and sectionRef.ELEMENT_REFERENCE_TABLE[\"AntiAliasing\"].OPTION_LIST.has(\"TAA\"):
 		# Reference to the anti aliasing element
 		var antiAliasing: HBoxContainer = sectionRef.ELEMENT_REFERENCE_TABLE[\"AntiAliasing\"]
 		

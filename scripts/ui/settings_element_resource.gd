@@ -19,27 +19,24 @@ func load_element_settings(VALUES: Dictionary, section: StringName, element: Str
 		else:
 			# Assign default value as current value
 			currentValue = VALUES["defaultValue"]
-			# Add default value of element to the settings data
+			# Add default value of the element to the settings data
 			SettingsDataManager.SETTINGS_DATA[section][element] = currentValue
 			SettingsDataManager.invalidSaveFile = true
-	
-	# Add the element to the valid settings dictionary
-	SettingsDataManager.VALID_SETTINGS[section].append(element)
 	
 	# Return the retrieved current value
 	return currentValue
 
 
-# Used for verifying the integrity of the save file
+# Checks if the loaded values are valid for the element and fixes them if they are not
 func verify_settings_data(VALUES: Dictionary, section: StringName, element: StringName) -> bool:
 	# Check if the section exists in settings data
 	if SettingsDataManager.SETTINGS_DATA.has(section):
 		# Check if the element exists in the settings data
-		if !SettingsDataManager.SETTINGS_DATA[section].has(element):
-			push_warning("Settings element does not exist")
+		if not SettingsDataManager.SETTINGS_DATA[section].has(element):
+			push_warning("Settings element does not exist: ", element)
 			return false
 	else:
-		push_warning("Settings section does not exist")
+		push_warning("Settings section does not exist: ", section)
 		return false
 	
 	# Get the value of the element
@@ -51,18 +48,18 @@ func verify_settings_data(VALUES: Dictionary, section: StringName, element: Stri
 		return false
 	
 	# Check if the retrieved value is a string
-	if typeof(VALUES["defaultValue"]) == TYPE_STRING ||  typeof(VALUES["defaultValue"]) == TYPE_BOOL:
+	if typeof(VALUES["defaultValue"]) == TYPE_STRING or typeof(VALUES["defaultValue"]) == TYPE_BOOL:
 		# Check if the retrieved value is valid
-		if !VALUES["validOptions"].has(retrievedValue):
+		if not VALUES["validOptions"].has(retrievedValue):
 			push_warning("Invalid value ", retrievedValue, " for element ", element, " expected values ", VALUES["validOptions"])
 			return false
 	
 	# Check if the retrieved value is a number
-	if typeof(VALUES["defaultValue"]) == TYPE_FLOAT || typeof(VALUES["defaultValue"]) == TYPE_INT:
+	if typeof(VALUES["defaultValue"]) == TYPE_FLOAT or typeof(VALUES["defaultValue"]) == TYPE_INT:
 		# Check if the retrieved value is valid
-		if retrievedValue < VALUES["minValue"] || retrievedValue > VALUES["maxValue"]:
+		if retrievedValue < VALUES["minValue"] or retrievedValue > VALUES["maxValue"]:
 			# Special check if max fps is set to 0 (unlimited)
-			if element == "MaxFPS" && retrievedValue == 0:
+			if element == "MaxFPS" and retrievedValue == 0:
 				return true
 			
 			push_warning("Invalid value ", retrievedValue, " for element ", element, " expected values between ", VALUES["minValue"], " and ", VALUES["maxValue"])
@@ -122,7 +119,7 @@ func toggled(sectionRef: TabBar, elementRef: Node, state: bool) -> void:
 
 
 func apply_in_game_setting(sectionRef: Node, elementRef: Node, value = null) -> void:
-	if sectionRef.owner.isInGameMenu:
+	if sectionRef.settingsMenu.isInGameMenu:
 		SettingsDataManager.call_deferred("emit_signal", "apply_in_game_settings", elementRef.section, elementRef.element, value)
 	else:
 		SettingsDataManager.IN_GAME_SETTINGS[elementRef.element] = elementRef

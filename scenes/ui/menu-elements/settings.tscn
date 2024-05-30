@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://px6a2dg8cawb"]
+[gd_scene load_steps=10 format=3 uid="uid://px6a2dg8cawb"]
 
 [ext_resource type="PackedScene" uid="uid://c66v42g6gs7gr" path="res://scenes/ui/menu-elements/settings-elements/gameplay.tscn" id="1_5exwk"]
 [ext_resource type="PackedScene" uid="uid://buqq0kms2dbb4" path="res://scenes/ui/menu-elements/settings-elements/graphics.tscn" id="2_gtlr3"]
 [ext_resource type="PackedScene" uid="uid://dfswr81erouhj" path="res://scenes/ui/menu-elements/settings-elements/controls.tscn" id="3_yucxh"]
+[ext_resource type="PackedScene" uid="uid://y5oxvao3aqtb" path="res://scenes/ui/menu-elements/settings-elements/audio.tscn" id="4_af6nm"]
 [ext_resource type="PackedScene" uid="uid://dvkksl3mrnoto" path="res://scenes/ui/menu-elements/settings-elements/discard_changes_popup.tscn" id="4_yfemx"]
 
 [sub_resource type="GDScript" id="GDScript_eua2a"]
@@ -12,7 +13,8 @@ script/source = "extends Control
 signal get_settings
 signal clear_cache
 
-@export var isInGameMenu: bool = true	## Used to check if gameplay related settings should be applied
+# Used to check if gameplay related settings should be applied
+@export var isInGameMenu: bool = true
 
 @onready var settingsPanel: VBoxContainer = %SettingsPanel
 @onready var settingsTabs: TabContainer = %SettingsTabs
@@ -91,6 +93,10 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="Controls" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_yucxh")]
+visible = false
+layout_mode = 2
+
+[node name="Audio" parent="SettingsPanel/SettingsTabs" instance=ExtResource("4_af6nm")]
 visible = false
 layout_mode = 2
 

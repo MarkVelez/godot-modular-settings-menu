@@ -83,7 +83,7 @@ func create_action_list() -> void:
 
 func input_button_pressed(action: String, actionInput: Button) -> void:
 	# Check if a button is not being remapped currently
-	if !isRemapping:
+	if not isRemapping:
 		isRemapping = true
 		actionToRemap = action
 		actionInputButton = actionInput
@@ -94,9 +94,9 @@ func _input(event):
 	# Check if an action is being remapped currently
 	if isRemapping:
 		# Check if the desired input is either a keyboard or mouse input
-		if event is InputEventKey || (event is InputEventMouseButton && event.pressed):
+		if event is InputEventKey or (event is InputEventMouseButton and event.pressed):
 			# Check if the event is a mouse event and if it was a double click
-			if event is InputEventMouseButton && event.double_click:
+			if event is InputEventMouseButton and event.double_click:
 				# Disable the double click flag
 				event.double_click = false
 			
@@ -190,7 +190,7 @@ func get_events(ACTIONS: Dictionary) -> Dictionary:
 	var EVENTS: Dictionary = {}
 	
 	# Check if there is a save file or of the save file is valid
-	if panelOwner.noSaveFile || panelOwner.invalidSaveFile:
+	if panelOwner.noSaveFile or panelOwner.invalidSaveFile:
 		# Load the events from the project settings
 		InputMap.load_from_project_settings()
 		# Itterate through the remappable actions
