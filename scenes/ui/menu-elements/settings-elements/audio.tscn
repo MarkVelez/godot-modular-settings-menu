@@ -1,0 +1,72 @@
+[gd_scene load_steps=6 format=3 uid="uid://y5oxvao3aqtb"]
+
+[ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_y8qul"]
+[ext_resource type="PackedScene" uid="uid://pir75xaw2g08" path="res://scenes/ui/menu-elements/settings-elements/audio-elements/master_volume.tscn" id="2_l5q4d"]
+[ext_resource type="PackedScene" uid="uid://y6kuxwyem48c" path="res://scenes/ui/menu-elements/settings-elements/audio-elements/music_volume.tscn" id="3_v08xa"]
+[ext_resource type="PackedScene" uid="uid://jl3iirunm0hq" path="res://scenes/ui/menu-elements/settings-elements/audio-elements/sfx_volume.tscn" id="4_j1ron"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e0spm"]
+
+[node name="Audio" type="TabBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_e0spm")
+script = ExtResource("1_y8qul")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ElementList" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="VolumeSettings" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList"]
+layout_mode = 2
+
+[node name="SubSectionName" type="Label" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/VolumeSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Volume Settings"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/VolumeSettings"]
+layout_mode = 2
+
+[node name="SubSectionElements" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/VolumeSettings"]
+layout_mode = 2
+
+[node name="MasterVolume" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/VolumeSettings/SubSectionElements" instance=ExtResource("2_l5q4d")]
+layout_mode = 2
+
+[node name="MusicVolume" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/VolumeSettings/SubSectionElements" instance=ExtResource("3_v08xa")]
+layout_mode = 2
+
+[node name="SFXVolume" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/VolumeSettings/SubSectionElements" instance=ExtResource("4_j1ron")]
+layout_mode = 2

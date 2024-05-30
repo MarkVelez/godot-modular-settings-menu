@@ -1,0 +1,120 @@
+[gd_scene load_steps=5 format=3 uid="uid://pir75xaw2g08"]
+
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_camm7"]
+
+[sub_resource type="GDScript" id="GDScript_i57rt"]
+resource_name = "master_volume"
+script/source = "extends HBoxContainer
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
+
+@onready var sliderValue: HBoxContainer = $SliderValue
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+
+# Default values for the element
+@export var minValue: float = 0.0
+@export var maxValue: float = 1.0
+@export var stepValue: float = 0.01
+@export var defaultValue: float = 1.0
+
+# An extra suffix for the value (optional)
+@export var valueSuffix: String = \"%\"
+# Name of the audio bus that the volume slider is assigned to
+@export var audioBus: StringName = &\"Master\"
+
+var currentValue: float
+
+
+func _ready():
+	# Connect neccessary signals
+	sectionRef.connect(\"apply_settings\", apply_settings)
+	SettingsDataManager.connect(\"load_settings\", load_settings)
+	
+	# Add an entry of the settings element to the section's reference table
+	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+
+
+# Loads the saved/default values of the element
+func load_settings() -> void:
+	# List of values for the element
+	var VALUES: Dictionary = {
+		\"defaultValue\": defaultValue,
+		\"minValue\": minValue,
+		\"maxValue\": maxValue,
+	}
+	
+	# Get the current value for the element
+	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	# Initialize the slider of the element
+	sliderValue.init_slider(minValue * 100, maxValue * 100, stepValue * 100, currentValue * 100)
+	
+	# Apply the loaded values to the game
+	call_deferred(\"apply_settings\")
+
+
+func value_changed(newValue: float) -> void:
+	currentValue = newValue / 100
+	
+	# Update the settings cache
+	ElementResource.value_changed(sectionRef, self, currentValue)
+
+
+# Element specific script for applying its value to the game
+func apply_settings() -> void:
+	# Get the index of the audio bus
+	var busIndex: int = AudioServer.get_bus_index(audioBus)
+	
+	# Set the volume of the audio bus
+	AudioServer.set_bus_volume_db(busIndex, linear_to_db(currentValue))
+"
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
+size = Vector2(0, 0)
+
+[sub_resource type="Theme" id="Theme_4i2xw"]
+SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
+
+[node name="MasterVolume" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_i57rt")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Master"
+vertical_alignment = 1
+
+[node name="SliderValue" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+script = ExtResource("1_camm7")
+
+[node name="Slider" type="HSlider" parent="SliderValue"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 0.0
+step = 0.0
+ticks_on_borders = true
+
+[node name="Value" type="SpinBox" parent="SliderValue"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = SubResource("Theme_4i2xw")
+max_value = 0.0
+step = 0.0
+alignment = 2
