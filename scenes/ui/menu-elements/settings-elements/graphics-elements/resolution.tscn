@@ -24,6 +24,8 @@ const ElementResource: Resource = preload(\"res://resources/ui/settings_element_
 	\"1280x720\", 
 	\"960x540\"
 ) var defaultValue: String = \"1920x1080\"
+# Toggle window resizing by the user
+@export var resizable: bool = false
 
 var currentValue: String
 var selectedIndex: int
@@ -76,14 +78,14 @@ func apply_settings() -> void:
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
 		return
 	
-	# Check if the game is in borderless mode
+	# Do nothing if the game is in borderless mode
 	if DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_BORDERLESS):
-		# Change the window size to the display's current resolution
-		DisplayServer.window_set_size(DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()))
-	else:
-		# Change the window size to the selected resolution
-		DisplayServer.window_set_size(OPTION_LIST[currentValue])
+		return
 	
+	# Change the window size to the selected resolution
+	DisplayServer.window_set_size(OPTION_LIST[currentValue])
+	# Change the viewport size to the selected resolution for correct scaling
+	get_viewport().set_size(OPTION_LIST[currentValue])
 	# Center the game window
 	get_window().move_to_center()
 "

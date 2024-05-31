@@ -57,8 +57,6 @@ func load_settings() -> void:
 	# Initialize the option button
 	ElementResource.init_option_button_element(OPTION_LIST, options, currentValue, self)
 	
-	# Check if the resolution element should be disabled
-	check_resolution()
 	# Apply the loaded values to the game
 	call_deferred(\"apply_settings\")
 
@@ -73,14 +71,25 @@ func option_selected(index: int) -> void:
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
+	# Change the display mode to the selected option
+	DisplayServer.window_set_mode(OPTION_LIST[currentValue])
+	
 	# Check if Borderless Windowed has been selected and toggle the flag accordingly
 	if currentValue == \"Borderless Windowed\":
+		var displaySize: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
+		
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
+		# Change the window size to the main display's resolution
+		DisplayServer.window_set_size(displaySize)
+		# Change the viewport size to the selected resolution for correct scaling
+		get_viewport().set_size(displaySize)
+		# Center the window
+		get_window().move_to_center()
 	else:
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 	
-	# Change the display mode to the selected option
-	DisplayServer.window_set_mode(OPTION_LIST[currentValue])
+	# Check if the resolution element exists
+	check_resolution()
 
 
 # Called to check if the resolution element should be disabled
@@ -95,9 +104,13 @@ func check_resolution() -> void:
 			resolution.options.set_disabled(true)
 		else:
 			resolution.options.set_disabled(false)
-			
-			if not sectionRef.CHANGED_ELEMENTS.has(\"Resolution\"):
-				sectionRef.CHANGED_ELEMENTS.append(\"Resolution\")
+			# Disable window resizing
+			get_viewport().get_window().set_flag(Window.FLAG_RESIZE_DISABLED, resolution.resizable)
+	else:
+		# Check if the current mode is windowed
+		if currentValue == \"Windowed\":
+			# Enable window resizing
+			get_viewport().get_window().set_flag(Window.FLAG_RESIZE_DISABLED, false)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

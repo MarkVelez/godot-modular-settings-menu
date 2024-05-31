@@ -80,16 +80,15 @@ grow_vertical = 2
 
 [node name="SettingsTabs" type="TabContainer" parent="SettingsPanel"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(640, 505)
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
-current_tab = 1
 
 [node name="Gameplay" parent="SettingsPanel/SettingsTabs" instance=ExtResource("1_5exwk")]
-visible = false
 layout_mode = 2
 
 [node name="Graphics" parent="SettingsPanel/SettingsTabs" instance=ExtResource("2_gtlr3")]
+visible = false
 layout_mode = 2
 
 [node name="Controls" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_yucxh")]
