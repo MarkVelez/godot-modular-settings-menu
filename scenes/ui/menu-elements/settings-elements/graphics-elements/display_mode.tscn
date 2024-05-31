@@ -104,13 +104,6 @@ func check_resolution() -> void:
 			resolution.options.set_disabled(true)
 		else:
 			resolution.options.set_disabled(false)
-			# Disable window resizing
-			get_viewport().get_window().set_flag(Window.FLAG_RESIZE_DISABLED, resolution.resizable)
-	else:
-		# Check if the current mode is windowed
-		if currentValue == \"Windowed\":
-			# Enable window resizing
-			get_viewport().get_window().set_flag(Window.FLAG_RESIZE_DISABLED, false)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

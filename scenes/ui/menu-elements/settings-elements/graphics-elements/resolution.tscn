@@ -48,6 +48,9 @@ func _ready():
 	
 	# Add an entry of the settings element to the section's reference table
 	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	
+	# Toggle window resizing
+	get_viewport().get_window().set_flag(Window.FLAG_RESIZE_DISABLED, !resizable)
 
 
 # Loads the saved/default values of the element
