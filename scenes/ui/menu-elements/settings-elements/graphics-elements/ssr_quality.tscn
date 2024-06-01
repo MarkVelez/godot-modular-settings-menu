@@ -14,7 +14,7 @@ script/source = "extends HBoxContainer
 @onready var options: OptionButton = $Options
 
 # Resource for common functions between settings elements
-const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # Default values for the element
 @export_enum(

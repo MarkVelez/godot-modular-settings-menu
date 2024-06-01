@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dghfxwcbi5ig"]
 
-[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_tfp87"]
+[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_tfp87"]
 
 [sub_resource type="GDScript" id="GDScript_eitn6"]
 resource_name = "max_fps"
@@ -16,7 +16,7 @@ script/source = "extends HBoxContainer
 @onready var sliderValue: HBoxContainer = $SliderValue
 
 # Resource for common functions between settings elements
-const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # Default values for the element
 @export var minValue: int = 30

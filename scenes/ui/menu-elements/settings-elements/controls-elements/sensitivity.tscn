@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cy8n6yalxprb7"]
 
-[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_ut0oh"]
+[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_ut0oh"]
 
 [sub_resource type="GDScript" id="GDScript_s1j2c"]
 resource_name = "sensitivity"
@@ -16,7 +16,7 @@ script/source = "extends HBoxContainer
 @onready var sliderValue: HBoxContainer = $SliderValue
 
 # Resource for common functions between settings elements
-const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # Default values for the element
 @export var minValue: float = 0.01

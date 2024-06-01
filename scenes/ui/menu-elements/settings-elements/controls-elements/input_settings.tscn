@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://i0w5gftb0j16"]
 
-[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input-settings-panel/input_settings_panel.tscn" id="1_6pc66"]
+[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/controls-elements/input-settings-panel/input_settings_panel.tscn" id="1_6pc66"]
 
 [sub_resource type="GDScript" id="GDScript_te2ja"]
 resource_name = "input_settings"

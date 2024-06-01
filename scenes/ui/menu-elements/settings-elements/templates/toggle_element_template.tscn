@@ -14,7 +14,7 @@ script/source = "extends HBoxContainer
 @onready var toggle: CheckButton = $Toggle
 
 # Resource for common functions between settings elements
-const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 @export var defaultValue: bool = false
 

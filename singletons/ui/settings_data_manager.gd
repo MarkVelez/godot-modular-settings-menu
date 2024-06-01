@@ -21,6 +21,9 @@ var noSaveFile: bool
 # Flag for checking if an invalid value was found in the save file
 var invalidSaveFile: bool = false
 
+# Resource for common functions between settings elements
+const ElementResource: Resource = preload("res://resources/ui/settings_element_resource.tres")
+
 
 func _ready() -> void:
 	# Verify the directory

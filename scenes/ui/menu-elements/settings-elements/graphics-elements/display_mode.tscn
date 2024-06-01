@@ -14,7 +14,7 @@ script/source = "extends HBoxContainer
 @onready var options: OptionButton = $Options
 
 # Resource for common functions between settings elements
-const ElementResource: Resource = preload(\"res://resources/ui/settings_element_resource.tres\")
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # Default values for the element
 @export_enum(
@@ -76,20 +76,15 @@ func apply_settings() -> void:
 	
 	# Check if Borderless Windowed has been selected and toggle the flag accordingly
 	if currentValue == \"Borderless Windowed\":
-		var displaySize: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
-		
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
-		# Change the window size to the main display's resolution
-		DisplayServer.window_set_size(displaySize)
-		# Change the viewport size to the selected resolution for correct scaling
-		get_viewport().set_size(displaySize)
-		# Center the window
-		get_window().move_to_center()
+		adjust_resolution()
 	else:
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
 	
-	# Check if the resolution element exists
-	check_resolution()
+	# Adjust the resolution if the current mode is windowed and the resolution element does not exist
+	if not sectionRef.ELEMENT_REFERENCE_TABLE.has(\"Resolution\") && currentValue == \"Windowed\":
+		# Adjust the window size to 80% of the display's resolution
+		adjust_resolution(0.8)
 
 
 # Called to check if the resolution element should be disabled
@@ -100,10 +95,27 @@ func check_resolution() -> void:
 		var resolution = sectionRef.ELEMENT_REFERENCE_TABLE[\"Resolution\"]
 		
 		# Check if the selected option is not Windowed and toggle the resolution element accordingly
-		if options.get_item_text(selectedIndex) != \"Windowed\":
+		if currentValue != \"Windowed\":
 			resolution.options.set_disabled(true)
 		else:
 			resolution.options.set_disabled(false)
+			
+			# Append resolution to the changed elements list
+			if not sectionRef.CHANGED_ELEMENTS.has(\"Resolution\"):
+				sectionRef.CHANGED_ELEMENTS.append(\"Resolution\")
+
+
+# Called to adjust the resolution for specific scenarios
+func adjust_resolution(scale: float = 1.0) -> void:
+	# Get the current display's resolution
+	var displaySize: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()) * scale
+	
+	# Change the window size to the main display's resolution
+	DisplayServer.window_set_size(displaySize)
+	# Change the viewport size to the selected resolution for correct scaling
+	get_viewport().set_size(displaySize)
+	# Center the window
+	get_window().move_to_center()
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
