@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://ejplmui1twn4"]
 
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/settings_section.gd" id="1_aglse"]
-[ext_resource type="PackedScene" uid="uid://dc1yif146sxav" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/templates/option_element_template.tscn" id="2_ws4gk"]
-[ext_resource type="PackedScene" uid="uid://bjcuw6amean2" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/templates/slider_element_template.tscn" id="3_o11e6"]
-[ext_resource type="PackedScene" uid="uid://cxaxyqer0af21" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/templates/toggle_element_template.tscn" id="4_41mog"]
+[ext_resource type="Script" path="res://scripts/ui/settings_section.gd" id="1_aglse"]
+[ext_resource type="PackedScene" uid="uid://dc1yif146sxav" path="res://scenes/ui/menu-elements/settings-elements/templates/option_element_template.tscn" id="2_ws4gk"]
+[ext_resource type="PackedScene" uid="uid://bjcuw6amean2" path="res://scenes/ui/menu-elements/settings-elements/templates/slider_element_template.tscn" id="3_o11e6"]
+[ext_resource type="PackedScene" uid="uid://cxaxyqer0af21" path="res://scenes/ui/menu-elements/settings-elements/templates/toggle_element_template.tscn" id="4_41mog"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e0spm"]
 

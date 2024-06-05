@@ -5,7 +5,7 @@ signal apply_settings
 # Name of the settings section (used as the key for the section in the settings data)
 @onready var section: StringName = name
 # Reference to the settings menu node
-@onready var settingsMenu: Control = owner
+@onready var settingsMenu: Node = owner
 
 # Reference table of all elements under the section
 var ELEMENT_REFERENCE_TABLE: Dictionary
@@ -37,8 +37,6 @@ func get_settings() -> void:
 	# If no save file exists saves the default values retrieved from the section's elements
 	if SettingsDataManager.noSaveFile or SettingsDataManager.invalidSaveFile:
 		SettingsDataManager.call_deferred("save_data")
-	
-	CHANGED_ELEMENTS.clear()
 
 
 # Called to clear the section's cache

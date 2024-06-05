@@ -1,16 +1,27 @@
 [gd_scene load_steps=4 format=3 uid="uid://cqqhgk8ufkmqa"]
 
-[ext_resource type="PackedScene" uid="uid://bbtri7oyxvehi" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/controls-elements/input-settings-panel/input-settings-panel-elements/input_button.tscn" id="1_1y7ch"]
-[ext_resource type="PackedScene" uid="uid://dvkksl3mrnoto" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/discard_changes_popup.tscn" id="2_oparo"]
+[ext_resource type="PackedScene" uid="uid://bbtri7oyxvehi" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input-settings-panel/input-settings-panel-elements/input_button.tscn" id="1_1y7ch"]
+[ext_resource type="PackedScene" uid="uid://dvkksl3mrnoto" path="res://scenes/ui/menu-elements/settings-elements/discard_changes_popup.tscn" id="2_oparo"]
 
 [sub_resource type="GDScript" id="GDScript_0eq0v"]
 script/source = "extends Control
 
+# Button scene for actions
+@export var InputButtonScene: PackedScene
+
+# Panel node references
 @onready var actionList: VBoxContainer = $VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ActionList
 @onready var resetButton: Button = $VBoxContainer/PanelContainer/MarginContainer/VBoxContainer/ResetButton
 @onready var backButton: Button = $VBoxContainer/HBoxContainer/BackButton
 @onready var applyButton: Button = $VBoxContainer/HBoxContainer/ApplyButton
-@onready var discardChangesPopup: PanelContainer = $DiscardChangesPopup
+@onready var discardChangesPopup: Node = $DiscardChangesPopup
+
+# List of events for each action
+var ACTION_EVENTS: Dictionary
+# Cache for changed actions
+var PANEL_CACHE: Dictionary
+# Reference list to the button for each action
+var ACTION_REFERENCE_LIST: Dictionary
 
 # Reference to the element this panel belongs to
 var panelOwner: Node
@@ -19,16 +30,6 @@ var panelOwner: Node
 var isRemapping: bool = false
 var actionToRemap: String
 var actionInputButton: Button
-
-# Button scene for actions
-@export var InputButtonScene: PackedScene
-
-# List of events for each action
-var ACTION_EVENTS: Dictionary
-# Cache for changed actions
-var PANEL_CACHE: Dictionary
-# Reference list to the button for each action
-var ACTION_REFERENCE_LIST: Dictionary
 
 
 func _ready():

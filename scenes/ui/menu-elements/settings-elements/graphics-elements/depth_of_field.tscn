@@ -4,18 +4,6 @@
 resource_name = "depth_of_field"
 script/source = "extends HBoxContainer
 
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar = owner
-# The section the settings element is under
-@onready var section: StringName = sectionRef.name
-# The name of the settings element
-@onready var element: StringName = name
-
-@onready var options: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
 # Default values for the element
 @export_enum(
 	\"Disabled\",
@@ -24,8 +12,23 @@ const ElementResource: Resource = SettingsDataManager.ElementResource
 	\"High\"
 ) var defaultValue: String = \"Disabled\"
 
-var selectedIndex: int
-var currentValue: String
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = true
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
+
+# Element node references
+@onready var optionsRef: OptionButton = $Options
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # List of options related to the settings element
 const OPTION_LIST: Dictionary = {
@@ -35,15 +38,15 @@ const OPTION_LIST: Dictionary = {
 	\"High\": RenderingServer.DOF_BLUR_QUALITY_HIGH
 }
 
+# Index of the currently selected item
+var selectedIndex: int
+# The current value of the element
+var currentValue: String
+
 
 func _ready():
-	# Neccessary signals
-	options.connect(\"item_selected\", option_selected)
-	sectionRef.connect(\"apply_settings\", apply_settings)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
-	
-	# Add an entry of the settings element to the section's reference table
-	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	# Initialize the element
+	ElementResource.init_element(&\"option\", sectionRef, self)
 
 
 # Loads the saved/default values of the element
@@ -55,12 +58,9 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, options, currentValue, self)
-	
-	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
 
 
 func option_selected(index: int) -> void:
@@ -70,15 +70,14 @@ func option_selected(index: int) -> void:
 
 # Called to apply the settings in the settings cache
 func apply_settings() -> void:
-	# Apply in game settings or add to the load list
-	ElementResource.apply_in_game_setting(sectionRef, self)
-	
-	# Return if the selected option is disabled
-	if currentValue == \"Disabled\":
-		return
-	
-	# Set the DOF quality according to the selected option
-	RenderingServer.camera_attributes_set_dof_blur_quality(OPTION_LIST[currentValue], true)
+	# Apply in game settings
+	if not ElementResource.apply_in_game_setting(sectionRef, self):
+		# Return if the selected option is disabled
+		if currentValue == \"Disabled\":
+			return
+		
+		# Set the DOF quality according to the selected option
+		RenderingServer.camera_attributes_set_dof_blur_quality(OPTION_LIST[currentValue], true)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]

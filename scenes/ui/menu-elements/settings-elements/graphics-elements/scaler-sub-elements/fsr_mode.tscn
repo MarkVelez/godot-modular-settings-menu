@@ -4,18 +4,7 @@
 resource_name = "fsr_options"
 script/source = "extends HBoxContainer
 
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar
-# The section the settings element is under
-@onready var section: StringName
-# The name of the settings element
-@onready var element: StringName = name
-
-@onready var options: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
+# List of options related to the settings element
 @export_enum(
 	\"Ultra Quality\",
 	\"Quality\",
@@ -23,8 +12,23 @@ const ElementResource: Resource = SettingsDataManager.ElementResource
 	\"Performance\"
 ) var defaultValue: String = \"Balanced\"
 
-var selectedIndex: int
-var currentValue: String
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = true
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar
+# The section the settings element is under
+@onready var section: StringName
+# The name of the settings element
+@onready var element: StringName = name
+
+# Element node references
+@onready var optionsRef: OptionButton = $Options
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # List of options related to the settings element
 const OPTION_LIST: Dictionary = {
@@ -34,11 +38,16 @@ const OPTION_LIST: Dictionary = {
 	\"Performance\": 0.5
 }
 
+# Index of the currently selected item
+var selectedIndex: int
+# The current value of the element
+var currentValue: String
+
 
 func _ready():
-	# Neccessary signals
-	options.connect(\"item_selected\", option_selected)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
+	# Initialize the element
+	ElementResource.init_element(&\"option\", sectionRef, self)
+
 
 # Loads the saved/default values of the element
 func load_settings() -> void:
@@ -49,9 +58,9 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, options, currentValue, self)
+	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
 
 
 func option_selected(index: int) -> void:

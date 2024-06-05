@@ -1,22 +1,10 @@
 [gd_scene load_steps=5 format=3 uid="uid://bdoaqhvw440eh"]
 
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_33syk"]
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_33syk"]
 
 [sub_resource type="GDScript" id="GDScript_ng2w8"]
 resource_name = "fsr_sharpness"
 script/source = "extends HBoxContainer
-
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar
-# The section the settings element is under
-@onready var section: StringName
-# The name of the settings element
-@onready var element: StringName = name
-
-@onready var sliderValue: HBoxContainer = $SliderValue
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # Default values for the element
 @export var minValue: float = 0.0
@@ -26,13 +14,31 @@ const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # An extra suffix for the value (optional)
 @export var valueSuffix: String = \"%\"
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = true
 
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar
+# The section the settings element is under
+@onready var section: StringName
+# The name of the settings element
+@onready var element: StringName = name
+
+# Element node references
+@onready var sliderValueRef: HBoxContainer = $SliderValue
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
+
+# The current value of the element
 var currentValue: float
 
 
 func _ready():
-	# Connect neccessary signals
-	SettingsDataManager.connect(\"load_settings\", load_settings)
+	# Initialize the element
+	ElementResource.init_element(&\"slider\", sectionRef, self)
 
 
 # Loads the saved/default values of the element
@@ -45,9 +51,9 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	# Initialize the slider of the element
-	sliderValue.init_slider(minValue * 100, maxValue * 100, stepValue * 100, currentValue * 100)
+	sliderValueRef.init_slider(minValue * 100, maxValue * 100, stepValue * 100, currentValue * 100)
 
 
 func value_changed(newValue: float) -> void:

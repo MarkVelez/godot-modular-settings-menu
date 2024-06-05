@@ -4,6 +4,13 @@
 resource_name = "toggle_element_template"
 script/source = "extends HBoxContainer
 
+# Default value for the element
+@export var defaultValue: bool = false
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool
+
 # Reference to the section the settings element is under
 @onready var sectionRef: TabBar = owner
 # The section the settings element is under
@@ -11,24 +18,19 @@ script/source = "extends HBoxContainer
 # The name of the settings element
 @onready var element: StringName = name
 
-@onready var toggle: CheckButton = $Toggle
+# Element node references
+@onready var toggleRef: CheckButton = $Toggle
 
 # Resource for common functions between settings elements
 const ElementResource: Resource = SettingsDataManager.ElementResource
 
-@export var defaultValue: bool = false
-
+# The current value of the element
 var currentValue: bool
 
 
 func _ready():
-	# Neccessary signals
-	toggle.connect(\"toggled\", toggled)
-	sectionRef.connect(\"apply_settings\", apply_settings)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
-	
-	# Add an entry of the settings element to the section's reference table
-	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	# Initialize the element
+	ElementResource.init_element(&\"toggle\", sectionRef, self)
 
 
 # Loads the saved/default values of the element
@@ -40,13 +42,10 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	
 	# Set the state of the toggle button
-	toggle.set_pressed(currentValue)
-	
-	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	toggleRef.set_pressed(currentValue)
 
 
 func toggled(state: bool) -> void:

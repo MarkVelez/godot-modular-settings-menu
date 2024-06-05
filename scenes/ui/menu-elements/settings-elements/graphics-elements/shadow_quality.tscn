@@ -4,18 +4,6 @@
 resource_name = "shadow_quality"
 script/source = "extends HBoxContainer
 
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar = owner
-# The section the settings element is under
-@onready var section: StringName = sectionRef.name
-# The name of the settings element
-@onready var element: StringName = name
-
-@onready var options: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
 # Default values for the element
 @export_enum(
 	\"Low\",
@@ -23,8 +11,23 @@ const ElementResource: Resource = SettingsDataManager.ElementResource
 	\"High\"
 ) var defaultValue: String = \"Medium\"
 
-var selectedIndex: int
-var currentValue: String
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
+
+# Element node references
+@onready var optionsRef: OptionButton = $Options
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # List of options related to the settings element
 const OPTION_LIST: Dictionary = {
@@ -33,15 +36,15 @@ const OPTION_LIST: Dictionary = {
 	\"High\": RenderingServer.SHADOW_QUALITY_SOFT_HIGH
 }
 
+# Index of the currently selected item
+var selectedIndex: int
+# The current value of the element
+var currentValue: String
+
 
 func _ready():
-	# Neccessary signals
-	options.connect(\"item_selected\", option_selected)
-	sectionRef.connect(\"apply_settings\", apply_settings)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
-	
-	# Add an entry of the settings element to the section's reference table
-	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	# Initialize the element
+	ElementResource.init_element(&\"option\", sectionRef, self)
 
 
 # Loads the saved/default values of the element
@@ -53,12 +56,9 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, options, currentValue, self)
-	
-	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
 
 
 func option_selected(index: int) -> void:

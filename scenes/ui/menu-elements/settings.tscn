@@ -15,19 +15,26 @@ signal clear_cache
 
 # Used to check if gameplay related settings should be applied
 @export var isInGameMenu: bool = true
+# The parent of the settings node (usually the menu it is part of)
+@export var parent: Node
 
-@onready var settingsPanel: VBoxContainer = %SettingsPanel
-@onready var settingsTabs: TabContainer = %SettingsTabs
-@onready var discardChangesPopup: PanelContainer = $DiscardChangesPopup
-@onready var applyButton: Button = %ApplyButton
-@onready var elementPanels: Control = %ElementPanels
+@onready var settingsPanel: Node = $SettingsPanel
+@onready var settingsTabs: TabContainer = $SettingsPanel/SettingsTabs
+@onready var discardChangesPopup: Node = $DiscardChangesPopup
+@onready var applyButton: Button = $SettingsPanel/HBoxContainer/ApplyButton
+@onready var elementPanels: Node = $ElementPanels
+
+
+func _ready():
+	# Load the settings data
+	SettingsDataManager.call_deferred(\"emit_signal\", \"load_settings\")
 
 
 func back_button_pressed() -> void:
 	# Check if there have been any changes made
 	if applyButton.is_disabled():
 		hide()
-		owner.menu.show()
+		parent.menu.show()
 		# Clear the settings cache
 		emit_signal(\"clear_cache\")
 	else:
@@ -64,7 +71,6 @@ mouse_filter = 1
 script = SubResource("GDScript_eua2a")
 
 [node name="SettingsPanel" type="VBoxContainer" parent="."]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -79,7 +85,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="SettingsTabs" type="TabContainer" parent="SettingsPanel"]
-unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
@@ -103,7 +108,6 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="ApplyButton" type="Button" parent="SettingsPanel/HBoxContainer"]
-unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/focus = SubResource("StyleBoxEmpty_ntlmy")
@@ -117,7 +121,6 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_qp71p")
 text = "Back"
 
 [node name="ElementPanels" type="Control" parent="."]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

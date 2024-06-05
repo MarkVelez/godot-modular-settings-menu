@@ -4,18 +4,6 @@
 resource_name = "display_mode"
 script/source = "extends HBoxContainer
 
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar = owner
-# The section the settings element is under
-@onready var section: StringName = sectionRef.name
-# The name of the settings element
-@onready var element: StringName = name
-
-@onready var options: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
 # Default values for the element
 @export_enum(
 	\"Fullscreen\", 
@@ -23,8 +11,23 @@ const ElementResource: Resource = SettingsDataManager.ElementResource
 	\"Windowed\"
 ) var defaultValue: String = \"Fullscreen\"
 
-var selectedIndex: int
-var currentValue: String
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
+
+# Element node references
+@onready var optionsRef: OptionButton = $Options
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # List of options related to the settings element
 const OPTION_LIST: Dictionary = {
@@ -33,15 +36,15 @@ const OPTION_LIST: Dictionary = {
 	\"Windowed\": DisplayServer.WINDOW_MODE_WINDOWED
 }
 
+# Index of the currently selected item
+var selectedIndex: int
+# The current value of the element
+var currentValue: String
+
 
 func _ready():
-	# Neccessary signals
-	options.connect(\"item_selected\", option_selected)
-	sectionRef.connect(\"apply_settings\", apply_settings)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
-	
-	# Add an entry of the settings element to the section's reference table
-	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	# Initialize the element
+	ElementResource.init_element(&\"option\", sectionRef, self)
 
 
 # Loads the saved/default values of the element
@@ -53,12 +56,12 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, options, currentValue, self)
+	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
 	
-	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+	# Check if the resolution element should be disabled
+	call_deferred(\"check_resolution\")
 
 
 func option_selected(index: int) -> void:
@@ -96,9 +99,9 @@ func check_resolution() -> void:
 		
 		# Check if the selected option is not Windowed and toggle the resolution element accordingly
 		if currentValue != \"Windowed\":
-			resolution.options.set_disabled(true)
+			resolution.optionsRef.set_disabled(true)
 		else:
-			resolution.options.set_disabled(false)
+			resolution.optionsRef.set_disabled(false)
 			
 			# Append resolution to the changed elements list
 			if not sectionRef.CHANGED_ELEMENTS.has(\"Resolution\"):
@@ -106,9 +109,9 @@ func check_resolution() -> void:
 
 
 # Called to adjust the resolution for specific scenarios
-func adjust_resolution(scale: float = 1.0) -> void:
+func adjust_resolution(sizeScale: float = 1.0) -> void:
 	# Get the current display's resolution
-	var displaySize: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()) * scale
+	var displaySize: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()) * sizeScale
 	
 	# Change the window size to the main display's resolution
 	DisplayServer.window_set_size(displaySize)

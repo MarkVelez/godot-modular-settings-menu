@@ -1,29 +1,12 @@
 [gd_scene load_steps=6 format=3 uid="uid://b3w7qpn4nhmu2"]
 
-[ext_resource type="PackedScene" uid="uid://ha87l3hl643g" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/resolution_scale.tscn" id="1_4irey"]
-[ext_resource type="PackedScene" uid="uid://5dydkttc2fww" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/fsr_mode.tscn" id="2_w65g1"]
-[ext_resource type="PackedScene" uid="uid://bdoaqhvw440eh" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/fsr_sharpness.tscn" id="3_v8pix"]
+[ext_resource type="PackedScene" uid="uid://ha87l3hl643g" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/resolution_scale.tscn" id="1_4irey"]
+[ext_resource type="PackedScene" uid="uid://5dydkttc2fww" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/fsr_mode.tscn" id="2_w65g1"]
+[ext_resource type="PackedScene" uid="uid://bdoaqhvw440eh" path="res://scenes/ui/menu-elements/settings-elements/graphics-elements/scaler-sub-elements/fsr_sharpness.tscn" id="3_v8pix"]
 
 [sub_resource type="GDScript" id="GDScript_mdyud"]
 resource_name = "scaler"
 script/source = "extends VBoxContainer
-
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar = owner
-# The section the settings element is under
-@onready var section: StringName = sectionRef.name
-# The name of the settings element
-@onready var element: StringName = name
-
-@onready var options: OptionButton = $\"ScalingOptions/Options\"
-
-# Reference to sub elements
-@onready var resolutionScale: HBoxContainer = $ResolutionScale
-@onready var fsrMode: HBoxContainer = $FSRMode
-@onready var fsrSharpness: HBoxContainer = $FSRSharpness
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # Default values for the element
 @export_enum(
@@ -32,8 +15,28 @@ const ElementResource: Resource = SettingsDataManager.ElementResource
 	\"FSR 2.2\"
 ) var defaultValue: String = \"Disabled\"
 
-var currentValue: String
-var selectedIndex: int
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
+
+# Sub element references
+@export var resolutionScaleRef: Node
+@export var fsrModeRef: Node
+@export var fsrSharpnessRef: Node
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
+
+# Element node references
+@onready var optionsRef: OptionButton = $\"ScalingOptions/Options\"
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # List of options related to the settings element
 const OPTION_LIST: Dictionary = {
@@ -42,30 +45,23 @@ const OPTION_LIST: Dictionary = {
 	\"FSR 2.2\": Viewport.SCALING_3D_MODE_FSR2
 }
 
+# Index of the currently selected item
+var selectedIndex: int
+# The current value of the element
+var currentValue: String
+
 
 func _ready():
-	# Neccessary signals
-	options.connect(\"item_selected\", option_selected)
-	sectionRef.connect(\"apply_settings\", apply_settings)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
+	var SUB_ELEMENTS: Array[Node] = [
+		resolutionScaleRef,
+		fsrModeRef,
+		fsrSharpnessRef
+	]
 	
-	# Add an entry of the settings element to the section's reference table
-	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
-	
-	# Give section information to Resolution Scale sub element
-	resolutionScale.sectionRef = sectionRef
-	resolutionScale.section = section
-	sectionRef.ELEMENT_REFERENCE_TABLE[resolutionScale.element] = resolutionScale
-	
-	# Give section information to FSR Options sub element
-	fsrMode.sectionRef = sectionRef
-	fsrMode.section = section
-	sectionRef.ELEMENT_REFERENCE_TABLE[fsrMode.element] = fsrMode
-	
-	# Give section information to FSR Sharpness sub element
-	fsrSharpness.sectionRef = sectionRef
-	fsrSharpness.section = section
-	sectionRef.ELEMENT_REFERENCE_TABLE[fsrSharpness.element] = fsrSharpness
+	# Initialize the element
+	ElementResource.init_element(&\"option\", sectionRef, self)
+	# Initialize sub elements
+	ElementResource.init_sub_elements(SUB_ELEMENTS, sectionRef)
 
 
 # Loads the saved/default values of the element
@@ -77,29 +73,27 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, options, currentValue, self)
+	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
 	
 	# Show the appropriate sub element when loading
 	match currentValue:
 		\"Disabled\":
-			resolutionScale.hide()
-			fsrMode.hide()
-			fsrSharpness.hide()
+			resolutionScaleRef.hide()
+			fsrModeRef.hide()
+			fsrSharpnessRef.hide()
 		\"Bilinear\":
-			fsrMode.hide()
-			fsrSharpness.hide()
-			resolutionScale.show()
+			fsrModeRef.hide()
+			fsrSharpnessRef.hide()
+			resolutionScaleRef.show()
 		\"FSR 2.2\":
-			resolutionScale.hide()
-			fsrMode.show()
-			fsrSharpness.show()
+			resolutionScaleRef.hide()
+			fsrModeRef.show()
+			fsrSharpnessRef.show()
 	
 	# Check if TAA is selected
 	call_deferred(\"check_anti_aliasing\")
-	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
 
 
 func option_selected(index: int) -> void:
@@ -109,17 +103,17 @@ func option_selected(index: int) -> void:
 	# Show the appropriate sub element based on the selected option
 	match currentValue:
 		\"Disabled\":
-			resolutionScale.hide()
-			fsrMode.hide()
-			fsrSharpness.hide()
+			resolutionScaleRef.hide()
+			fsrModeRef.hide()
+			fsrSharpnessRef.hide()
 		\"Bilinear\":
-			fsrMode.hide()
-			fsrSharpness.hide()
-			resolutionScale.show()
+			fsrModeRef.hide()
+			fsrSharpnessRef.hide()
+			resolutionScaleRef.show()
 		\"FSR 2.2\":
-			resolutionScale.hide()
-			fsrMode.show()
-			fsrSharpness.show()
+			resolutionScaleRef.hide()
+			fsrModeRef.show()
+			fsrSharpnessRef.show()
 	
 	# Check if TAA is selected
 	check_anti_aliasing()
@@ -135,10 +129,10 @@ func apply_settings() -> void:
 		\"Disabled\":
 			get_viewport().set_scaling_3d_scale(1.0)
 		\"Bilinear\":
-			resolutionScale.apply_settings()
+			resolutionScaleRef.apply_settings()
 		\"FSR 2.2\":
-			fsrMode.apply_settings()
-			fsrSharpness.apply_settings()
+			fsrModeRef.apply_settings()
+			fsrSharpnessRef.apply_settings()
 
 
 # Checks if TAA is selected while FSR 2.2 is enabled
@@ -151,21 +145,21 @@ func check_anti_aliasing() -> void:
 		# Check if selected scaler mode is FSR 2.2
 		if currentValue == \"FSR 2.2\":
 			# Disable the TAA option for anti aliasing
-			antiAliasing.options.set_item_disabled(antiAliasing.OPTION_LIST.find(\"TAA\"), true)
+			antiAliasing.optionsRef.set_item_disabled(antiAliasing.OPTION_LIST.find(\"TAA\"), true)
 			
 			# Check if TAA is selected
 			if antiAliasing.currentValue == \"TAA\":
 				# Reselect the anti aliasing mode
 				ElementResource.option_selected(sectionRef, antiAliasing, antiAliasing.OPTION_LIST.find(\"Disabled\"))
-				antiAliasing.options.selected = antiAliasing.selectedIndex
+				antiAliasing.optionsRef.selected = antiAliasing.selectedIndex
 		else:
 			# Enable the TAA option for anti aliasing again
-			antiAliasing.options.set_item_disabled(antiAliasing.OPTION_LIST.find(\"TAA\"), false)
+			antiAliasing.optionsRef.set_item_disabled(antiAliasing.OPTION_LIST.find(\"TAA\"), false)
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="ScalingMode" type="VBoxContainer"]
+[node name="ScalingMode" type="VBoxContainer" node_paths=PackedStringArray("resolutionScaleRef", "fsrModeRef", "fsrSharpnessRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -174,6 +168,9 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 script = SubResource("GDScript_mdyud")
+resolutionScaleRef = NodePath("ResolutionScale")
+fsrModeRef = NodePath("FSRMode")
+fsrSharpnessRef = NodePath("FSRSharpness")
 
 [node name="ScalingOptions" type="HBoxContainer" parent="."]
 layout_mode = 2

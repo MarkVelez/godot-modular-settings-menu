@@ -3,26 +3,23 @@ extends Node
 signal load_settings
 signal apply_in_game_settings(section: StringName, setting: StringName, value)
 
+# Resource for common functions between settings elements
+const ElementResource: Resource = preload("res://resources/ui/settings_element_resource.tres")
+
+# Path to the settings save file
+var dataFolder: String = OS.get_user_data_dir()
+const fileName: String = "/settings.cfg"
+var path: String = dataFolder + fileName
+
 # Dictionary that stores all settings data
 var SETTINGS_DATA: Dictionary
 # A reference table of all sections
 var SECTION_REFERENCE_TABLE: Dictionary
-# List of settings that need to be applied when the game scene has been loaded
-# Used when the settings menu is not an in game one
-var IN_GAME_SETTINGS: Dictionary
-
-# Path to the settings save file
-var dataFolder: String = OS.get_user_data_dir()
-var fileName: String = "/settings.cfg"
-var path: String = dataFolder + fileName
 
 # Flag for checking if a save file exists
 var noSaveFile: bool
 # Flag for checking if an invalid value was found in the save file
 var invalidSaveFile: bool = false
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = preload("res://resources/ui/settings_element_resource.tres")
 
 
 func _ready() -> void:
@@ -36,9 +33,7 @@ func _ready() -> void:
 	else:
 		# Enable the no save file flag
 		noSaveFile = true
-	
-	# Call signal for loading all settings at the end of the frame to let the elements initialize
-	call_deferred("emit_signal", "load_settings")
+		push_warning("No save file found")
 
 
 # Called to save the settings data to the save file

@@ -1,21 +1,13 @@
 [gd_scene load_steps=3 format=3 uid="uid://i0w5gftb0j16"]
 
-[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://addons/modular-settings-menu/scenes/menu-elements/settings-elements/controls-elements/input-settings-panel/input_settings_panel.tscn" id="1_6pc66"]
+[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://scenes/ui/menu-elements/settings-elements/controls-elements/input-settings-panel/input_settings_panel.tscn" id="1_6pc66"]
 
 [sub_resource type="GDScript" id="GDScript_te2ja"]
 resource_name = "input_settings"
 script/source = "extends Button
 
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar = owner
-# The section the settings element is under
-@onready var section: StringName = sectionRef.name
-# The name of the settings element
-@onready var element: StringName = name
-
 # Reference to the element's panel
 @export var ElementPanel: PackedScene
-
 # List of actions to make remappable and how the name they should display
 @export var ACTION_LIST: Dictionary = {
 	\"up\": \"Up\",
@@ -24,16 +16,31 @@ script/source = "extends Button
 	\"right\": \"Right\",
 }
 
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
+
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
+
+# Path to the settings save file
+var dataFolder: String = OS.get_user_data_dir()
+const fileName: String = \"/keybinds.json\"
+var path: String = dataFolder + fileName
+
 # Currently stored input data
 var INPUT_SETTINGS_DATA: Dictionary
 
 # Reference to the element's extra panel
 var elementPanelRef: Node
-
-# Path to the settings save file
-var dataFolder: String = OS.get_user_data_dir()
-var fileName: String = \"/keybinds.json\"
-var path: String = dataFolder + fileName
 
 # Flag for checking if a save file exists for input settings
 var noSaveFile: bool
@@ -42,13 +49,8 @@ var invalidSaveFile: bool = false
 
 
 func _ready():
-	# Neccessary signals
-	connect(\"pressed\", pressed)
-	sectionRef.connect(\"apply_settings\", apply_settings)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
-	
-	# Add an entry of the settings element to the section's reference table
-	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	# Initialize the element
+	ElementResource.init_element(&\"button\", sectionRef, self)
 	
 	# Verify the directory
 	DirAccess.make_dir_absolute(dataFolder)
@@ -78,8 +80,10 @@ func load_settings() -> void:
 		INPUT_SETTINGS_DATA = elementPanelRef.get_events(ACTION_LIST)
 		save_input_settings()
 	else:
-		# Apply the loaded values to the game
-		call_deferred(\"apply_settings\")
+		# Check if the current element is in an in game menu or not
+		if sectionRef.settingsMenu.isInGameMenu == isInGameSetting:
+			# Apply the loaded values to the game
+			call_deferred(\"apply_settings\")
 
 
 func pressed() -> void:

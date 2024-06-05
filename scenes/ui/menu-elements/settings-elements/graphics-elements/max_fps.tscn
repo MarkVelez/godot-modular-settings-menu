@@ -1,22 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://dghfxwcbi5ig"]
 
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_tfp87"]
+[ext_resource type="Script" path="res://scripts/ui/slider_value.gd" id="1_tfp87"]
 
 [sub_resource type="GDScript" id="GDScript_eitn6"]
 resource_name = "max_fps"
 script/source = "extends HBoxContainer
-
-# Reference to the section the settings element is under
-@onready var sectionRef: TabBar = owner
-# The section the settings element is under
-@onready var section: StringName = sectionRef.name
-# The name of the settings element
-@onready var element: StringName = name
-
-@onready var sliderValue: HBoxContainer = $SliderValue
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # Default values for the element
 @export var minValue: int = 30
@@ -26,17 +14,31 @@ const ElementResource: Resource = SettingsDataManager.ElementResource
 
 # An extra suffix for the value (optional)
 @export var valueSuffix: String = \" FPS\"
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
 
+# Reference to the section the settings element is under
+@onready var sectionRef: TabBar = owner
+# The section the settings element is under
+@onready var section: StringName = sectionRef.name
+# The name of the settings element
+@onready var element: StringName = name
+
+# Element node references
+@onready var sliderValueRef: HBoxContainer = $SliderValue
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
+
+# The current value of the element
 var currentValue: int
 
 
 func _ready():
-	# Connect neccessary signals
-	sectionRef.connect(\"apply_settings\", apply_settings)
-	SettingsDataManager.connect(\"load_settings\", load_settings)
-	
-	# Add an entry of the settings element to the section's reference table
-	sectionRef.ELEMENT_REFERENCE_TABLE[element] = self
+	# Initialize the element
+	ElementResource.init_element(&\"slider\", sectionRef, self)
 
 
 # Loads the saved/default values of the element
@@ -49,19 +51,16 @@ func load_settings() -> void:
 	}
 	
 	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, section, element)
+	currentValue = ElementResource.load_element_settings(VALUES, sectionRef, self)
 	# Initialize the slider of the element
-	sliderValue.init_slider(minValue, maxValue + 1, stepValue, currentValue)
+	sliderValueRef.init_slider(minValue, maxValue + 1, stepValue, currentValue)
 	
 	# Check if current value is above max value
 	if currentValue == 0:
 		# Set the value box text to Unlimited
-		sliderValue.valueBox.set_text(\"Unlimited\")
+		sliderValueRef.valueBoxRef.set_text(\"Unlimited\")
 		# Set the slider value to max
-		sliderValue.slider.set_value(maxValue + 1)
-	
-	# Apply the loaded values to the game
-	call_deferred(\"apply_settings\")
+		sliderValueRef.sliderRef.set_value(maxValue + 1)
 
 
 func value_changed(newValue: int) -> void:
@@ -72,7 +71,7 @@ func value_changed(newValue: int) -> void:
 		# Set the current value to 0 as this represents an unlimited fps
 		currentValue = 0
 		# Set the value box text to Unlimited
-		sliderValue.valueBox.set_text(\"Unlimited\")
+		sliderValueRef.valueBoxRef.set_text(\"Unlimited\")
 	
 	# Update the settings cache
 	ElementResource.value_changed(sectionRef, self, currentValue)
