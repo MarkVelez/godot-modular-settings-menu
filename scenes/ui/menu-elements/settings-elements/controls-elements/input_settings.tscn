@@ -126,7 +126,7 @@ func save_input_settings() -> void:
 					# Add a serialized entry for the action with its event
 					DATA[input] = {
 						\"type\": \"keyboard\",
-						\"key\": INPUT_SETTINGS_DATA[input].get_physical_keycode()
+						\"key\": INPUT_SETTINGS_DATA[input].get_keycode()
 					}
 				\"InputEventMouseButton\":
 					# Add a serialized entry for the action with its event
@@ -186,7 +186,7 @@ func verify_settings_data(DATA: Dictionary) -> void:
 						var key: InputEventKey = InputEventKey.new()
 						
 						# Set the physical keycode of the new input event
-						key.set_physical_keycode(DATA[input][\"key\"])
+						key.set_keycode(DATA[input][\"key\"])
 						# Add the input event to the input settings data
 						INPUT_SETTINGS_DATA[input] = key
 					\"mouse\":
