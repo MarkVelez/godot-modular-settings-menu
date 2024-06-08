@@ -11,6 +11,7 @@ resource_name = "settings"
 script/source = "extends Control
 
 signal get_settings
+signal apply_settings
 signal clear_cache
 
 # Used to check if gameplay related settings should be applied
@@ -44,8 +45,10 @@ func back_button_pressed() -> void:
 
 func apply_button_pressed() -> void:
 	applyButton.set_disabled(true)
-	# Apply the settings of the current section
-	settingsTabs.get_child(settingsTabs.current_tab).on_apply_settings()
+	# Apply the settings of each section
+	emit_signal(\"apply_settings\")
+	# Save the updated settings data
+	SettingsDataManager.call_deferred(\"save_data\")
 
 
 # Called to discard the changes in the current section
