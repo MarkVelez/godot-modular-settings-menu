@@ -10,47 +10,19 @@ config_version=5
 
 [application]
 
-config/name="Menu Template"
-run/main_scene="res://scenes/menu_test.tscn"
-config/features=PackedStringArray("4.2", "GL Compatibility")
+config/name="Modular-settings-menu"
+run/main_scene="res://testing/scenes/menu_test.tscn"
+config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
+
+[audio]
+
+buses/default_bus_layout="res://testing/default_bus_layout.tres"
 
 [autoload]
 
-SettingsDataManager="*res://singletons/ui/settings_data_manager.gd"
+SettingsDataManager="*res://addons/modular-settings-menu/singletons/settings_data_manager.gd"
 
-[display]
+[editor_plugins]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
-window/size/resizable=false
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
-
-[input]
-
-up={
-"deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":87,"key_label":0,"unicode":119,"echo":false,"script":null)
-]
-}
-down={
-"deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":83,"key_label":0,"unicode":115,"echo":false,"script":null)
-]
-}
-left={
-"deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":65,"key_label":0,"unicode":97,"echo":false,"script":null)
-]
-}
-right={
-"deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":68,"key_label":0,"unicode":100,"echo":false,"script":null)
-]
-}
-
-[rendering]
-
-textures/vram_compression/import_s3tc_bptc=true
-reflections/sky_reflections/texture_array_reflections=false
+enabled=PackedStringArray("res://addons/modular-settings-menu/plugin.cfg")

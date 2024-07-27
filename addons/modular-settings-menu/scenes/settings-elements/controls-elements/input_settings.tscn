@@ -1,0 +1,243 @@
+[gd_scene load_steps=3 format=3 uid="uid://i0w5gftb0j16"]
+
+[ext_resource type="PackedScene" uid="uid://cqqhgk8ufkmqa" path="res://addons/modular-settings-menu/scenes/settings-elements/controls-elements/input-settings-panel/input_settings_panel.tscn" id="1_6pc66"]
+
+[sub_resource type="GDScript" id="GDScript_te2ja"]
+resource_name = "input_settings"
+script/source = "extends Button
+
+# Reference to the element's panel
+@export var ElementPanel: PackedScene
+#List of actions to make remappable and how the name they should display
+@export var ACTION_LIST: Dictionary = {
+	\"ui_up\": \"Up\",
+	\"ui_down\": \"Down\",
+	\"ui_left\": \"Left\",
+	\"ui_right\": \"Right\",
+}
+
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = false
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
+
+# Reference to the node the settings element is under
+@onready var parentRef: Node = owner
+# Identifier for the element (used as the key for the section in the settings data)
+@onready var identifier: StringName = name
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
+
+# Path to the settings save file
+var dataFolder: String = SettingsDataManager.dataFolder
+const fileName: String = \"keybinds\"
+const fileExtension: String = \".json\"
+var path: String = dataFolder + \"/\" + fileName + fileExtension
+
+# Currently stored input data
+var INPUT_SETTINGS_DATA: Dictionary
+
+# Reference to the element's extra panel
+var elementPanelRef: Node
+
+# Flag for checking if a save file exists for input settings
+var noSaveFile: bool
+# Flag for checking if an invalid value was found in the save file
+var invalidSaveFile: bool = false
+
+
+func _ready():
+	# Initialize the element
+	ElementResource.init_element(&\"button\", parentRef, self)
+	
+	# Verify the directory
+	DirAccess.make_dir_absolute(dataFolder)
+	
+	# Check if a save file exists
+	if not FileAccess.file_exists(path):
+		# Enable the no save file flag
+		noSaveFile = true
+
+
+# Loads the saved/default values of the element
+func load_settings() -> void:
+	# Create the element panel in the scene tree
+	create_element_panel()
+	
+	# Get the current value for the element
+	if noSaveFile:
+		# Get the events for the remappable actions from the project settings
+		INPUT_SETTINGS_DATA = elementPanelRef.get_events(ACTION_LIST)
+		save_input_settings()
+	else:
+		get_input_settings()
+	
+	# Check if save file is valid
+	if invalidSaveFile:
+		# Get the events for the remappable actions from the project settings
+		INPUT_SETTINGS_DATA = elementPanelRef.get_events(ACTION_LIST)
+		save_input_settings()
+	else:
+		# Check if the current element is in an in game menu or not
+		if parentRef.settingsMenu.isInGameMenu == isInGameSetting:
+			# Apply the loaded values to the game
+			call_deferred(&\"apply_settings\")
+
+
+func pressed() -> void:
+	# Check if a save file exists
+	if not FileAccess.file_exists(path):
+		# Enable the no save file flag
+		noSaveFile = true
+	
+	# Populate the element's extra panel with the remappable actions
+	elementPanelRef.create_action_list()
+	# Switch panels
+	parentRef.settingsMenu.settingsPanel.hide()
+	elementPanelRef.show()
+
+
+# Called to apply the settings in the settings cache
+func apply_settings() -> void:
+	# Assign the events for the remappable actions
+	elementPanelRef.update_action_events(INPUT_SETTINGS_DATA)
+
+
+# Called to update the input settings data
+func panel_settings_changed(NEW_VALUE: Dictionary) -> void:
+	INPUT_SETTINGS_DATA = NEW_VALUE.duplicate()
+	save_input_settings()
+
+
+# Called to save the input settings
+func save_input_settings() -> void:
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	var DATA: Dictionary = {}
+	
+	# Itterate through the input settings
+	for input in INPUT_SETTINGS_DATA:
+		# Check if the action is unbound
+		if INPUT_SETTINGS_DATA[input] != null:
+			# Check the input type
+			match INPUT_SETTINGS_DATA[input].get_class():
+				\"InputEventKey\":
+					# Add a serialized entry for the action with its event
+					DATA[input] = {
+						\"type\": &\"keyboard\",
+						\"key\": INPUT_SETTINGS_DATA[input].get_keycode()
+					}
+				\"InputEventMouseButton\":
+					# Add a serialized entry for the action with its event
+					DATA[input] = {
+						\"type\": &\"mouse\",
+						\"button\": INPUT_SETTINGS_DATA[input].get_button_index()
+					}
+		else:
+			# Add a null entry for the unbound action
+			DATA[input] = null
+	
+	# Convert the data dictionary to a json string
+	var jsonString: String = JSON.stringify(DATA, \"\\t\")
+	# Save the string to a json file
+	file.store_string(jsonString)
+	file.close()
+	
+	# Disable the no save file flag if it was enabled
+	if noSaveFile:
+		noSaveFile = false
+
+
+# Called to retrieve the input settings data from the save file
+func get_input_settings() -> void:
+	var file := FileAccess.open(path, FileAccess.READ)
+	# Get the data as a json string from the file
+	var content: String = file.get_as_text()
+	# Parse the json string to a dictionary
+	var DATA = JSON.parse_string(content)
+	
+	file.close()
+	
+	# Check if there were any errors or if the save file is empty
+	if DATA == null or DATA.size() == 0:
+		# Push an error for failing to load the save data
+		push_error(\"Failed to parse input settings\")
+		# Toggle the invalid save file flag
+		invalidSaveFile = true
+		return
+	
+	# Verify the validity of the save data
+	verify_settings_data(DATA)
+
+
+# Used for verifying the integrity of the save file
+func verify_settings_data(DATA: Dictionary) -> void:
+	# Itterate through all the retrieved data
+	for input in DATA:
+		# Check if the action is part of the remappable action
+		if ACTION_LIST.has(input):
+			# Check if the action is no unbound
+			if DATA[input] != null:
+				# Check the input type of the action's event
+				match DATA[input][\"type\"]:
+					&\"keyboard\":
+						# Create a new input event
+						var key: InputEventKey = InputEventKey.new()
+						
+						# Set the keycode of the new input event
+						key.set_keycode(DATA[input][\"key\"])
+						# Add the input event to the input settings data
+						INPUT_SETTINGS_DATA[input] = key
+					&\"mouse\":
+						# Create a new input event
+						var button: InputEventMouseButton = InputEventMouseButton.new()
+						
+						# Set the button index of the new input event
+						button.set_button_index(DATA[input][\"button\"])
+						# Add the input event to the input settings data
+						INPUT_SETTINGS_DATA[input] = button
+			else:
+				# Add an unbound action entry to the input settings data
+				INPUT_SETTINGS_DATA[input] = null
+		else:
+			# Push a warning for an invalid entry
+			push_warning(\"Invalid input settings entry: \", input)
+			# Toggle the invalid save file flag
+			invalidSaveFile = true
+	
+	# Itterate through all the expected actions
+	for action in ACTION_LIST:
+		# Check if an action is missing
+		if not DATA.has(action):
+			# Add an empty entry for the action
+			DATA[action] = null
+			# Set the invalid save file flag to true
+			invalidSaveFile = true
+			push_warning(\"Input action is missing: \", action)
+
+
+# Called to create the element's extra panel
+func create_element_panel() -> void:
+	var elementPanels: Control = parentRef.settingsMenu.elementPanels
+	# Instantiate the element panel
+	elementPanelRef = ElementPanel.instantiate()
+	
+	# Check if the element panel exists
+	if not elementPanels.find_child(elementPanelRef.name):
+		# Give a reference of the element
+		elementPanelRef.panelOwner = self
+		elementPanelRef.hide()
+		# Add the panel to the element panels list
+		elementPanels.add_child(elementPanelRef)
+		elementPanelRef.set_owner(parentRef.owner)
+"
+
+[node name="InputSettings" type="Button"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Input Settings"
+script = SubResource("GDScript_te2ja")
+ElementPanel = ExtResource("1_6pc66")

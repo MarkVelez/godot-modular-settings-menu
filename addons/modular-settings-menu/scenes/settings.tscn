@@ -1,0 +1,127 @@
+[gd_scene load_steps=6 format=3 uid="uid://px6a2dg8cawb"]
+
+[ext_resource type="PackedScene" uid="uid://dvkksl3mrnoto" path="res://addons/modular-settings-menu/scenes/settings-elements/discard_changes_popup.tscn" id="4_yfemx"]
+
+[sub_resource type="GDScript" id="GDScript_eua2a"]
+resource_name = "settings"
+script/source = "extends Control
+
+signal get_settings
+signal apply_settings
+signal clear_cache
+
+# Used to check if gameplay related settings should be applied
+@export var isInGameMenu: bool = true
+# The parent of the settings node (usually the menu it is part of)
+@export var menuPanel: Node
+# Node which the element panels are under
+@export var elementPanels: Node
+
+@onready var settingsPanel: Node = $SettingsPanel
+@onready var settingsTabs: TabContainer = $SettingsPanel/SettingsTabs
+@onready var discardChangesPopup: Node = $DiscardChangesPopup
+@onready var applyButton: Button = $SettingsPanel/HBoxContainer/ApplyButton
+
+
+
+func _ready():
+	# Load the settings data
+	SettingsDataManager.call_deferred(&\"emit_signal\", &\"load_settings\")
+
+
+func back_button_pressed() -> void:
+	# Check if there have been any changes made
+	if applyButton.is_disabled():
+		hide()
+		menuPanel.show()
+		# Clear the settings cache
+		emit_signal(&\"clear_cache\")
+	else:
+		# Display the discard changes popup
+		discardChangesPopup.show()
+
+
+func apply_button_pressed() -> void:
+	applyButton.set_disabled(true)
+	# Apply the settings of each section
+	emit_signal(&\"apply_settings\")
+	# Save the updated settings data
+	SettingsDataManager.call_deferred(&\"save_data\")
+	# Reset the changed elements count
+	SettingsDataManager.changedElementsCount = 0
+
+
+# Called to discard the changes in the current section
+func discard_changes() -> void:
+	# Discard the changes in the current section
+	settingsTabs.get_child(settingsTabs.current_tab).discard_changes()
+"
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kwbsm"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ntlmy"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qp71p"]
+
+[node name="Settings" type="Control" node_paths=PackedStringArray("elementPanels")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = SubResource("GDScript_eua2a")
+elementPanels = NodePath("ElementPanels")
+
+[node name="SettingsPanel" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -270.0
+offset_right = 320.0
+offset_bottom = 270.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsTabs" type="TabContainer" parent="SettingsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel"]
+layout_mode = 2
+
+[node name="ApplyButton" type="Button" parent="SettingsPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ntlmy")
+disabled = true
+text = "Apply"
+
+[node name="BackButton" type="Button" parent="SettingsPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_qp71p")
+text = "Back"
+
+[node name="ElementPanels" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DiscardChangesPopup" parent="." node_paths=PackedStringArray("parent") instance=ExtResource("4_yfemx")]
+visible = false
+layout_mode = 1
+parent = NodePath("..")
+
+[connection signal="pressed" from="SettingsPanel/HBoxContainer/ApplyButton" to="." method="apply_button_pressed"]
+[connection signal="pressed" from="SettingsPanel/HBoxContainer/BackButton" to="." method="back_button_pressed"]

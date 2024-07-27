@@ -1,0 +1,129 @@
+[gd_scene load_steps=3 format=3 uid="uid://bk5ky60jln7ag"]
+
+[sub_resource type="GDScript" id="GDScript_h10e0"]
+resource_name = "ssao_quality"
+script/source = "extends HBoxContainer
+
+# Default values for the element
+@export_enum(
+	\"Disabled\",
+	\"Low\",
+	\"Medium\",
+	\"High\"
+) var defaultValue: String = \"Disabled\"
+
+# Toggle based on whether the element handles a setting that requires an in game node to exist
+@export var isInGameSetting: bool = true
+# Toggle based on whether the element is a sub element or not
+@export var isSubElement: bool = false
+
+# Reference to the node the settings element is under
+@onready var parentRef: Node = owner
+# Identifier for the element (used as the key for the section in the settings data)
+@onready var identifier: StringName = name
+
+# Element node references
+@onready var optionsRef: OptionButton = $Options
+
+# Resource for common functions between settings elements
+const ElementResource: Resource = SettingsDataManager.ElementResource
+
+# List of options related to the settings element
+const OPTION_LIST: Dictionary = {
+	\"Disabled\": null,
+	\"Low\": {
+		\"quality\": RenderingServer.ENV_SSAO_QUALITY_LOW,
+		\"halfSize\": true,
+		\"blurPasses\": 1,
+		\"fadeOutFrom\": 25,
+		\"fadeOutTo\": 150
+	},
+	\"Medium\": {
+		\"quality\": RenderingServer.ENV_SSAO_QUALITY_MEDIUM,
+		\"halfSize\": true,
+		\"blurPasses\": 2,
+		\"fadeOutFrom\": 50,
+		\"fadeOutTo\": 300
+	},
+	\"High\": {
+		\"quality\": RenderingServer.ENV_SSAO_QUALITY_HIGH,
+		\"halfSize\": false,
+		\"blurPasses\": 4,
+		\"fadeOutFrom\": 100,
+		\"fadeOutTo\": 600
+	}
+}
+
+# Index of the currently selected item
+var selectedIndex: int
+# The current value of the element
+var currentValue: String
+
+
+func _ready():
+	# Initialize the element
+	ElementResource.init_element(&\"option\", parentRef, self)
+
+
+# Loads the saved/default values of the element
+func load_settings() -> void:
+	# List of values for the element
+	var VALUES: Dictionary = {
+		\"defaultValue\": defaultValue,
+		\"validOptions\": OPTION_LIST
+	}
+	
+	# Get the current value for the element
+	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
+	# Initialize the option button
+	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
+
+
+func option_selected(index: int) -> void:
+	# Update the settings cache
+	ElementResource.option_selected(parentRef, self, index)
+
+
+# Called to apply the settings in the settings cache
+func apply_settings() -> void:
+	# Apply in game settings or add to the load list
+	ElementResource.apply_in_game_setting(parentRef, self)
+	
+	# Return if the selected option is disabled
+	if currentValue == \"Disabled\":
+		return
+	
+	# Set SSAO quality
+	RenderingServer.environment_set_ssao_quality(
+	OPTION_LIST[currentValue][\"quality\"], 
+	OPTION_LIST[currentValue][\"halfSize\"], 
+	0.5, 
+	OPTION_LIST[currentValue][\"blurPasses\"], 
+	OPTION_LIST[currentValue][\"fadeOutFrom\"], 
+	OPTION_LIST[currentValue][\"fadeOutTo\"]
+	)
+"
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
+
+[node name="SSAOQuality" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Screen Space Ambient Occlusion"
+script = SubResource("GDScript_h10e0")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "SSAO Quality"
+vertical_alignment = 1
+
+[node name="Options" type="OptionButton" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_drjjf")

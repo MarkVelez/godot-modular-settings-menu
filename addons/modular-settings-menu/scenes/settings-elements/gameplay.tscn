@@ -1,0 +1,65 @@
+[gd_scene load_steps=4 format=3 uid="uid://c66v42g6gs7gr"]
+
+[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/settings_section.gd" id="1_i11k5"]
+[ext_resource type="PackedScene" uid="uid://elu1vc0ox472" path="res://addons/modular-settings-menu/scenes/settings-elements/gameplay-elements/fov.tscn" id="2_c8t76"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_e0spm"]
+
+[node name="Gameplay" type="TabBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_e0spm")
+script = ExtResource("1_i11k5")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ElementList" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="GeneralSettings" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList"]
+layout_mode = 2
+
+[node name="SubSectionName" type="Label" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/GeneralSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "General Settings"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/GeneralSettings"]
+layout_mode = 2
+
+[node name="SubSectionElements" type="VBoxContainer" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/GeneralSettings"]
+layout_mode = 2
+
+[node name="FOV" parent="MarginContainer/ScrollContainer/MarginContainer/ElementList/GeneralSettings/SubSectionElements" instance=ExtResource("2_c8t76")]
+layout_mode = 2

@@ -1,0 +1,81 @@
+[gd_scene load_steps=4 format=3 uid="uid://cwhs0kpipkxfv"]
+
+[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/element_panel.gd" id="1_3f2r5"]
+[ext_resource type="PackedScene" uid="uid://bjcuw6amean2" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/slider_element_template.tscn" id="2_fpsnu"]
+[ext_resource type="PackedScene" uid="uid://dvkksl3mrnoto" path="res://addons/modular-settings-menu/scenes/settings-elements/discard_changes_popup.tscn" id="2_yu33j"]
+
+[node name="ElementPanelTemplate" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3f2r5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -194.0
+offset_top = -29.0
+offset_right = 194.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 280)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer/MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ElementList" type="VBoxContainer" parent="VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="SliderElementTemplate" parent="VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/MarginContainer/ElementList" instance=ExtResource("2_fpsnu")]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ApplyButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_direction = 1
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+disabled = true
+text = "Apply"
+
+[node name="BackButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_direction = 1
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+text = "Back"
+
+[node name="DiscardChangesPopup" parent="." node_paths=PackedStringArray("parent") instance=ExtResource("2_yu33j")]
+visible = false
+layout_mode = 1
+parent = NodePath("..")
