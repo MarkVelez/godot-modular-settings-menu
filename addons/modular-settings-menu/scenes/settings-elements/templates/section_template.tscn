@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/settings_section.gd" id="1_aglse"]
 [ext_resource type="PackedScene" uid="uid://dc1yif146sxav" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/option_element_template.tscn" id="2_ws4gk"]
-[ext_resource type="PackedScene" uid="uid://csr6kawyf3t3i" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/sub-element-template/parent_element_template.tscn" id="2_xre3j"]
+[ext_resource type="PackedScene" uid="uid://csr6kawyf3t3i" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/multi-element-template/multi_element_template.tscn" id="2_xre3j"]
 [ext_resource type="PackedScene" uid="uid://bjcuw6amean2" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/slider_element_template.tscn" id="3_o11e6"]
 [ext_resource type="PackedScene" uid="uid://cxaxyqer0af21" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/toggle_element_template.tscn" id="4_41mog"]
 

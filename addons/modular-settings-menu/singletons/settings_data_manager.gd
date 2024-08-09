@@ -1,29 +1,26 @@
 extends Node
-## Handles the loading and saving of settings data.
+## Handles the loading and saving of settings data_.
 
-## Emitted when loading the settings data.
+## Emitted when loading the settings data_.
 signal load_settings
 ## Emitted when applying specific settings to in game objects.
 signal apply_in_game_settings(section: StringName, setting: StringName, value)
 
-## Resource for common functions between settings elements.
-const ElementResource: Resource = preload("../resources/settings_element_resource.tres")
-
-## Path to the settings save file.
-var dataFolder: String = OS.get_user_data_dir()
-## Name of the file that the settings data is saved in.
-const fileName: String = "settings"
+## PATH to the settings save file.
+var DATA_FOLDER: String = OS.get_user_data_dir()
+## Name of the file that the settings data_ is saved in.
+const FILE_NAME: String = "settings"
 ## Extension for the save file.
-const fileExtension: String = ".cfg"
-## The path to the save file on the computer.
-var path: String = dataFolder + "/" + fileName + fileExtension
+const FILE_EXTENSION: String = ".cfg"
+## The PATH to the save file on the computer.
+var PATH: String = DATA_FOLDER + "/" + FILE_NAME + FILE_EXTENSION
 
-## Dictionary that stores all settings data.
-var SETTINGS_DATA: Dictionary
+## Dictionary that stores all settings data_.
+var settingsData_: Dictionary
 ## A reference table of all sections.
-var SECTION_REFERENCE_TABLE: Dictionary
+var SECTION_REFERENCE_TABLE_: Dictionary
 ## A reference table of all element panels.
-var ELEMENT_PANEL_REFERENCE_TABLE: Dictionary
+var ELEMENT_PANEL_REFERENCE_TABLE_: Dictionary
 
 ## The number of elements that have been changed since the settings have been saved.
 var changedElementsCount: int = 0
@@ -36,34 +33,34 @@ var invalidSaveFile: bool = false
 
 func _ready() -> void:
 	# Verify the directory
-	DirAccess.make_dir_absolute(dataFolder)
+	DirAccess.make_dir_absolute(DATA_FOLDER)
 	
 	# Check if a save file exists
-	if FileAccess.file_exists(path):
-		# Proceed normally by retrieving data from the save file
-		call_deferred(&"get_data")
+	if FileAccess.file_exists(PATH):
+		# Proceed normally by retrieving data_ from the save file
+		call_deferred("get_data")
 	else:
 		# Enable the no save file flag
 		noSaveFile = true
 		push_warning("No save file found")
 
 
-## Called to save the settings data to the save file.
+## Called to save the settings data_ to the save file.
 func save_data() -> void:
 	# Create a new config instance
 	var config := ConfigFile.new()
 	
-	# Add the data from the settings data dictionary
-	for section in SETTINGS_DATA:
-		for element in SETTINGS_DATA[section]:
-			config.set_value(section, element, SETTINGS_DATA[section][element])
+	# Add the data_ from the settings data_ dictionary
+	for section in settingsData_:
+		for element in settingsData_[section]:
+			config.set_value(section, element, settingsData_[section][element])
 	
-	# Save the data to the specified directory
-	var err = config.save(path)
+	# Save the data_ to the specified directory
+	var err = config.save(PATH)
 	
 	# Check for errors
 	if err != OK:
-		push_error("Failed to save data: ", err)
+		push_error("Failed to save data_: ", err)
 		return
 	
 	# Disable the no save file flag if it was enabled
@@ -75,124 +72,141 @@ func save_data() -> void:
 		invalidSaveFile = false
 
 
-## Called to retrieve data from the save file.
+## Called to retrieve data_ from the save file.
 func get_data() -> void:
 	# Create a new config instance
 	var config := ConfigFile.new()
-	# Load the save data
-	var err := config.load(path)
-	# Temporary data dictionary
-	var DATA: Dictionary = {}
+	# Load the save data_
+	var err := config.load(PATH)
+	# Temporary data_ dictionary
+	var data_: Dictionary = {}
 	
 	# Check for errors
 	if err != OK:
-		push_error("Failed to load settings data: ", err)
+		push_error("Failed to load settings data_: ", err)
 		return
 	
-	# Add the retrieved data to the settings data dictionary
+	# Add the retrieved data_ to the settings data_ dictionary
 	for section in config.get_sections():
-		DATA[section] = {}
+		data_[section] = {}
 		for key in config.get_section_keys(section):
-			DATA[section][key] = config.get_value(section, key)
+			data_[section][key] = config.get_value(section, key)
 	
-	# Verify the validity of the loaded data
-	verify_settings_data(DATA)
+	# Verify the validity of the loaded data_
+	verify_settingsData_(data_)
 	
-	# Copy the retrieved data into the settings data dictionary
-	SETTINGS_DATA = DATA.duplicate(true)
+	# Copy the retrieved data_ into the settings data_ dictionary
+	settingsData_ = data_.duplicate(true)
 
 
 ## Checks if the save file has any invalid entries and removes them or adds missing sections.
-func verify_settings_data(DATA: Dictionary) -> void:
+func verify_settingsData_(data_: Dictionary) -> void:
 	# List of valid entries to compare to
-	var VALID_ENTRIES: Dictionary = SECTION_REFERENCE_TABLE.duplicate()
+	var validEntries_: Dictionary = SECTION_REFERENCE_TABLE_.duplicate()
 	# Merge the element panel references into the valid entries
-	VALID_ENTRIES.merge(ELEMENT_PANEL_REFERENCE_TABLE)
+	validEntries_.merge(ELEMENT_PANEL_REFERENCE_TABLE_)
 	# List of invalid entries to be removed
-	var INVALID_ENTRIES: Dictionary = {}
+	var invalidEntries_: Dictionary = {}
 	
-	# Itterate through the loaded settings data
-	for section in DATA:
-		if is_valid_section(INVALID_ENTRIES, section):
-			verify_elements(DATA, INVALID_ENTRIES, section)
+	# Itterate through the loaded settings data_
+	for section in data_:
+		if is_valid_section(invalidEntries_, section):
+			verify_elements(data_, invalidEntries_, section)
 	
-	# Check if there are any sections missing from the retrieved data
-	check_for_missing_sections(DATA, VALID_ENTRIES)
+	# Check if there are any sections missing from the retrieved data_
+	check_for_missing_sections(data_, validEntries_)
 	
 	# Check if there are any invalid entries
-	if INVALID_ENTRIES.size() > 0:
+	if invalidEntries_.size() > 0:
 		# Set the invalid save file flag to true
 		invalidSaveFile = true
-		remove_invalid_entries(DATA, INVALID_ENTRIES, VALID_ENTRIES)
+		remove_invalid_entries(data_, invalidEntries_, validEntries_)
 
 
-## Used by the verify_settings_data() function to verify the retrieved sections.
-func is_valid_section(INVALID_ENTRIES: Dictionary, section: String) -> bool:
+## Used by the verify_settingsData_() function to verify the retrieved sections.
+func is_valid_section(invalidEntries_: Dictionary, SECTION: String) -> bool:
 	# Check if the section is in either of the reference tables
-	if SECTION_REFERENCE_TABLE.has(section) or ELEMENT_PANEL_REFERENCE_TABLE.has(section):
+	if (
+		SECTION_REFERENCE_TABLE_.has(SECTION)
+		or ELEMENT_PANEL_REFERENCE_TABLE_.has(SECTION)
+	):
 		return true
 		
 	# Add the invalid section to the invalid entries list
-	INVALID_ENTRIES[section] = []
-	push_warning("Invalid section '", section, "' found")
+	invalidEntries_[SECTION] = []
+	push_warning("Invalid section '", SECTION, "' found.")
 	return false
 
 
-## Used by the verify_settings_data() function to verify the elements inside of the retrieved sections.
-func verify_elements(DATA: Dictionary, INVALID_ENTRIES: Dictionary, section: String) -> void:
+## Used by the verify_settingsData_() function to verify the elements inside of the retrieved sections.
+func verify_elements(
+	data_: Dictionary,
+	invalidEntries_: Dictionary,
+	SECTION: String
+) -> void:
 	# Array of all elements under the section
-	var VALID_SECTION_ELEMENTS: Array = get_valid_elements(section)
+	var VALID_SECTION_ELEMENTS: Array = get_valid_elements(SECTION)
 	
 	# Itterate through all the elements in the section
-	for element in DATA[section]:
+	for element in data_[SECTION]:
 		# Check for invalid elements
 		if not VALID_SECTION_ELEMENTS.has(element):
 			# Check if the element is in a valid section
-			if not INVALID_ENTRIES.has(section):
+			if not invalidEntries_.has(SECTION):
 				# Add the section to the invalid entries list
-				INVALID_ENTRIES[section] = []
+				invalidEntries_[SECTION] = []
 			
 			# Add the invalid element to the invalid entries list
-			INVALID_ENTRIES[section].append(element)
-			push_warning("Invalid element '", element, "' found in section '", section, "'")
+			invalidEntries_[SECTION].append(element)
+			push_warning(
+				"Invalid element '"
+				+ element
+				+ "' found in section '"
+				+ SECTION
+				+ "'."
+			)
 
 
 ## Used by the verify_elements() function to retrieve the valid elements for the retrieved section.
-func get_valid_elements(section: String) -> Array:
+func get_valid_elements(SECTION: String) -> Array:
 	# Check if the section is a settings section
-	if SECTION_REFERENCE_TABLE.has(section):
-		return SECTION_REFERENCE_TABLE[section].ELEMENT_REFERENCE_TABLE.keys()
+	if SECTION_REFERENCE_TABLE_.has(SECTION):
+		return SECTION_REFERENCE_TABLE_[SECTION].ELEMENT_REFERENCE_TABLE_.keys()
 	
 	# Check if the section is an element panel
-	if ELEMENT_PANEL_REFERENCE_TABLE.has(section):
-		return ELEMENT_PANEL_REFERENCE_TABLE[section].ELEMENT_REFERENCE_TABLE.keys()
+	if ELEMENT_PANEL_REFERENCE_TABLE_.has(SECTION):
+		return ELEMENT_PANEL_REFERENCE_TABLE_[SECTION].ELEMENT_REFERENCE_TABLE_.keys()
 	
 	return []
 
 
-## Used by the verify_settings_data() function to check if any expected sections are missing.
-func check_for_missing_sections(DATA: Dictionary, VALID_ENTRIES: Dictionary) -> void: 
+## Used by the verify_settingsData_() function to check if any expected sections are missing.
+func check_for_missing_sections(data_: Dictionary, validEntries_: Dictionary) -> void: 
 	# Itterate through all valid sections
-	for section in VALID_ENTRIES:
-		# Check if the section is missing from the loaded data
-		if not DATA.has(section):
+	for section in validEntries_:
+		# Check if the section is missing from the loaded data_
+		if not data_.has(section):
 			# Add an empty entry for the section
-			DATA[section] = {}
+			data_[section] = {}
 			# Set the invalid save file flag to true
 			invalidSaveFile = true
 			push_warning("Settings section is missing: ", section)
 
 
-## Used by the verify_settings_data() function to remove invalid entires from the retrieved data.
-func remove_invalid_entries(DATA: Dictionary, INVALID_ENTRIES: Dictionary, VALID_ENTRIES: Dictionary) -> void:
+## Used by the verify_settingsData_() function to remove invalid entires from the retrieved data_.
+func remove_invalid_entries(
+	data_: Dictionary,
+	invalidEntries_: Dictionary,
+	validEntries_: Dictionary
+) -> void:
 	# Itterate through the sections in the invalid entries list
-	for section in INVALID_ENTRIES:
+	for section in invalidEntries_:
 		# Check if the section is valid
-		if VALID_ENTRIES.has(section):
+		if validEntries_.has(section):
 			# Itterate through the invalid elements
-			for element in INVALID_ENTRIES[section]:
+			for element in invalidEntries_[section]:
 				# Remove the invalid element
-				DATA[section].erase(element)
+				data_[section].erase(element)
 		else:
 			# Remove the invalid section
-			DATA.erase(section)
+			data_.erase(section)

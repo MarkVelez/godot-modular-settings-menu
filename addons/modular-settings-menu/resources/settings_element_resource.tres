@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="SettingsElementResource" load_steps=2 format=3 uid="uid://nm5symuv5lwk"]
-
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/settings_element_resource.gd" id="1_akqtc"]
-
-[resource]
-script = ExtResource("1_akqtc")

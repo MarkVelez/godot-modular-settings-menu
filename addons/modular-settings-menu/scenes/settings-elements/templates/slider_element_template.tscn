@@ -1,6 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bjcuw6amean2"]
-
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_m4flt"]
+[gd_scene load_steps=4 format=3 uid="uid://bjcuw6amean2"]
 
 [sub_resource type="GDScript" id="GDScript_i57rt"]
 resource_name = "slider_element_template"
@@ -91,7 +89,6 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
-script = ExtResource("1_m4flt")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2
