@@ -2,53 +2,7 @@
 
 [sub_resource type="GDScript" id="GDScript_bpxmf"]
 resource_name = "toggle_element_template"
-script/source = "extends HBoxContainer
-
-# Default value for the element
-@export var defaultValue: bool = false
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var toggleRef: CheckButton = $Toggle
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# The current value of the element
-var currentValue: bool
-
-
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"toggle\", parentRef, self)
-
-
-# Loads the saved/default values of the element
-func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"validOptions\": [true, false]
-	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	
-	# Set the state of the toggle button
-	toggleRef.set_pressed(currentValue)
-
-
-func toggled(state: bool) -> void:
-	# Update the settings cache
-	ElementResource.toggled(parentRef, self, state)
+script/source = "extends ToggleElement
 
 
 # Called to apply the setting to the game
@@ -58,13 +12,15 @@ func apply_settings() -> void:
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="ToggleElementTemplate" type="HBoxContainer"]
+[node name="ToggleElementTemplate" type="HBoxContainer" node_paths=PackedStringArray("ToggleRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_bpxmf")
+ToggleRef = NodePath("Toggle")
+IDENTIFIER = "ToggleTemplate"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2

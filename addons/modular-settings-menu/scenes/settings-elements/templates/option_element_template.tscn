@@ -2,62 +2,14 @@
 
 [sub_resource type="GDScript" id="GDScript_sk6j2"]
 resource_name = "option_element_template"
-script/source = "extends HBoxContainer
-
-# Default values for the element
-@export_enum(
-	\"Example\"
-) var defaultValue: String = \"Example\"
-
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var optionsRef: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# List of options related to the settings element
-const OPTION_LIST: Dictionary = {
-	\"Example\": \"Value\"
-}
-
-# Index of the currently selected item
-var selectedIndex: int
-# The current value of the element
-var currentValue: String
+script/source = "extends OptionElement
 
 
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"option\", parentRef, self)
-
-
-# Loads the saved/default values of the element
-func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"validOptions\": OPTION_LIST
+# Provide the options for the element
+func _init() -> void:
+	OPTION_LIST_ = {
+		\"Example\": null
 	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
-
-
-func option_selected(index: int) -> void:
-	# Update the settings cache
-	ElementResource.option_selected(parentRef, self, index)
 
 
 # Called to apply the setting to the game
@@ -67,13 +19,16 @@ func apply_settings() -> void:
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="OptionElementTemplate" type="HBoxContainer"]
+[node name="OptionElementTemplate" type="HBoxContainer" node_paths=PackedStringArray("OptionsRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_sk6j2")
+DEFAULT_VALUE = "Example"
+OptionsRef = NodePath("Options")
+IDENTIFIER = "OptionTemplate"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
