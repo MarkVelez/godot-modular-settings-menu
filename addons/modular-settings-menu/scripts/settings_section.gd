@@ -1,18 +1,21 @@
-extends TabBar
+extends Control
+class_name SettingsSection
+## The base script for settings sections.
 
 signal apply_settings
 
-# Reference to the settings menu node
+## Reference to the settings menu node
 @export var SettingsMenuRef: Node
 
-# IDENTIFIER for the section (used as the key for the section in the settings data)
+## Identifier for the section.
+## This value is used as the key in the settings data.
 @export var IDENTIFIER: String
 
-# Reference table of all elements under the section
+## Reference table of all elements under the section.
 var ELEMENT_REFERENCE_TABLE_: Dictionary
-# Cache of all the settings values for the section
+## Cache of all the settings values for the section.
 var settingsCache_: Dictionary
-# A list of all the elements that were changed since the settings were last applied
+## A list of all the elements that were changed since the settings were last applied.
 var changedElements_: Array[String]
 
 
@@ -31,10 +34,11 @@ func _ready():
 		SettingsDataManager.settingsData_[IDENTIFIER] = {}
 
 
-# Called when opening the settings menu to fill the settings cache
+## Called when opening the settings menu to fill the settings cache.
 func get_settings() -> void:
 	# Copy the settings data for the section into it's cache
-	settingsCache_ = SettingsDataManager.settingsData_[IDENTIFIER].duplicate(true)
+	settingsCache_ =\
+		SettingsDataManager.settingsData_[IDENTIFIER].duplicate(true)
 	
 	# If no save file exists saves the default values retrieved from the section's elements
 	if SettingsDataManager.noSaveFile or SettingsDataManager.invalidSaveFile:
@@ -44,37 +48,46 @@ func get_settings() -> void:
 	changedElements_.clear()
 
 
-# Called to clear the section's cache
+## Called to clear the section's cache.
 func clear_cache() -> void:
 	settingsCache_.clear()
 
 
-# Called to check for changes between the cache and the settings data
-func settings_changed(element: StringName) -> void:
+## Called when a setting has been changed.
+func settings_changed(elementId: String) -> void:
+	SettingsMenuRef.ApplyButtonRef.set_disabled(check_for_changes(elementId))
+
+
+## Called to check for changes between the cache and the settings data.
+func check_for_changes(elementId: String) -> bool:
+	var savedValue = SettingsDataManager.settingsData_[IDENTIFIER][elementId]
 	# Check if there are differences between the cache and the settings data
-	if settingsCache_[element] == SettingsDataManager.settingsData_[IDENTIFIER][element]:
+	if settingsCache_[elementId] == savedValue:
 		# Check if the element is on the changed elements list
-		if changedElements_.has(element):
+		if changedElements_.has(elementId):
 			# Remove the element from the list
-			changedElements_.erase(element)
+			changedElements_.erase(elementId)
 			# Decrease the changed elements count
 			SettingsDataManager.changedElementsCount -= 1
 			
 		# Check if there are any other changed elements
 		if SettingsDataManager.changedElementsCount == 0:
 			# Disabled the apply button
-			SettingsMenuRef.applyButton.set_disabled(true)
-	else:
-		SettingsMenuRef.applyButton.set_disabled(false)
-		# Check if the element is not the changed elements list
-		if not changedElements_.has(element):
-			# Add the element to the list
-			changedElements_.append(element)
-			# Increase the changed elements count
-			SettingsDataManager.changedElementsCount += 1
+			return true
+	
+	# Check if the element is not the changed elements list
+	if not changedElements_.has(elementId):
+		# Add the element to the list
+		changedElements_.append(elementId)
+		# Increase the changed elements count
+		SettingsDataManager.changedElementsCount += 1
+	
+	# Enable the apply button
+	return false
 
 
-# Called to saved the data in the section's cache to the settings data and apply the settings to the game
+## Called to saved the data in the section's cache to the settings data
+## and apply the settings to the game.
 func on_apply_settings() -> void:
 	# Check if any of the sections elements have been changed
 	if changedElements_.size() > 0:
@@ -89,6 +102,7 @@ func on_apply_settings() -> void:
 		changedElements_.clear()
 
 
+## Called to discard changes that have been made since the last save.
 func discard_changes() -> void:
 	# Check if any of the sections elements have been changed
 	if changedElements_.size() > 0:
