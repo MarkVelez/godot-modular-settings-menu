@@ -26,15 +26,15 @@ func pressed() -> void:
 
 # Called to create the element's extra panel
 func create_element_panel() -> void:
-	var elementPanelsRef: Control = ParentRef.SettingsMenuRef.ElementPanelsRef
+	var ElementPanelsRef: Control = ParentRef.SettingsMenuRef.ElementPanelsRef
 	# Instantiate the element panel
 	ElementPanelRef = ElementPanelScene.instantiate()
 	
 	# Check if the element panel exists
-	if not elementPanelsRef.find_child(ElementPanelRef.name):
+	if not ElementPanelsRef.find_child(ElementPanelRef.name):
 		# Give a reference of the element
-		ElementPanelRef.panelOwner = self
+		ElementPanelRef.PanelOwnerRef = self
 		ElementPanelRef.hide()
 		# Add the panel to the element panels list
-		elementPanelsRef.add_child(ElementPanelRef)
+		ElementPanelsRef.add_child(ElementPanelRef)
 		ElementPanelRef.set_owner(ParentRef.SettingsMenuRef)

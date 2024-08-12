@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cwhs0kpipkxfv"]
+[gd_scene load_steps=3 format=3 uid="uid://cwhs0kpipkxfv"]
 
 [ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/element_panel.gd" id="1_3f2r5"]
 [ext_resource type="PackedScene" uid="uid://bjcuw6amean2" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/slider_element_template.tscn" id="2_fpsnu"]
-[ext_resource type="PackedScene" uid="uid://dvkksl3mrnoto" path="res://addons/modular-settings-menu/scenes/settings-elements/discard_changes_popup.tscn" id="2_yu33j"]
 
 [node name="ElementPanelTemplate" type="Control"]
 layout_mode = 3
@@ -12,6 +11,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_3f2r5")
+IDENTIFIER = "PanelTemplate"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -74,8 +74,3 @@ layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 text = "Back"
-
-[node name="DiscardChangesPopup" parent="." node_paths=PackedStringArray("parent") instance=ExtResource("2_yu33j")]
-visible = false
-layout_mode = 1
-parent = NodePath("..")
