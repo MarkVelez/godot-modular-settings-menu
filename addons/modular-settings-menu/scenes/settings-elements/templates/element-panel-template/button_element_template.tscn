@@ -11,4 +11,4 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Button Element"
 script = ExtResource("1_cnjcn")
-ElementPanel = ExtResource("2_gbpfn")
+ElementPanelScene = ExtResource("2_gbpfn")
