@@ -4,26 +4,27 @@
 resource_name = "discard_changes_popup"
 script/source = "extends PanelContainer
 
-@onready var yesButton: Button = $PopupWindow/MarginContainer/VBoxContainer/HBoxContainer/YesButton
-@onready var noButton: Button = $PopupWindow/MarginContainer/VBoxContainer/HBoxContainer/NoButton
+@onready var YesButtonRef: Button = %YesButton
+@onready var NoButtonRef: Button = %NoButton
 
-@export var parent: Node	## The panel the discard changes popup belongs to
+var CallerRef: Control
 
 
 func _ready():
 	# Connect necessary signals
-	yesButton.connect(\"pressed\", yes_button_pressed)
-	noButton.connect(\"pressed\", no_button_pressed)
+	YesButtonRef.connect(\"pressed\", yes_button_pressed)
+	NoButtonRef.connect(\"pressed\", no_button_pressed)
+	connect(\"hidden\", on_hidden)
 
 
 func yes_button_pressed() -> void:
 	# Check if the panel this belongs to has the \"discard changes\" function
-	if parent.has_method(\"discard_changes\"):
-		parent.discard_changes()
+	if CallerRef.has_method(\"discard_changes\"):
+		CallerRef.discard_changes()
 	
 	# Disable the panel's apply button
-	parent.applyButton.set_disabled(true)
-	parent.back_button_pressed()
+	CallerRef.ApplyButtonRef.set_disabled(true)
+	CallerRef.on_back_pressed()
 	
 	# Reset the changed elements count
 	SettingsDataManager.changedElementsCount = 0
@@ -33,6 +34,10 @@ func yes_button_pressed() -> void:
 
 func no_button_pressed() -> void:
 	hide()
+
+
+func on_hidden() -> void:
+	CallerRef = null
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8kuxy"]
@@ -77,11 +82,13 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="YesButton" type="Button" parent="PopupWindow/MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Yes"
 
 [node name="NoButton" type="Button" parent="PopupWindow/MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "No"
