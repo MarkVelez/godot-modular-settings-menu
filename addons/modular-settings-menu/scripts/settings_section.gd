@@ -5,12 +5,12 @@ class_name SettingsSection
 signal apply_settings
 signal setting_changed(elementId: String)
 
-## Reference to the settings menu node
-@export var SettingsMenuRef: Node
-
 ## Identifier for the section.
 ## This value is used as the key in the settings data.
 @export var IDENTIFIER: String
+
+## Reference to the settings menu node.
+var SettingsMenuRef: Node
 
 ## Reference table of all elements under the section.
 var ELEMENT_REFERENCE_TABLE_: Dictionary
@@ -98,7 +98,7 @@ func on_apply_settings() -> void:
 		
 		# Apply the settings for the changed elements
 		for element in changedElements_:
-			ELEMENT_REFERENCE_TABLE_[element].apply_settings()
+			ELEMENT_REFERENCE_TABLE_[element]._apply_settings()
 		
 		# Clear the changed elements array
 		changedElements_.clear()

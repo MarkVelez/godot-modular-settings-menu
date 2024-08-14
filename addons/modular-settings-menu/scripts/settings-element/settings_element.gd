@@ -77,7 +77,7 @@ func load_settings() -> void:
 		or not IS_SUB_ELEMENT
 	):
 		# Apply the loaded values to the game
-		call_deferred("apply_settings")
+		call_deferred("_apply_settings")
 
 
 ## Used to get the valid values an element can have for validating settings data.
