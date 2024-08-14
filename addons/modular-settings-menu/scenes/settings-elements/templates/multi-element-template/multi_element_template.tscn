@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3 uid="uid://csr6kawyf3t3i"]
+
+[ext_resource type="PackedScene" uid="uid://vlmvkci3ptii" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/multi-element-template/main_element.tscn" id="1_mhqaj"]
+[ext_resource type="PackedScene" uid="uid://bjcuw6amean2" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/slider_element_template.tscn" id="2_mf8gn"]
+[ext_resource type="PackedScene" uid="uid://cxaxyqer0af21" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/toggle_element_template.tscn" id="3_gs1f8"]
+
+[sub_resource type="GDScript" id="GDScript_sk6j2"]
+resource_name = "multi_element_template"
+script/source = "extends MultiElement
+
+
+func display_sub_elements() -> void:
+	match currentValue:
+		\"None\":
+			for element in SUB_ELEMENTS_:
+				element.hide()
+		\"Slider\":
+			SUB_ELEMENTS_[0].show()
+			SUB_ELEMENTS_[1].hide()
+		\"Toggle\":
+			SUB_ELEMENTS_[0].hide()
+			SUB_ELEMENTS_[1].show()
+"
+
+[node name="MultiElementTemplate" type="VBoxContainer" node_paths=PackedStringArray("MainElementRef", "SUB_ELEMENTS_")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = SubResource("GDScript_sk6j2")
+MainElementRef = NodePath("MainElement")
+SUB_ELEMENTS_ = [NodePath("SliderElementTemplate"), NodePath("ToggleElementTemplate")]
+
+[node name="MainElement" parent="." instance=ExtResource("1_mhqaj")]
+layout_mode = 2
+
+[node name="SliderElementTemplate" parent="." instance=ExtResource("2_mf8gn")]
+layout_mode = 2
+
+[node name="ToggleElementTemplate" parent="." instance=ExtResource("3_gs1f8")]
+layout_mode = 2

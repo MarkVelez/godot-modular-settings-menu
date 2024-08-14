@@ -6,7 +6,7 @@ script/source = "extends SliderElement
 
 
 # Called to apply the setting to the game
-func apply_settings() -> void:
+func _apply_settings() -> void:
 	pass
 "
 

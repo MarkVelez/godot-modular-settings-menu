@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://dc1yif146sxav"]
+[gd_scene load_steps=3 format=3 uid="uid://vlmvkci3ptii"]
 
 [sub_resource type="GDScript" id="GDScript_sk6j2"]
 resource_name = "option_element_template"
@@ -8,27 +8,29 @@ script/source = "extends OptionElement
 # Provide the options for the element
 func _init() -> void:
 	OPTION_LIST_ = {
-		\"Example\": null
+		\"None\": null,
+		\"Slider\": null,
+		\"Toggle\": null
 	}
 
 
 # Called to apply the setting to the game
-func _apply_settings() -> void:
+func apply_settings() -> void:
 	pass
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="OptionElementTemplate" type="HBoxContainer" node_paths=PackedStringArray("OptionsRef")]
+[node name="MainElement" type="HBoxContainer" node_paths=PackedStringArray("OptionsRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_sk6j2")
-DEFAULT_VALUE = "Example"
+DEFAULT_VALUE = "None"
 OptionsRef = NodePath("Options")
-IDENTIFIER = "OptionTemplate"
+IDENTIFIER = "MainElement"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2

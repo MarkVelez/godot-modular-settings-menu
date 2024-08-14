@@ -3,6 +3,7 @@ class_name SettingsSection
 ## The base script for settings sections.
 
 signal apply_settings
+signal setting_changed(elementId: String)
 
 ## Reference to the settings menu node
 @export var SettingsMenuRef: Node
@@ -56,6 +57,7 @@ func clear_cache() -> void:
 ## Called when a setting has been changed.
 func settings_changed(elementId: String) -> void:
 	SettingsMenuRef.ApplyButtonRef.set_disabled(check_for_changes(elementId))
+	emit_signal("setting_changed", elementId)
 
 
 ## Called to check for changes between the cache and the settings data.

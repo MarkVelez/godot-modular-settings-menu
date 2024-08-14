@@ -8,23 +8,33 @@ class_name SettingsElement
 
 ## Toggle based on whether the element handles a setting that requires an in game node to exist.
 @export var IS_IN_GAME_SETTING: bool
-## Toggle based on whether the element is a sub element or not.
-@export var IS_SUB_ELEMENT: bool
 
-## Reference to the section the settings element is under.
-@onready var ParentRef: Node = owner
 ## The name of the section the element is under.
 @onready var SECTION: String = ParentRef.IDENTIFIER
 
+## Reference to the section the settings element is under.
+var ParentRef: SettingsSection
+
+# Multi element flags
+## Flag to turn an element into the main element of a multi element.
+var IS_MULTI_ELEMENT: bool = false
+## Flag to turn an element into a sub element of a multi element.
+var IS_SUB_ELEMENT: bool = false
+
 ## Current value of the element.
 var currentValue
+
+
+func _enter_tree() -> void:
+	if not IS_MULTI_ELEMENT:
+		ParentRef = owner
 
 
 func _ready() -> void:
 	SettingsDataManager.connect("load_settings", load_settings)
 	# Check if the element is a sub element
 	if not IS_SUB_ELEMENT:
-		ParentRef.connect("apply_settings", apply_settings)
+		ParentRef.connect("apply_settings", _apply_settings)
 		# Add an entry of the settings element to the section's reference table
 		ParentRef.ELEMENT_REFERENCE_TABLE_[IDENTIFIER] = self
 
@@ -33,15 +43,6 @@ func _ready() -> void:
 ## This function is overwritten by each [b]type[/b] of element.
 func init_element() -> void:
 	return
-
-
-## Used to initialize sub elements of a multi element.
-func init_sub_elements(SUB_ELEMENTS_: Array[Control]) -> void:
-	# Itterate through the sub elements
-	for ElementRef in SUB_ELEMENTS_:
-		# Give section information to sub element
-		ElementRef.ParentRef = ParentRef
-		ParentRef.ELEMENT_REFERENCE_TABLE[ElementRef.IDENTIFIER] = ElementRef
 
 
 ## Loads the saved or default value of the element.
@@ -200,5 +201,5 @@ func apply_in_game_setting(value = null) -> bool:
 
 ## Called to apply the setting to the game.
 ## This function is overwritten by each [b]element[/b].
-func apply_settings() -> void:
+func _apply_settings() -> void:
 	return
