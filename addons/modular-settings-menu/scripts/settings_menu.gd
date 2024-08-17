@@ -1,9 +1,10 @@
 extends Control
 class_name SettingsMenu
 
-signal get_settings
-signal apply_settings
-signal clear_cache
+## Emitted when the settings menu is made visible.
+signal settings_menu_opened
+signal apply_button_pressed
+signal settings_menu_closed
 
 ## Used to check if gameplay related settings should be applied
 @export var IS_IN_GAME_MENU: bool = true
@@ -29,29 +30,34 @@ func _enter_tree() -> void:
 
 func _ready():
 	# Load the settings data
-	SettingsDataManager.call_deferred("emit_signal", "load_settings")
+	SettingsDataManager.call_deferred("emit_signal", "settings_retrieved")
 
 
-func back_button_pressed() -> void:
+func on_back_button_pressed() -> void:
 	# Check if there have been any changes made
 	if ApplyButtonRef.is_disabled():
 		hide()
 		MenuPanelRef.show()
 		# Clear the settings cache
-		emit_signal("clear_cache")
+		emit_signal("settings_menu_closed")
 	else:
 		# Display the discard changes popup
 		display_discard_changes(self)
 
 
-func apply_button_pressed() -> void:
+func on_apply_button_pressed() -> void:
 	ApplyButtonRef.set_disabled(true)
 	# Apply the settings of each section
-	emit_signal("apply_settings")
+	emit_signal("apply_button_pressed")
 	# Save the updated settings data
 	SettingsDataManager.call_deferred("save_data")
 	# Reset the changed elements count
 	SettingsDataManager.changedElementsCount = 0
+
+
+func on_visiblity_changed() -> void:
+	if is_visible_in_tree():
+		emit_signal("settings_menu_opened")
 
 
 # Called to discard the changes in the current section

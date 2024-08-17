@@ -14,7 +14,7 @@ var currentValue :
 
 func _enter_tree() -> void:
 	ParentRef = owner
-	SettingsDataManager.connect("load_settings", load_settings)
+	SettingsDataManager.connect("settings_retrieved", load_settings)
 	ParentRef.connect("setting_changed", update_element)
 	init_main_element()
 	init_sub_elements()

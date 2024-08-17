@@ -5,7 +5,7 @@ extends Node
 
 func _ready():
 	# Connect neccessary signal
-	SettingsDataManager.connect(&"apply_in_game_settings", apply_in_game_settings)
+	SettingsDataManager.connect("applied_in_game_setting", apply_in_game_settings)
 
 
 # Called to apply in game settings for the specific node

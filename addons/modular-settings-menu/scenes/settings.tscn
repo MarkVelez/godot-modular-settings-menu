@@ -68,5 +68,5 @@ mouse_filter = 2
 visible = false
 layout_mode = 1
 
-[connection signal="pressed" from="SettingsPanel/HBoxContainer/ApplyButton" to="." method="apply_button_pressed"]
-[connection signal="pressed" from="SettingsPanel/HBoxContainer/BackButton" to="." method="back_button_pressed"]
+[connection signal="pressed" from="SettingsPanel/HBoxContainer/ApplyButton" to="." method="on_apply_button_pressed"]
+[connection signal="pressed" from="SettingsPanel/HBoxContainer/BackButton" to="." method="on_back_button_pressed"]

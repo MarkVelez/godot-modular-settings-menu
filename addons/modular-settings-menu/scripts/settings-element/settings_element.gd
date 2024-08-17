@@ -31,10 +31,10 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	SettingsDataManager.connect("load_settings", load_settings)
+	SettingsDataManager.connect("settings_retrieved", load_settings)
 	# Check if the element is a sub element
 	if not IS_SUB_ELEMENT:
-		ParentRef.connect("apply_settings", _apply_settings)
+		ParentRef.connect("apply_button_pressed", _apply_settings)
 		# Add an entry of the settings element to the section's reference table
 		ParentRef.ELEMENT_REFERENCE_TABLE_[IDENTIFIER] = self
 
@@ -189,7 +189,7 @@ func apply_in_game_setting(value = null) -> bool:
 	if ParentRef.SettingsMenuRef.IS_IN_GAME_MENU:
 		SettingsDataManager.call_deferred(
 			"emit_signal",
-			"apply_in_game_settings",
+			"applied_in_game_setting",
 			SECTION,
 			IDENTIFIER,
 			value

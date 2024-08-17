@@ -2,9 +2,9 @@ extends Node
 ## Handles the loading and saving of settings data.
 
 ## Emitted when loading the settings data.
-signal load_settings
+signal settings_retrieved
 ## Emitted when applying specific settings to in game objects.
-signal apply_in_game_settings(section: StringName, setting: StringName, value)
+signal applied_in_game_setting(section: String, setting: String, value)
 
 ## PATH to the settings save file.
 var DATA_FOLDER: String = OS.get_user_data_dir()

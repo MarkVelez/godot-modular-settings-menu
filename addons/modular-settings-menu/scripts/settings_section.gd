@@ -2,7 +2,9 @@ extends Control
 class_name SettingsSection
 ## The base script for settings sections.
 
-signal apply_settings
+## Emitted when the apply button is pressed.
+signal apply_button_pressed
+## Emitted when a setting has it's value changed.
 signal setting_changed(elementId: String)
 
 ## Identifier for the section.
@@ -22,9 +24,9 @@ var changedElements_: Array[String]
 
 func _ready():
 	# Connect neccessary signals from the central root node for the settings
-	SettingsMenuRef.connect("get_settings", get_settings)
-	SettingsMenuRef.connect("apply_settings", on_apply_settings)
-	SettingsMenuRef.connect("clear_cache", clear_cache)
+	SettingsMenuRef.connect("settings_menu_opened", get_settings)
+	SettingsMenuRef.connect("apply_button_pressed", on_apply_settings)
+	SettingsMenuRef.connect("settings_menu_closed", clear_cache)
 	
 	# Add a reference of the section to the reference table
 	SettingsDataManager.SECTION_REFERENCE_TABLE_[IDENTIFIER] = self

@@ -15,7 +15,7 @@ const SETTINGS_FUNCTIONS: Dictionary = {
 
 
 func _ready():
-	SettingsDataManager.connect(&"apply_in_game_settings", apply_in_game_settings)
+	SettingsDataManager.connect("applied_in_game_setting", apply_in_game_settings)
 
 
 # Called by elements to apply in game settings
