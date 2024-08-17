@@ -14,8 +14,8 @@ var currentValue :
 
 func _enter_tree() -> void:
 	ParentRef = owner
-	SettingsDataManager.connect("settings_retrieved", load_settings)
 	ParentRef.connect("setting_changed", update_element)
+	SettingsDataManager.connect("settings_retrieved", load_settings)
 	init_main_element()
 	init_sub_elements()
 
@@ -38,13 +38,13 @@ func init_sub_elements() -> void:
 
 ## Called when settings are loaded to display the appropriate elements.
 func load_settings() -> void:
-	call_deferred("display_sub_elements")
+	call_deferred("_display_sub_elements")
 
 
 ## Called when the main element's value changes do display the appropraite elements.
 func update_element(elementId: String) -> void:
 	if elementId == MainElementRef.IDENTIFIER:
-		call_deferred("display_sub_elements")
+		call_deferred("_display_sub_elements")
 
 
 ## Called to update the visibility of sub elements based on the main elements's current value.

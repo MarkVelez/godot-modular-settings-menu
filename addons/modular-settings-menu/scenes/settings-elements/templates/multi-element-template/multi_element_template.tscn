@@ -9,7 +9,7 @@ resource_name = "multi_element_template"
 script/source = "extends MultiElement
 
 
-func display_sub_elements() -> void:
+func _display_sub_elements() -> void:
 	match currentValue:
 		\"None\":
 			for element in SUB_ELEMENTS_:

@@ -55,7 +55,7 @@ func on_apply_button_pressed() -> void:
 	SettingsDataManager.changedElementsCount = 0
 
 
-func on_visiblity_changed() -> void:
+func on_visibility_changed() -> void:
 	if is_visible_in_tree():
 		emit_signal("settings_menu_opened")
 

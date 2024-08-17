@@ -24,7 +24,7 @@ func yes_button_pressed() -> void:
 	
 	# Disable the panel's apply button
 	CallerRef.ApplyButtonRef.set_disabled(true)
-	CallerRef.on_back_pressed()
+	CallerRef.on_back_button_pressed()
 	
 	# Reset the changed elements count
 	SettingsDataManager.changedElementsCount = 0

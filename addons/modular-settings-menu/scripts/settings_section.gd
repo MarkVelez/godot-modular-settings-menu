@@ -64,9 +64,10 @@ func settings_changed(elementId: String) -> void:
 
 ## Called to check for changes between the cache and the settings data.
 func check_for_changes(elementId: String) -> bool:
+	var cacheValue = settingsCache_[elementId]
 	var savedValue = SettingsDataManager.settingsData_[IDENTIFIER][elementId]
 	# Check if there are differences between the cache and the settings data
-	if settingsCache_[elementId] == savedValue:
+	if cacheValue == savedValue:
 		# Check if the element is on the changed elements list
 		if changedElements_.has(elementId):
 			# Remove the element from the list
