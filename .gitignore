@@ -10,6 +10,8 @@ export_presets.cfg
 # Project ignores
 project.godot
 /testing
+icon.svg
+icon.svg.import
 
 # Imported translations (automatically generated from CSV files)
 *.translation
