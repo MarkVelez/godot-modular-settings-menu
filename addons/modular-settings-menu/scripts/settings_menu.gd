@@ -3,7 +3,9 @@ class_name SettingsMenu
 
 ## Emitted when the settings menu is made visible.
 signal settings_menu_opened
+## Emitted when the apply button is pressed.
 signal apply_button_pressed
+## Emitted when the settings menu is hidden.
 signal settings_menu_closed
 
 ## Used to check if gameplay related settings should be applied

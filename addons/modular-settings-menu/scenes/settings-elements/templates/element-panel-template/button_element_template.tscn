@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://d0rkws47yf8l2"]
 
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/settings-element/button_element.gd" id="1_cnjcn"]
+[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/base-settings-elements/button_element.gd" id="1_cnjcn"]
 [ext_resource type="PackedScene" uid="uid://cwhs0kpipkxfv" path="res://addons/modular-settings-menu/scenes/settings-elements/templates/element-panel-template/element_panel_template.tscn" id="2_gbpfn"]
 
 [node name="ButtonElementTemplate" type="Button"]

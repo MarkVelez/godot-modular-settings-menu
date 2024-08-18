@@ -1,76 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://y6kuxwyem48c"]
+[gd_scene load_steps=4 format=3 uid="uid://y6kuxwyem48c"]
 
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_pb6kb"]
-
-[sub_resource type="GDScript" id="GDScript_i57rt"]
-resource_name = "music_volume"
-script/source = "extends HBoxContainer
-
-# Default values for the element
-@export var minValue: float = 0.0
-@export var maxValue: float = 1.0
-@export var stepValue: float = 0.01
-@export var defaultValue: float = 1.0
-
-# An extra suffix for the value (optional)
-@export var valueSuffix: String = \"%\"
-# Name of the audio bus that the volume slider is assigned to
-@export var audioBus: StringName = &\"Music\"
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool = false
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool = false
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var sliderValueRef: HBoxContainer = $SliderValue
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# The current value of the element
-var currentValue: float
-
-
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"slider\", parentRef, self)
-
-
-# Loads the saved/default values of the element
-func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"minValue\": minValue,
-		\"maxValue\": maxValue,
-	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the slider of the element
-	sliderValueRef.init_slider(minValue * 100, maxValue * 100, stepValue * 100, currentValue * 100)
-
-
-func value_changed(newValue: float) -> void:
-	currentValue = newValue / 100
-	
-	# Update the settings cache
-	ElementResource.value_changed(parentRef, self, currentValue)
-
-
-# Element specific script for applying its value to the game
-func apply_settings() -> void:
-	# Get the index of the audio bus
-	var busIndex: int = AudioServer.get_bus_index(audioBus)
-	
-	# Set the volume of the audio bus
-	AudioServer.set_bus_volume_db(busIndex, linear_to_db(currentValue))
-"
+[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/settings-elements-scripts/audio_setting.gd" id="1_05os8"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
 size = Vector2(0, 0)
@@ -78,13 +8,20 @@ size = Vector2(0, 0)
 [sub_resource type="Theme" id="Theme_4i2xw"]
 SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
 
-[node name="MusicVolume" type="HBoxContainer"]
+[node name="MusicVolume" type="HBoxContainer" node_paths=PackedStringArray("SliderRef", "ValueBoxRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("GDScript_i57rt")
+script = ExtResource("1_05os8")
+AUDIO_BUS = "Music"
+STEP_VALUE = 0.01
+DISPLAY_PERCENT_VALUE = true
+VALUE_SUFFIX = "%"
+SliderRef = NodePath("SliderValue/Slider")
+ValueBoxRef = NodePath("SliderValue/Value")
+IDENTIFIER = "MusicVolume"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
@@ -97,7 +34,6 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
-script = ExtResource("1_pb6kb")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2
