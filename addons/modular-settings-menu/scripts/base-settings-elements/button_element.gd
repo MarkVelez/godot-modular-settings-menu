@@ -1,12 +1,13 @@
 extends Button
+class_name ButtonElement
 
-# Reference to the element's panel
+## Reference to the element's panel scene.
 @export var ElementPanelScene: PackedScene
 
-# Reference to the node the settings element is under
+## Reference to the node the settings element is under.
 @onready var ParentRef: Node = owner
 
-# Reference to the element's extra panel
+## Reference to the element's panel.
 var ElementPanelRef: Node
 
 
@@ -24,10 +25,9 @@ func pressed() -> void:
 	ElementPanelRef.get_settings()
 
 
-# Called to create the element's extra panel
+## Called to create the element's panel.
 func create_element_panel() -> void:
 	var ElementPanelsRef: Control = ParentRef.SettingsMenuRef.ElementPanelsRef
-	# Instantiate the element panel
 	ElementPanelRef = ElementPanelScene.instantiate()
 	
 	# Check if the element panel exists

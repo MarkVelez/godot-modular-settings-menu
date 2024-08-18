@@ -5,7 +5,7 @@ extends SettingsSection
 @onready var ApplyButtonRef: Button = $VBoxContainer/HBoxContainer/ApplyButton
 
 # Reference to the element this panel belongs to
-var PanelOwnerRef: Node
+var PanelOwnerRef: ButtonElement
 
 
 func _ready():
