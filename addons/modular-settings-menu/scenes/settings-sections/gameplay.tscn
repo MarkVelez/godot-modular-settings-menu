@@ -15,6 +15,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_e0spm")
 script = ExtResource("1_i11k5")
+IDENTIFIER = "Gameplay"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1

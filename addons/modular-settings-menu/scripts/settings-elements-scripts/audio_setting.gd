@@ -5,7 +5,7 @@ extends SliderElement
 
 
 # Element specific script for applying its value to the game
-func apply_settings() -> void:
+func _apply_settings() -> void:
 	# Get the index of the audio bus
 	var busIndex: int = AudioServer.get_bus_index(AUDIO_BUS)
 	

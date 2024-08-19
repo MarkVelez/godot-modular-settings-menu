@@ -1,70 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://elu1vc0ox472"]
-
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_1ljok"]
+[gd_scene load_steps=4 format=3 uid="uid://elu1vc0ox472"]
 
 [sub_resource type="GDScript" id="GDScript_1rk38"]
 resource_name = "fov"
-script/source = "extends HBoxContainer
-
-# Default values for the element
-@export var minValue: float = 30.0
-@export var maxValue: float = 120.0
-@export var stepValue: float = 1.0
-@export var defaultValue: float = 75.0
-
-# An extra suffix for the value (optional)
-@export var valueSuffix: String = \"°\"
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool = true
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool = false
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var sliderValueRef: HBoxContainer = $SliderValue
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# The current value of the element
-var currentValue: float
-
-
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"slider\", parentRef, self)
-
-
-# Loads the saved/default values of the element
-func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"minValue\": minValue,
-		\"maxValue\": maxValue,
-	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the slider of the element
-	sliderValueRef.init_slider(minValue, maxValue, stepValue, currentValue)
-
-
-func value_changed(newValue: float) -> void:
-	currentValue = newValue
-	
-	# Update the settings cache
-	ElementResource.value_changed(parentRef, self, currentValue)
+script/source = "extends SliderElement
 
 
 # Element specific script for applying its value to the game
-func apply_settings() -> void:
-	# Apply in game settings or add to the load list
-	ElementResource.apply_in_game_setting(parentRef, self)
+func _apply_settings() -> void:
+	apply_in_game_setting(currentValue)
 "
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_hlot4"]
@@ -73,13 +16,22 @@ size = Vector2(0, 0)
 [sub_resource type="Theme" id="Theme_4i2xw"]
 SpinBox/icons/updown = SubResource("PlaceholderTexture2D_hlot4")
 
-[node name="FOV" type="HBoxContainer"]
+[node name="FOV" type="HBoxContainer" node_paths=PackedStringArray("SliderRef", "ValueBoxRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_1rk38")
+MIN_VALUE = 30.0
+MAX_VALUE = 120.0
+STEP_VALUE = 1.0
+DEFAULT_VALUE = 75.0
+VALUE_SUFFIX = "°"
+SliderRef = NodePath("SliderValue/Slider")
+ValueBoxRef = NodePath("SliderValue/Value")
+IDENTIFIER = "FOV"
+IS_IN_GAME_SETTING = true
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
@@ -92,7 +44,6 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
-script = ExtResource("1_1ljok")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2
