@@ -9,19 +9,12 @@ func _ready():
 
 
 # Called to apply in game settings for the specific node
-func apply_in_game_settings(section: String, element: String, _value) -> void:
+func apply_in_game_settings(section: String, element: String, value) -> void:
 	match element:
 		"FOV":
-			# Set the camera FOV to the value stored in the settings data dictionary
-			CameraRef.set_fov(SettingsDataManager.settingsData_[section][element])
+			CameraRef.set_fov(value)
 		"DepthOfField":
-			var enabled: bool
-			# Check if the current value of the element is disabled
-			if SettingsDataManager.settingsData_[section][element] == "Disabled":
-				enabled = false
-			else:
-				enabled = true
-			
+			var enabled: bool = false if value == "Disabled" else true
 			# Disable/Enable DOF
 			CameraRef.attributes.set_dof_blur_far_enabled(enabled)
 			CameraRef.attributes.set_dof_blur_near_enabled(enabled)
