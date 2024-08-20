@@ -15,6 +15,8 @@ var currentValue :
 func _enter_tree() -> void:
 	ParentRef = owner
 	ParentRef.connect("setting_changed", update_element)
+	ParentRef.connect("apply_button_pressed", apply_settings)
+	ParentRef.SettingsMenuRef.connect("changes_discarded", load_settings)
 	SettingsDataManager.connect("settings_retrieved", load_settings)
 	init_main_element()
 	init_sub_elements()
@@ -41,7 +43,7 @@ func load_settings() -> void:
 	call_deferred("_display_sub_elements")
 
 
-## Called when the main element's value changes do display the appropraite elements.
+## Called when the main element's value changes do display the appropriate elements.
 func update_element(elementId: String) -> void:
 	if elementId == MainElementRef.IDENTIFIER:
 		call_deferred("_display_sub_elements")
@@ -51,3 +53,15 @@ func update_element(elementId: String) -> void:
 ## This function is overwritten by the multi element wrapper.
 func _display_sub_elements() -> void:
 	return
+
+
+## Called when the apply button is pressed.
+func apply_settings() -> void:
+	if ParentRef.changedElements_.has(MainElementRef.IDENTIFIER):
+		for SubElementRef in SUB_ELEMENTS_:
+			if (
+				not SubElementRef.is_visible_in_tree()
+				or ParentRef.changedElements_.has(SubElementRef.IDENTIFIER)
+			):
+				continue
+			SubElementRef._apply_settings()
