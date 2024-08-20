@@ -10,22 +10,29 @@ class_name OptionElement
 @export var OptionsRef: OptionButton
 
 ## List of options related to the settings element
-var OPTION_LIST_: Dictionary
+var OPTION_LIST_
 
 ## Index of the currently selected item
 var selectedIndex: int
 
 
-func init_element() -> void:
+func _ready() -> void:
+	super._ready()
 	OPTION_LIST_.make_read_only()
 	OptionsRef.connect("item_selected", option_selected)
+
+
+func init_element() -> void:
 	fill_options_button()
 
 
 func get_valid_values() -> Dictionary:
 	if not OPTION_LIST_.has(DEFAULT_VALUE):
 		push_warning("Invalid default value for element '" + IDENTIFIER + "'.")
-		DEFAULT_VALUE = OPTION_LIST_.keys()[0]
+		if OPTION_LIST_ is Dictionary:
+			DEFAULT_VALUE = OPTION_LIST_.keys()[0]
+		else:
+			DEFAULT_VALUE = OPTION_LIST_[0]
 	
 	return {
 		"defaultValue": DEFAULT_VALUE,

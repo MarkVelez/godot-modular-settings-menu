@@ -150,7 +150,7 @@ func is_valid_value(VALUES_: Dictionary, RETRIEVED_VALUE) -> bool:
 			if not VALUES_["validOptions"].has(RETRIEVED_VALUE):
 				push_warning(
 					"Invalid value '"
-					+ RETRIEVED_VALUE
+					+ str(RETRIEVED_VALUE)
 					+ "' for element '"
 					+ IDENTIFIER
 					+ "' expected values: "
@@ -170,13 +170,13 @@ func is_valid_value(VALUES_: Dictionary, RETRIEVED_VALUE) -> bool:
 				
 				push_warning(
 					"Invalid value "
-					+ RETRIEVED_VALUE
+					+ str(RETRIEVED_VALUE)
 					+ " for element '"
 					+ IDENTIFIER
 					+ "' expected values between "
-					+ VALUES_["minValue"]
+					+ str(VALUES_["minValue"])
 					+ " and "
-					+ VALUES_["maxValue"]
+					+ str(VALUES_["maxValue"])
 				)
 				return false
 	

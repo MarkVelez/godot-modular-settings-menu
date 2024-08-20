@@ -8,10 +8,15 @@ class_name ToggleElement
 ## Reference to the toggle button of the element.
 @export var ToggleRef: Button
 
+
+func _ready() -> void:
+	super._ready()
+	ToggleRef.connect("toggled", toggled)
+
+
 ## Overwrite for SettingsElement.
 func init_element() -> void:
 	ToggleRef.set_pressed(currentValue)
-	ToggleRef.connect("toggled", toggled)
 
 
 ## Gets the valid values from the element to be used for validating data.

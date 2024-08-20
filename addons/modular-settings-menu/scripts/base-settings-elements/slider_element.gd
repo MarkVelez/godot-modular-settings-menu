@@ -20,6 +20,7 @@ class_name SliderElement
 ## Reference to the SpinBox or Label of the element.
 @export var ValueBoxRef: Control
 
+
 ## Overwrite for SettingsElement.
 func init_element() -> void:
 	init_slider(100 if DISPLAY_PERCENT_VALUE else 1)
