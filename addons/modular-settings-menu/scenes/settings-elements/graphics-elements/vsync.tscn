@@ -2,89 +2,48 @@
 
 [sub_resource type="GDScript" id="GDScript_kwfgn"]
 resource_name = "vsync"
-script/source = "extends HBoxContainer
+script/source = "extends OptionElement
 
-# Default values for the element
-@export_enum(
-	\"Disabled\",
-	\"Enabled\",
-	\"Adaptive\",
-) var defaultValue: String = \"Disabled\"
 
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool = false
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool = false
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var optionsRef: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# List of options related to the settings element
-const OPTION_LIST: Dictionary = {
+func _init() -> void:
+	OPTION_LIST_ = {
 	\"Disabled\": DisplayServer.VSYNC_DISABLED,
 	\"Enabled\": DisplayServer.VSYNC_ENABLED,
 	\"Adaptive\": DisplayServer.VSYNC_ADAPTIVE
 }
 
-# Index of the currently selected item
-var selectedIndex: int
-# The current value of the element
-var currentValue: String
-
-
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"option\", parentRef, self)
-
 
 # Loads the saved/default values of the element
 func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"validOptions\": OPTION_LIST
-	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
-	
+	super.load_settings()
 	# Toggle the max fps element
-	call_deferred(&\"toggle_max_fps\")
+	call_deferred(\"toggle_max_fps\")
 
 
 func option_selected(index: int) -> void:
-	# Update the settings cache
-	ElementResource.option_selected(parentRef, self, index)
-	
+	super.option_selected(index)
 	# Toggle the max fps element
 	toggle_max_fps()
 
 
 # Called to apply the settings in the settings cache
-func apply_settings() -> void:
+func _apply_settings() -> void:
 	# Set the vsync mode to the selected option
-	DisplayServer.window_set_vsync_mode(OPTION_LIST[currentValue])
+	DisplayServer.window_set_vsync_mode(OPTION_LIST_[currentValue])
 	
 	# Set the max fps to unlimited if vsync is being enabled
 	if currentValue != \"Disabled\":
 		Engine.set_max_fps(0)
 	
 	# Check if the max fps element exists and if vsync is disabled
-	if parentRef.ELEMENT_REFERENCE_TABLE.has(\"MaxFPS\") && currentValue == \"Disabled\":
+	if (
+		ParentRef.ELEMENT_REFERENCE_TABLE_.has(\"MaxFPS\")
+		and currentValue == \"Disabled\"
+	):
 		# Check if max fps has been changed
-		if not parentRef.CHANGED_ELEMENTS.has(\"MaxFPS\"):
+		if not ParentRef.changedElements_.has(\"MaxFPS\"):
 			# Apply the max fps settings manually
-			parentRef.ELEMENT_REFERENCE_TABLE[\"MaxFPS\"].apply_settings()
+			ParentRef.ELEMENT_REFERENCE_TABLE_[\"MaxFPS\"]._apply_settings()
 	elif currentValue == \"Disabled\":
 		# Set the max fps to the max fps read from the project settings
 		Engine.set_max_fps(ProjectSettings.get_setting(\"application/run/max_fps\"))
@@ -93,31 +52,35 @@ func apply_settings() -> void:
 
 # Disable/Enable the max fps element according to if vsync is on or not
 func toggle_max_fps() -> void:
-	# Check if the max fps element exists
-	if parentRef.ELEMENT_REFERENCE_TABLE.has(\"MaxFPS\"):
-		# Reference to the slider value node of the max fps element
-		var sliderValue: HBoxContainer = parentRef.ELEMENT_REFERENCE_TABLE[\"MaxFPS\"].sliderValueRef
-		
-		# Check if vsync is disabled
-		if currentValue == \"Disabled\":
-			# Enable the max fps element
-			sliderValue.sliderRef.set_editable(true)
-			sliderValue.valueBoxRef.modulate = Color.WHITE
-		else:
-			# Disable the max fps element
-			sliderValue.sliderRef.set_editable(false)
-			sliderValue.valueBoxRef.modulate = Color.GRAY
+	if not ParentRef.ELEMENT_REFERENCE_TABLE_.has(\"MaxFPS\"):
+		return
+	
+	# Reference to the slider value node of the max fps element
+	var MaxFpsRef: SettingsElement =\\
+		ParentRef.ELEMENT_REFERENCE_TABLE_[\"MaxFPS\"]
+	
+	if currentValue == \"Disabled\":
+		# Enable the max fps element
+		MaxFpsRef.SliderRef.set_editable(true)
+		MaxFpsRef.ValueBoxRef.modulate = Color.WHITE
+	else:
+		# Disable the max fps element
+		MaxFpsRef.SliderRef.set_editable(false)
+		MaxFpsRef.ValueBoxRef.modulate = Color.GRAY
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="VSync" type="HBoxContainer"]
+[node name="VSync" type="HBoxContainer" node_paths=PackedStringArray("OptionsRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_kwfgn")
+DEFAULT_VALUE = "Disabled"
+OptionsRef = NodePath("Options")
+IDENTIFIER = "VSync"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2

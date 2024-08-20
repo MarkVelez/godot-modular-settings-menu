@@ -2,78 +2,30 @@
 
 [sub_resource type="GDScript" id="GDScript_usma2"]
 resource_name = "fsr_options"
-script/source = "extends HBoxContainer
-
-# List of options related to the settings element
-@export_enum(
-	\"Ultra Quality\",
-	\"Quality\",
-	\"Balanced\",
-	\"Performance\"
-) var defaultValue: String = \"Balanced\"
-
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool = false
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool = true
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var optionsRef: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# List of options related to the settings element
-const OPTION_LIST: Dictionary = {
-	\"Ultra Quality\": 0.77,
-	\"Quality\": 0.67,
-	\"Balanced\": 0.59,
-	\"Performance\": 0.5
-}
-
-# Index of the currently selected item
-var selectedIndex: int
-# The current value of the element
-var currentValue: String
+script/source = "extends OptionElement
 
 
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"option\", parentRef, self)
-
-
-# Loads the saved/default values of the element
-func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"validOptions\": OPTION_LIST
+func _init() -> void:
+	OPTION_LIST_ = {
+		\"Ultra Quality\": 0.77,
+		\"Quality\": 0.67,
+		\"Balanced\": 0.59,
+		\"Performance\": 0.5
 	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
 
 
-func option_selected(index: int) -> void:
-	ElementResource.option_selected(parentRef, self, index)
-
-
-func apply_settings() -> void:
-	get_viewport().set_scaling_3d_scale(OPTION_LIST[currentValue])
+func _apply_settings() -> void:
+	get_viewport().set_scaling_3d_scale(OPTION_LIST_[currentValue])
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="FSRMode" type="HBoxContainer"]
+[node name="FSRMode" type="HBoxContainer" node_paths=PackedStringArray("OptionsRef")]
 size_flags_vertical = 3
 script = SubResource("GDScript_usma2")
+DEFAULT_VALUE = "Balanced"
+OptionsRef = NodePath("Options")
+IDENTIFIER = "FSRMode"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2

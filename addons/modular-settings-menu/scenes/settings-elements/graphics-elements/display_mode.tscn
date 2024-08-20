@@ -2,133 +2,98 @@
 
 [sub_resource type="GDScript" id="GDScript_duwn0"]
 resource_name = "display_mode"
-script/source = "extends HBoxContainer
-
-# Default values for the element
-@export_enum(
-	\"Fullscreen\", 
-	\"Borderless Windowed\", 
-	\"Windowed\"
-) var defaultValue: String = \"Fullscreen\"
-
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool = false
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool = false
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var optionsRef: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# List of options related to the settings element
-const OPTION_LIST: Dictionary = {
-	\"Fullscreen\": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
-	\"Borderless Windowed\": DisplayServer.WINDOW_MODE_WINDOWED,
-	\"Windowed\": DisplayServer.WINDOW_MODE_WINDOWED
-}
-
-# Index of the currently selected item
-var selectedIndex: int
-# The current value of the element
-var currentValue: String
+script/source = "extends OptionElement
 
 
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"option\", parentRef, self)
-
-
-# Loads the saved/default values of the element
-func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"validOptions\": OPTION_LIST
+func _init() -> void:
+	OPTION_LIST_ = {
+		\"Fullscreen\": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
+		\"Borderless Windowed\": DisplayServer.WINDOW_MODE_WINDOWED,
+		\"Windowed\": DisplayServer.WINDOW_MODE_WINDOWED
 	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
-	
+
+
+func load_settings() -> void:
+	super.load_settings()
 	# Check if the resolution element should be disabled
-	call_deferred(&\"check_resolution\")
+	call_deferred(\"check_resolution\")
 
 
 func option_selected(index: int) -> void:
-	# Update the settings cache
-	ElementResource.option_selected(parentRef, self, index)
-	
+	super.option_selected(index)
 	# Check if the resolution element should be disabled
 	check_resolution()
 
 
-# Called to apply the settings in the settings cache
-func apply_settings() -> void:
-	# Change the display mode to the selected option
-	DisplayServer.window_set_mode(OPTION_LIST[currentValue])
+func _apply_settings() -> void:
+	DisplayServer.window_set_mode(OPTION_LIST_[currentValue])
 	
-	# Check if Borderless Windowed has been selected and toggle the flag accordingly
 	if currentValue == \"Borderless Windowed\":
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
+		DisplayServer.window_set_flag(
+			DisplayServer.WINDOW_FLAG_BORDERLESS,
+			true
+		)
 		adjust_resolution()
 	else:
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
+		DisplayServer.window_set_flag(
+			DisplayServer.WINDOW_FLAG_BORDERLESS,
+			false
+		)
 	
-	# Adjust the resolution if the current mode is windowed and the resolution element does not exist
-	if not parentRef.ELEMENT_REFERENCE_TABLE.has(\"Resolution\") && currentValue == \"Windowed\":
-		# Adjust the window size to 80% of the display's resolution
-		adjust_resolution(0.8)
-	elif currentValue == \"Windowed\":
-		# Check if resolution has been changed
-		if not parentRef.CHANGED_ELEMENTS.has(\"Resolution\"):
+	if currentValue == \"Windowed\":
+		# Set the resolution to 80% if the resolution setting doesnt exist
+		if not ParentRef.ELEMENT_REFERENCE_TABLE_.has(\"Resolution\"):
+			adjust_resolution(0.8)
+			return
+		
+		# Apply the selected resolution manually if it has not been changed
+		if not ParentRef.changedElements_.has(\"Resolution\"):
+			# Resolution change has to be delayed by at least 2 frames.
+			# Otherwise height of the window will be off by a bit.
+			await get_tree().process_frame
+			await get_tree().process_frame
 			# Apply the resolution settings manually
-			parentRef.ELEMENT_REFERENCE_TABLE[\"Resolution\"].apply_settings()
+			ParentRef.ELEMENT_REFERENCE_TABLE_[\"Resolution\"]._apply_settings()
 
 
 # Called to check if the resolution element should be disabled
 func check_resolution() -> void:
-	# Check if the the resolution element exists
-	if parentRef.ELEMENT_REFERENCE_TABLE.has(\"Resolution\"):
-		# Get the reference for it
-		var resolution = parentRef.ELEMENT_REFERENCE_TABLE[\"Resolution\"]
-		
-		# Check if the selected option is not Windowed and toggle the resolution element accordingly
-		if currentValue != \"Windowed\":
-			resolution.optionsRef.set_disabled(true)
-		else:
-			resolution.optionsRef.set_disabled(false)
-
-
-# Called to adjust the resolution for specific scenarios
-func adjust_resolution(sizeScale: float = 1.0) -> void:
-	# Get the current display's resolution
-	var displaySize: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()) * sizeScale
+	if not ParentRef.ELEMENT_REFERENCE_TABLE_.has(\"Resolution\"):
+		return
 	
-	# Change the window size to the main display's resolution
-	DisplayServer.window_set_size(displaySize)
-	# Change the viewport size to the selected resolution for correct scaling
+	var ResolutionRef: SettingsElement =\\
+		ParentRef.ELEMENT_REFERENCE_TABLE_[\"Resolution\"]
+	
+	if currentValue != \"Windowed\":
+		ResolutionRef.OptionsRef.set_disabled(true)
+	else:
+		ResolutionRef.OptionsRef.set_disabled(false)
+
+
+# Called to scale the resolution to the provided percentage
+func adjust_resolution(sizeScale: float = 1.0) -> void:
+	var displaySize: Vector2i =\\
+		DisplayServer.screen_get_size(
+			DisplayServer.window_get_current_screen()
+		) * sizeScale
+	
+	get_window().set_size(displaySize)
 	get_viewport().set_size(displaySize)
-	# Center the window
 	get_window().move_to_center()
 "
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="DisplayMode" type="HBoxContainer"]
+[node name="DisplayMode" type="HBoxContainer" node_paths=PackedStringArray("OptionsRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_duwn0")
+DEFAULT_VALUE = "Fullscreen"
+OptionsRef = NodePath("Options")
+IDENTIFIER = "DisplayMode"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2

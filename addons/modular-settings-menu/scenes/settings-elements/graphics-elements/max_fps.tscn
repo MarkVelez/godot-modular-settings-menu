@@ -1,99 +1,59 @@
-[gd_scene load_steps=3 format=3 uid="uid://dghfxwcbi5ig"]
-
-[ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/slider_value.gd" id="1_6ay8p"]
+[gd_scene load_steps=2 format=3 uid="uid://dghfxwcbi5ig"]
 
 [sub_resource type="GDScript" id="GDScript_eitn6"]
 resource_name = "max_fps"
-script/source = "extends HBoxContainer
-
-# Default values for the element
-@export var minValue: int = 30
-@export var maxValue: int = 240
-@export var stepValue: int = 1
-@export var defaultValue: int = 60
-
-# An extra suffix for the value (optional)
-@export var valueSuffix: String = \" FPS\"
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool = false
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool = false
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var sliderValueRef: HBoxContainer = $SliderValue
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# The current value of the element
-var currentValue: int
+script/source = "extends SliderElement
 
 
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"slider\", parentRef, self)
+func init_element() -> void:
+	super.init_element()
+	# Increase UI max value by one for unlimited fps
+	SliderRef.set_max(MAX_VALUE + 1)
+	if ValueBoxRef is SpinBox:
+		ValueBoxRef.set_max(MAX_VALUE + 1)
 
 
-# Loads the saved/default values of the element
 func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"minValue\": minValue,
-		\"maxValue\": maxValue,
-	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the slider of the element
-	sliderValueRef.init_slider(minValue, maxValue + 1, stepValue, currentValue)
-	
-	# Check if current value is above max value
+	super.load_settings()
 	if currentValue == 0:
-		# Set the value box text to Unlimited
-		sliderValueRef.valueBoxRef.set_text(\"Unlimited\")
-		# Set the slider value to max
-		sliderValueRef.sliderRef.set_value(maxValue + 1)
+		ValueBoxRef.set_text(\"Unlimited\")
+		SliderRef.set_value(MAX_VALUE + 1)
 
 
-func value_changed(newValue: int) -> void:
-	currentValue = newValue
+func value_changed(value: float) -> void:
+	if value > MAX_VALUE:
+		value = 0
+		ValueBoxRef.set_text(\"Unlimited\")
 	
-	# Check if current value is above max value
-	if currentValue > maxValue:
-		# Set the current value to 0 as this represents an unlimited fps
-		currentValue = 0
-		# Set the value box text to Unlimited
-		sliderValueRef.valueBoxRef.set_text(\"Unlimited\")
+	super.value_changed(value)
 	
-	# Update the settings cache
-	ElementResource.value_changed(parentRef, self, currentValue)
 
 
 # Element specific script for applying its value to the game
-func apply_settings() -> void:
-	# Check if the vsync element exists
-	if parentRef.ELEMENT_REFERENCE_TABLE.has(\"VSync\"):
-		# Check if it's current value is not disabled
-		if parentRef.ELEMENT_REFERENCE_TABLE[\"VSync\"].currentValue != \"Disabled\":
-			return
+func _apply_settings() -> void:
+	if (
+		ParentRef.ELEMENT_REFERENCE_TABLE_.has(\"VSync\")
+		and ParentRef.ELEMENT_REFERENCE_TABLE_[\"VSync\"].currentValue != \"Disabled\"
+	):
+		return
 	
-	# Set the fps limit to the selected value
 	Engine.set_max_fps(currentValue)
 "
 
-[node name="MaxFPS" type="HBoxContainer"]
+[node name="MaxFPS" type="HBoxContainer" node_paths=PackedStringArray("SliderRef", "ValueBoxRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_eitn6")
+MIN_VALUE = 30.0
+MAX_VALUE = 240.0
+STEP_VALUE = 1.0
+DEFAULT_VALUE = 60.0
+SliderRef = NodePath("SliderValue/Slider")
+ValueBoxRef = NodePath("SliderValue/Value")
+IDENTIFIER = "MaxFPS"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
@@ -106,7 +66,6 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
-script = ExtResource("1_6ay8p")
 
 [node name="Slider" type="HSlider" parent="SliderValue"]
 layout_mode = 2

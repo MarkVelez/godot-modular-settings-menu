@@ -2,78 +2,21 @@
 
 [sub_resource type="GDScript" id="GDScript_5w56l"]
 resource_name = "anti_aliasing"
-script/source = "extends HBoxContainer
-
-# Default values for the element
-@export_enum(
-	\"Disabled\",
-	\"FXAA\",
-	\"2x MSAA\",
-	\"4x MSAA\",
-	\"8x MSAA\",
-	\"TAA\"
-) var defaultValue: String = \"Disabled\"
-
-# Toggle based on whether the element handles a setting that requires an in game node to exist
-@export var isInGameSetting: bool = false
-# Toggle based on whether the element is a sub element or not
-@export var isSubElement: bool = false
-
-# Reference to the node the settings element is under
-@onready var parentRef: Node = owner
-# Identifier for the element (used as the key for the section in the settings data)
-@onready var identifier: StringName = name
-
-# Element node references
-@onready var optionsRef: OptionButton = $Options
-
-# Resource for common functions between settings elements
-const ElementResource: Resource = SettingsDataManager.ElementResource
-
-# List of options related to the settings element
-const OPTION_LIST: Array[String] = [
-	\"Disabled\",
-	\"FXAA\",
-	\"2x MSAA\",
-	\"4x MSAA\",
-	\"8x MSAA\",
-	\"TAA\"
-]
-
-# Index of the currently selected item
-var selectedIndex: int
-# The current value of the element
-var currentValue: String
+script/source = "extends OptionElement
 
 
-func _ready():
-	# Initialize the element
-	ElementResource.init_element(&\"option\", parentRef, self)
+func _init() -> void:
+	OPTION_LIST_ = [
+		\"Disabled\",
+		\"FXAA\",
+		\"2x MSAA\",
+		\"4x MSAA\",
+		\"8x MSAA\",
+		\"TAA\"
+	]
 
 
-# Loads the saved/default values of the element
-func load_settings() -> void:
-	# List of values for the element
-	var VALUES: Dictionary = {
-		\"defaultValue\": defaultValue,
-		\"validOptions\": OPTION_LIST
-	}
-	
-	# Get the current value for the element
-	currentValue = ElementResource.load_element_settings(VALUES, parentRef, self)
-	# Initialize the option button
-	ElementResource.init_option_button_element(OPTION_LIST, optionsRef, currentValue, self)
-	
-	
-
-
-func option_selected(index: int) -> void:
-	# Update the settings cache
-	ElementResource.option_selected(parentRef, self, index)
-
-
-# Called to apply the settings in the settings cache
-func apply_settings() -> void:
+func _apply_settings() -> void:
 	# Enables the selected anti aliasing
 	match currentValue:
 		\"Disabled\":
@@ -81,17 +24,33 @@ func apply_settings() -> void:
 		\"FXAA\":
 			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_FXAA)
 		\"2x MSAA\":
-			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_2X)
+			set_anti_aliasing_mode(
+				Viewport.SCREEN_SPACE_AA_DISABLED,
+				Viewport.MSAA_2X
+			)
 		\"4x MSAA\":
-			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_4X)
+			set_anti_aliasing_mode(
+				Viewport.SCREEN_SPACE_AA_DISABLED,
+				Viewport.MSAA_4X
+			)
 		\"8x MSAA\":
-			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_8X)
+			set_anti_aliasing_mode(
+				Viewport.SCREEN_SPACE_AA_DISABLED,
+				Viewport.MSAA_8X
+			)
 		\"TAA\":
-			set_anti_aliasing_mode(Viewport.SCREEN_SPACE_AA_DISABLED, Viewport.MSAA_DISABLED, true)
+			set_anti_aliasing_mode(
+				Viewport.SCREEN_SPACE_AA_DISABLED,
+				Viewport.MSAA_DISABLED, true
+			)
 
 
 # Sets the anti aliasing mode according to the values provided
-func set_anti_aliasing_mode(fxaaMode: Viewport.ScreenSpaceAA = Viewport.SCREEN_SPACE_AA_DISABLED, msaaMode: Viewport.MSAA = Viewport.MSAA_DISABLED, taaMode: bool = false) -> void:
+func set_anti_aliasing_mode(
+	fxaaMode: Viewport.ScreenSpaceAA = Viewport.SCREEN_SPACE_AA_DISABLED,
+	msaaMode: Viewport.MSAA = Viewport.MSAA_DISABLED,
+	taaMode: bool = false
+) -> void:
 	get_viewport().set_screen_space_aa(fxaaMode)
 	get_viewport().set_msaa_3d(msaaMode)
 	get_viewport().set_use_taa(taaMode)
@@ -99,13 +58,16 @@ func set_anti_aliasing_mode(fxaaMode: Viewport.ScreenSpaceAA = Viewport.SCREEN_S
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_drjjf"]
 
-[node name="AntiAliasing" type="HBoxContainer"]
+[node name="AntiAliasing" type="HBoxContainer" node_paths=PackedStringArray("OptionsRef")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_5w56l")
+DEFAULT_VALUE = "Disabled"
+OptionsRef = NodePath("Options")
+IDENTIFIER = "AntiAliasing"
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 2
