@@ -1,7 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://px6a2dg8cawb"]
+[gd_scene load_steps=10 format=3 uid="uid://px6a2dg8cawb"]
 
 [ext_resource type="Script" path="res://addons/modular-settings-menu/scripts/settings_menu.gd" id="1_crapp"]
+[ext_resource type="PackedScene" uid="uid://c66v42g6gs7gr" path="res://addons/modular-settings-menu/scenes/settings-sections/gameplay.tscn" id="2_kjxrg"]
+[ext_resource type="PackedScene" uid="uid://buqq0kms2dbb4" path="res://addons/modular-settings-menu/scenes/settings-sections/graphics.tscn" id="3_8fcn6"]
+[ext_resource type="PackedScene" uid="uid://dfswr81erouhj" path="res://addons/modular-settings-menu/scenes/settings-sections/controls.tscn" id="4_3a4pu"]
 [ext_resource type="PackedScene" uid="uid://dvkksl3mrnoto" path="res://addons/modular-settings-menu/scenes/settings-elements/discard_changes_popup.tscn" id="4_yfemx"]
+[ext_resource type="PackedScene" uid="uid://y5oxvao3aqtb" path="res://addons/modular-settings-menu/scenes/settings-sections/audio.tscn" id="5_ayxwc"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kwbsm"]
 
@@ -37,6 +41,26 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_kwbsm")
+current_tab = 0
+
+[node name="Gameplay" parent="SettingsPanel/SettingsTabs" instance=ExtResource("2_kjxrg")]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Graphics" parent="SettingsPanel/SettingsTabs" instance=ExtResource("3_8fcn6")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Controls" parent="SettingsPanel/SettingsTabs" instance=ExtResource("4_3a4pu")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Audio" parent="SettingsPanel/SettingsTabs" instance=ExtResource("5_ayxwc")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="SettingsPanel"]
 layout_mode = 2

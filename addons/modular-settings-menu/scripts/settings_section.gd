@@ -12,7 +12,7 @@ signal setting_changed(elementId: String)
 @export var IDENTIFIER: String
 
 ## Reference to the settings menu node.
-var SettingsMenuRef: Node
+var SettingsMenuRef: SettingsMenu
 
 ## Reference table of all elements under the section.
 var ELEMENT_REFERENCE_TABLE_: Dictionary
@@ -20,6 +20,10 @@ var ELEMENT_REFERENCE_TABLE_: Dictionary
 var settingsCache_: Dictionary
 ## A list of all the elements that were changed since the settings were last applied.
 var changedElements_: Array[String]
+
+
+func _enter_tree() -> void:
+	SettingsMenuRef = owner
 
 
 func _ready():
