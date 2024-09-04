@@ -1,3 +1,5 @@
+<img src="media/icon.png">
+
 # Modular Settings Menu for Godot 4
 
 Modular Settings Menu is a template/framework for [Godot 4](https://godotengine.org/) that provides a versatile and easy to configure settings menu that includes most of the basic settings one would expect in a game while also being able to add custom ones with ease.
