@@ -18,6 +18,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/tab_focus = SubResource("StyleBoxEmpty_e0spm")
 script = ExtResource("1_aglse")
+IDENTIFIER = "ExampleSection"
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
